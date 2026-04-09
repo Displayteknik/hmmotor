@@ -3,422 +3,348 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HM Motor — Redigera</title>
+  <title>HM Motor — Visuell redigering</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- GrapesJS -->
+  <link href="https://unpkg.com/grapesjs@0.21.13/dist/css/grapes.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/grapesjs@0.21.13/dist/grapes.min.js"></script>
+  <script src="https://unpkg.com/grapesjs-preset-webpage@1.0.3/dist/index.js"></script>
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--blue:#2563eb;--blue-hover:#1d4ed8;--blue-ring:rgba(37,99,235,.12);--green:#059669;--red:#dc2626;--border:#e5e7eb;--text:#111827;--text-sec:#6b7280;--text-dim:#9ca3af;--bg:#f3f4f6;--white:#fff;--radius:8px}
-    body{margin:0;font-family:'Inter',-apple-system,sans-serif;color:var(--text);background:var(--bg);height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#18191b;color:#ddd;height:100vh;overflow:hidden}
 
     /* Login */
-    #login{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#fff}
-    #login h1{font-size:1.5rem;font-weight:700;margin-bottom:.25rem}
-    #login p{color:var(--text-sec);font-size:.9rem;margin-bottom:2rem}
-    #login button{background:var(--blue);color:#fff;border:none;padding:12px 32px;font-size:.9rem;font-weight:600;border-radius:var(--radius);cursor:pointer;font-family:inherit}
-    #login button:hover{background:var(--blue-hover)}
+    #login{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#111}
+    #login h1{font-size:1.4rem;font-weight:700;margin-bottom:.25rem;color:#fff}
+    #login p{color:#888;font-size:.85rem;margin-bottom:2rem}
+    #login button{background:#2563eb;color:#fff;border:none;padding:12px 32px;font-size:.9rem;font-weight:600;border-radius:8px;cursor:pointer;font-family:inherit}
+    #login button:hover{background:#1d4ed8}
 
-    /* Layout */
-    #app{display:none;height:100vh;flex-direction:column}
-    .toolbar{height:48px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0}
-    .toolbar .left{display:flex;align-items:center;gap:12px}
-    .toolbar .brand{font-weight:700;font-size:.9rem}
-    .toolbar .sep{color:#ddd}
-    .toolbar .mode{font-size:.8rem;color:var(--text-sec);font-weight:500}
-    .toolbar .right{display:flex;align-items:center;gap:8px}
-    .toolbar a,.toolbar button{font-size:.8rem;font-weight:500;font-family:inherit;text-decoration:none;padding:6px 12px;border-radius:6px;cursor:pointer;border:none;transition:all .15s}
-    .toolbar a{color:var(--text-sec);background:none}
-    .toolbar a:hover{color:var(--text);background:var(--bg)}
-    .toolbar .save-btn{background:var(--blue);color:#fff}
-    .toolbar .save-btn:hover{background:var(--blue-hover)}
-    .toolbar .save-btn:disabled{opacity:.4;cursor:default}
-    .toolbar .logout{color:var(--text-dim);background:none}
+    /* Editor wrapper */
+    #editor-wrap{display:none;height:100vh;flex-direction:column}
 
-    /* Split view */
-    .split{display:flex;flex:1;overflow:hidden}
-    .preview-pane{flex:1;position:relative;background:#e5e5e5}
-    .preview-pane iframe{width:100%;height:100%;border:none}
+    /* Top bar */
+    .topbar{height:46px;background:#1e1f22;border-bottom:1px solid #2a2b2e;display:flex;align-items:center;justify-content:space-between;padding:0 12px;flex-shrink:0;z-index:10}
+    .topbar .left{display:flex;align-items:center;gap:10px}
+    .topbar .brand{font-weight:700;font-size:.85rem;color:#fff}
+    .topbar .sep{color:#444}
+    .topbar .mode{color:#888;font-size:.8rem}
+    .topbar .right{display:flex;align-items:center;gap:6px}
+    .topbar button,.topbar a{font-size:.78rem;font-weight:500;font-family:inherit;padding:6px 12px;border-radius:6px;cursor:pointer;border:1px solid #333;background:#2a2b2e;color:#ccc;text-decoration:none;transition:all .15s}
+    .topbar button:hover,.topbar a:hover{background:#333;color:#fff}
+    .topbar .save-btn{background:#2563eb;color:#fff;border-color:#2563eb}
+    .topbar .save-btn:hover{background:#1d4ed8}
 
-    /* Sidebar */
-    .sidebar{width:380px;background:#fff;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:transform .25s ease;flex-shrink:0}
-    .sidebar.closed{transform:translateX(380px);margin-left:-380px}
-    .sidebar-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-    .sidebar-head h3{font-size:.9rem;font-weight:700;display:flex;align-items:center;gap:8px}
-    .sidebar-head h3 .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
-    .sidebar-head button{background:none;border:none;font-size:1.2rem;color:var(--text-dim);cursor:pointer;width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center}
-    .sidebar-head button:hover{background:var(--bg);color:var(--text)}
-    .sidebar-body{flex:1;overflow-y:auto;padding:16px 20px 80px}
+    /* GrapesJS overrides */
+    #gjs{flex:1;overflow:hidden}
 
-    /* Sidebar fields */
-    .s-field{margin-bottom:14px}
-    .s-field label{display:block;font-size:.7rem;font-weight:600;color:var(--text-sec);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
-    .s-field input,.s-field textarea{width:100%;border:1.5px solid var(--border);border-radius:var(--radius);padding:9px 12px;font-size:.85rem;font-family:inherit;color:var(--text);transition:border .15s,box-shadow .15s;resize:vertical;background:#fff}
-    .s-field input:focus,.s-field textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-ring)}
-    .s-field textarea{min-height:64px;line-height:1.5}
-    .s-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-
-    /* List in sidebar */
-    .s-list-item{border:1.5px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:8px;position:relative}
-    .s-list-item:hover{border-color:#d1d5db}
-    .s-list-item .s-remove{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--text-dim);font-size:1rem;cursor:pointer;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:4px}
-    .s-list-item .s-remove:hover{color:var(--red);background:#fef2f2}
-    .s-list-item .s-field{margin-bottom:8px}
-    .s-list-item .s-field:last-child{margin-bottom:0}
-    .s-add{display:flex;align-items:center;justify-content:center;gap:4px;width:100%;padding:8px;border:1.5px dashed var(--border);border-radius:var(--radius);background:none;color:var(--blue);font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px}
-    .s-add:hover{background:#eff6ff;border-color:var(--blue)}
-
-    /* Section picker (when no section selected) */
-    .section-list{padding:8px 0}
-    .section-item{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;border-radius:var(--radius);transition:background .1s;margin-bottom:2px}
-    .section-item:hover{background:var(--bg)}
-    .section-item .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-    .section-item .info{flex:1}
-    .section-item .info h4{font-size:.85rem;font-weight:600}
-    .section-item .info span{font-size:.75rem;color:var(--text-dim)}
-    .section-item .arrow{color:var(--text-dim);font-size:.7rem}
-
-    /* Overlay highlights */
-    .edit-overlay{position:absolute;pointer-events:none;border:2px solid var(--blue);border-radius:6px;background:rgba(37,99,235,.06);z-index:10;transition:all .2s ease}
-    .edit-overlay .edit-label{position:absolute;top:-28px;left:-2px;background:var(--blue);color:#fff;font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:4px 4px 0 0;white-space:nowrap;pointer-events:auto;cursor:pointer}
+    /* Make GrapesJS dark */
+    .gjs-one-bg{background:#1e1f22 !important}
+    .gjs-two-color{color:#ddd !important}
+    .gjs-three-bg{background:#2a2b2e !important}
+    .gjs-four-color,.gjs-four-color-h:hover{color:#2563eb !important}
+    .gjs-pn-panel{border:none !important}
+    .gjs-pn-views,.gjs-pn-views-container{background:#1e1f22 !important}
+    .gjs-pn-options{background:#1e1f22 !important}
+    .gjs-cv-canvas{background:#e5e7eb !important}
+    .gjs-block{background:#2a2b2e !important;border:1px solid #333 !important;border-radius:6px !important;color:#ccc !important;padding:8px !important;min-height:auto !important}
+    .gjs-block:hover{border-color:#2563eb !important;color:#fff !important}
+    .gjs-block__media{display:none !important}
+    .gjs-blocks-cs{padding:8px !important}
+    .gjs-pn-btn{border-radius:4px !important}
+    .gjs-pn-btn.gjs-pn-active{background:#2563eb !important;color:#fff !important}
+    .gjs-sm-sector-title,.gjs-clm-tags .gjs-sm-title{background:#252628 !important;color:#aaa !important;font-size:.7rem !important;text-transform:uppercase !important;letter-spacing:.05em !important}
+    .gjs-field{background:#1a1b1e !important;border:1px solid #333 !important;border-radius:4px !important;color:#ddd !important}
+    .gjs-field:focus-within{border-color:#2563eb !important}
+    .gjs-trt-trait{padding:4px 8px !important}
+    .gjs-sm-properties{padding:8px !important}
 
     /* Toast */
-    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);opacity:0;padding:10px 20px;border-radius:var(--radius);font-size:.85rem;font-weight:500;color:#fff;z-index:999;transition:all .3s;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);opacity:0;padding:10px 20px;border-radius:8px;font-size:.85rem;font-weight:500;color:#fff;z-index:9999;transition:all .3s;box-shadow:0 4px 12px rgba(0,0,0,.3)}
     .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-    .toast.success{background:var(--green)}.toast.error{background:var(--red)}
-
-    /* Loading */
-    .loading{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-dim);font-size:.9rem;gap:10px}
-    .spinner{width:20px;height:20px;border:2.5px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .6s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
+    .toast.success{background:#059669}.toast.error{background:#dc2626}
   </style>
 </head>
 <body>
 
 <div id="login">
   <h1>HM Motor</h1>
-  <p>Logga in för att redigera sajten</p>
+  <p>Visuell redigering</p>
   <button onclick="netlifyIdentity.open('login')">Logga in</button>
 </div>
 
-<div id="app">
-  <div class="toolbar">
+<div id="editor-wrap">
+  <div class="topbar">
     <div class="left">
       <span class="brand">HM Motor</span>
       <span class="sep">/</span>
       <span class="mode">Visuell redigering</span>
     </div>
     <div class="right">
-      <a href="/dashboard">Fordonshantering</a>
-      <button class="save-btn" id="globalSave" onclick="saveAll()" disabled>Spara</button>
-      <button class="logout" id="logoutBtn">Logga ut</button>
+      <a href="/dashboard">Fordon</a>
+      <a href="/" target="_blank">Visa sajten ↗</a>
+      <button onclick="undoAction()">↶ Ångra</button>
+      <button onclick="redoAction()">↷ Gör om</button>
+      <button class="save-btn" id="saveBtn" onclick="saveChanges()">Spara</button>
+      <button onclick="netlifyIdentity.logout();location.reload()" style="border-color:#555">Logga ut</button>
     </div>
   </div>
-  <div class="split">
-    <div class="preview-pane" id="previewPane">
-      <div class="loading"><div class="spinner"></div>Laddar sajten...</div>
-    </div>
-    <div class="sidebar" id="sidebar">
-      <div class="sidebar-head">
-        <h3 id="sidebarTitle">Välj sektion</h3>
-        <button onclick="closeSidebar()" title="Stäng">×</button>
-      </div>
-      <div class="sidebar-body" id="sidebarBody">
-        <div class="section-list" id="sectionList"></div>
-      </div>
-    </div>
-  </div>
+  <div id="gjs"></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const SECTIONS = [
-  { id:'hero', label:'Startsida — Hero', color:'#2563eb', anchor:'hero' },
-  { id:'faq', label:'Vanliga frågor', color:'#8b5cf6', anchor:'faq' },
-  { id:'about', label:'Om oss', color:'#059669', anchor:null },
-  { id:'just-nu', label:'Just nu — Nyheter', color:'#f59e0b', anchor:'just-nu' },
-  { id:'services', label:'Varför HM Motor', color:'#ec4899', anchor:'services' }
-];
-
-let data={}, shas={}, token='', dirty=new Set(), activeSection=null;
+let editor, token, pageSha;
 
 /* ── Auth ── */
-function initAuth(){
-  const u=netlifyIdentity.currentUser();
-  if(u){startApp(u);return}
-  document.getElementById('login').style.display='flex';
-  netlifyIdentity.on('login',u=>startApp(u));
-}
-
-async function startApp(user){
-  token=await user.jwt();
-  document.getElementById('login').style.display='none';
-  document.getElementById('app').style.display='flex';
-  document.getElementById('logoutBtn').onclick=()=>{netlifyIdentity.logout();location.reload()};
-  await loadAll();
-}
-
-/* ── API ── */
-async function loadFile(name){
-  const r=await fetch(`/.netlify/git/github/contents/content/pages/${name}.json`,{headers:{Authorization:'Bearer '+token}});
-  if(!r.ok)throw new Error('Load failed: '+name);
-  const j=await r.json();
-  shas[name]=j.sha;
-  data[name]=JSON.parse(atob(j.content));
-}
-
-async function saveFile(name){
-  const body=JSON.stringify(data[name],null,2)+'\n';
-  const r=await fetch(`/.netlify/git/github/contents/content/pages/${name}.json`,{
-    method:'PUT',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
-    body:JSON.stringify({message:`Uppdatera ${name}`,content:btoa(unescape(encodeURIComponent(body))),sha:shas[name]})
-  });
-  if(!r.ok)throw new Error('Save failed');
-  const j=await r.json();
-  shas[name]=j.content.sha;
-}
-
-/* ── Load ── */
-async function loadAll(){
-  try{
-    await Promise.all(SECTIONS.map(s=>loadFile(s.id)));
-    initPreview();
-    renderSectionList();
-  }catch(e){
-    document.getElementById('previewPane').innerHTML=`<div class="loading" style="color:var(--red)">Fel: ${e.message}</div>`;
+function initAuth() {
+  const u = netlifyIdentity.currentUser();
+  if (u) startApp(u);
+  else {
+    document.getElementById('login').style.display = 'flex';
+    netlifyIdentity.on('login', u => startApp(u));
   }
 }
 
-/* ── Preview iframe ── */
-function initPreview(){
-  const pane=document.getElementById('previewPane');
-  pane.innerHTML='<iframe id="previewFrame" src="/"></iframe>';
-  const frame=document.getElementById('previewFrame');
-  frame.onload=()=>{
-    try{
-      const doc=frame.contentDocument;
-      // Add click handlers to editable sections
-      addEditableOverlays(doc);
-    }catch(e){console.warn('iframe access blocked',e)}
-  };
+async function startApp(user) {
+  token = await user.jwt();
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('editor-wrap').style.display = 'flex';
+  await loadPageAndInit();
 }
 
-function addEditableOverlays(doc){
-  // Mark sections clickable
-  const map={
-    hero:doc.querySelector('.hero, [class*="hero"], section:first-of-type'),
-    faq:doc.getElementById('faq')||doc.querySelector('[class*="faq"]'),
-    'just-nu':doc.getElementById('just-nu')||doc.querySelector('[class*="just-nu"]'),
-    services:doc.getElementById('services')||doc.querySelector('.services, [class*="varfor"]'),
-  };
-
-  // Add edit-mode styles to iframe
-  const style=doc.createElement('style');
-  style.textContent=`
-    [data-editable]{cursor:pointer;position:relative;transition:outline .15s}
-    [data-editable]:hover{outline:2px solid #2563eb;outline-offset:4px;border-radius:4px}
-    [data-editable]:hover::after{content:attr(data-edit-label);position:absolute;top:-24px;left:0;background:#2563eb;color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;font-family:Inter,sans-serif;z-index:9999;white-space:nowrap}
-  `;
-  doc.head.appendChild(style);
-
-  // Find sections by various selectors
-  const sections=doc.querySelectorAll('section, [id]');
-  sections.forEach(el=>{
-    const id=el.id||el.className;
-    SECTIONS.forEach(s=>{
-      if(id&&(id.includes(s.anchor||s.id)||el.className.includes(s.anchor||s.id))){
-        el.setAttribute('data-editable',s.id);
-        el.setAttribute('data-edit-label','✏️ '+s.label);
-        el.addEventListener('click',(e)=>{
-          e.preventDefault();
-          e.stopPropagation();
-          openSection(s.id);
-        });
-      }
+/* ── Load page HTML from GitHub ── */
+async function loadPageAndInit() {
+  try {
+    const r = await fetch('/.netlify/git/github/contents/index.html', {
+      headers: { Authorization: 'Bearer ' + token }
     });
-  });
-}
-
-/* ── Section list ── */
-function renderSectionList(){
-  const el=document.getElementById('sectionList');
-  el.innerHTML=SECTIONS.map(s=>`
-    <div class="section-item" onclick="openSection('${s.id}')">
-      <span class="dot" style="background:${s.color}"></span>
-      <div class="info"><h4>${s.label}</h4><span>${getSummary(s.id)}</span></div>
-      <span class="arrow">›</span>
-    </div>`).join('');
-}
-
-function getSummary(id){
-  if(id==='hero')return esc(data.hero.title||'');
-  if(id==='faq')return data.faq.items.length+' frågor';
-  if(id==='about')return esc(data.about.title||'');
-  if(id==='just-nu')return data['just-nu'].cards.length+' nyheter';
-  if(id==='services')return esc(data.services.title||'');
-  return '';
-}
-
-/* ── Sidebar editing ── */
-function openSection(id){
-  activeSection=id;
-  const s=SECTIONS.find(x=>x.id===id);
-  document.getElementById('sidebarTitle').innerHTML=`<span class="dot" style="background:${s.color}"></span>${s.label}`;
-  document.getElementById('sidebarBody').innerHTML=renderEditor(id);
-  document.getElementById('sidebar').classList.remove('closed');
-
-  // Scroll iframe to section
-  try{
-    const frame=document.getElementById('previewFrame');
-    const el=frame.contentDocument.querySelector(`[data-editable="${id}"]`)||frame.contentDocument.getElementById(s.anchor||id);
-    if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
-  }catch(e){}
-}
-
-function closeSidebar(){
-  activeSection=null;
-  document.getElementById('sidebarTitle').textContent='Välj sektion';
-  document.getElementById('sidebarBody').innerHTML='<div class="section-list" id="sectionList"></div>';
-  renderSectionList();
-}
-
-function renderEditor(id){
-  let h='';
-  if(id==='hero'){
-    const d=data.hero;
-    h+=sf('Badge',d.badge,'hero','badge');
-    h+=sf('Rubrik',d.title,'hero','title');
-    h+=st('Undertext',d.subtitle,'hero','subtitle');
-    h+=`<div class="s-row">${sf('Knapp 1',d.cta1_text,'hero','cta1_text')}${sf('Länk 1',d.cta1_url,'hero','cta1_url')}</div>`;
-    h+=`<div class="s-row">${sf('Knapp 2',d.cta2_text,'hero','cta2_text')}${sf('Länk 2',d.cta2_url,'hero','cta2_url')}</div>`;
-    h+=sf('Bild-URL',d.image_url,'hero','image_url');
-    h+=listEditor('Trust-signaler',d.trust_items,'hero','trust_items',['bold:Fetstil','text:Text']);
-  } else if(id==='faq'){
-    h+=listEditor('Frågor & svar',data.faq.items,'faq','items',['question:Fråga','answer:Svar|ta']);
-  } else if(id==='about'){
-    const d=data.about;
-    h+=sf('Rubrik',d.title,'about','title');
-    h+=st('Intro',d.intro,'about','intro');
-    h+=listEditor('Tidslinje',d.timeline,'about','timeline',['year:År','title:Rubrik','text:Text|ta']);
-    h+=listEditor('Värderingar',d.values,'about','values',['title:Rubrik','text:Text|ta']);
-  } else if(id==='just-nu'){
-    h+=listEditor('Nyhetskort',data['just-nu'].cards,'just-nu','cards',['label:Etikett','title:Rubrik','text:Text|ta','link:Länk','link_text:Länktext']);
-  } else if(id==='services'){
-    const d=data.services;
-    h+=sf('Rubrik',d.title,'services','title');
-    h+=st('Text 1',d.text1,'services','text1');
-    h+=st('Text 2',d.text2,'services','text2');
-    h+=listEditor('Punkter',d.points,'services','points',['title:Rubrik','text:Text|ta']);
+    const j = await r.json();
+    pageSha = j.sha;
+    const html = decodeURIComponent(escape(atob(j.content)));
+    initEditor(html);
+  } catch (e) {
+    // Fallback: fetch the live page
+    const r = await fetch('/');
+    const html = await r.text();
+    initEditor(html);
   }
-  h+=`<div style="margin-top:20px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:flex-end">
-    <button class="save-btn" onclick="saveCurrent()" style="background:var(--blue);color:#fff;border:none;padding:10px 24px;font-size:.85rem;font-weight:600;border-radius:var(--radius);cursor:pointer;font-family:inherit">Spara ${SECTIONS.find(x=>x.id===id).label}</button>
-  </div>`;
-  return h;
 }
 
-/* Field helpers */
-function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+/* ── GrapesJS Init ── */
+function initEditor(html) {
+  // Extract body content and styles
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
 
-function sf(label,val,file,key){
-  return `<div class="s-field"><label>${label}</label><input type="text" value="${esc(val||'')}" oninput="upd('${file}','${key}',this.value)"></div>`;
-}
-function st(label,val,file,key){
-  return `<div class="s-field"><label>${label}</label><textarea oninput="upd('${file}','${key}',this.value)">${esc(val||'')}</textarea></div>`;
-}
+  // Get external CSS links
+  const cssLinks = [];
+  doc.querySelectorAll('link[rel="stylesheet"]').forEach(l => {
+    let href = l.getAttribute('href');
+    if (href && !href.startsWith('http')) href = window.location.origin + '/' + href.replace(/^\//, '');
+    if (href) cssLinks.push(href);
+  });
 
-function listEditor(label,items,file,arrKey,fields){
-  let h=`<div style="margin-top:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-    <label style="font-size:.7rem;font-weight:600;color:var(--text-sec);text-transform:uppercase;letter-spacing:.04em">${label}</label>
-  </div>`;
-  items.forEach((item,i)=>{
-    h+=`<div class="s-list-item"><button class="s-remove" onclick="removeI('${file}','${arrKey}',${i})">×</button>`;
-    fields.forEach(fd=>{
-      const[k,rest]=fd.split(':');
-      const[lbl,type]=rest.split('|');
-      const v=item[k]||'';
-      if(type==='ta'){
-        h+=`<div class="s-field"><label>${lbl}</label><textarea oninput="updL('${file}','${arrKey}',${i},'${k}',this.value)">${esc(v)}</textarea></div>`;
-      }else{
-        h+=`<div class="s-field"><label>${lbl}</label><input type="text" value="${esc(v)}" oninput="updL('${file}','${arrKey}',${i},'${k}',this.value)"></div>`;
+  // Get body HTML (exclude scripts)
+  const bodyClone = doc.body.cloneNode(true);
+  bodyClone.querySelectorAll('script').forEach(s => s.remove());
+  const bodyHTML = bodyClone.innerHTML;
+
+  // Get inline styles
+  let inlineCSS = '';
+  doc.querySelectorAll('style').forEach(s => inlineCSS += s.textContent);
+
+  editor = grapesjs.init({
+    container: '#gjs',
+    height: '100%',
+    width: 'auto',
+    fromElement: false,
+    components: bodyHTML,
+    style: inlineCSS,
+    storageManager: false,
+    canvas: {
+      styles: cssLinks.concat([
+        'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap'
+      ]),
+      scripts: [
+        'https://unpkg.com/lucide@latest'
+      ]
+    },
+    plugins: ['gjs-preset-webpage'],
+    pluginsOpts: {
+      'gjs-preset-webpage': {
+        blocksBasicOpts: { flexGrid: true },
+        navbarOpts: false,
+        countdownOpts: false,
+        formsOpts: false,
       }
-    });
-    h+='</div>';
+    },
+    panels: {
+      defaults: []
+    },
+    blockManager: {
+      appendTo: '.gjs-pn-views-container',
+    },
+    styleManager: {
+      appendTo: '.gjs-pn-views-container',
+    },
+    deviceManager: {
+      devices: [
+        { name: 'Desktop', width: '' },
+        { name: 'Tablet', width: '768px', widthMedia: '992px' },
+        { name: 'Mobil', width: '375px', widthMedia: '480px' },
+      ]
+    },
   });
-  const max=arrKey==='cards'?3:99;
-  if(items.length<max) h+=`<button class="s-add" onclick="addI('${file}','${arrKey}')">+ Lägg till</button>`;
-  h+='</div>';
-  return h;
+
+  // Add custom blocks for HM Motor components
+  const bm = editor.BlockManager;
+
+  bm.add('hm-section', {
+    label: 'Sektion',
+    category: 'HM Motor',
+    content: '<section class="section section--white"><div class="container"><div class="section-header"><h2>Ny sektion</h2></div><p>Innehåll här...</p></div></section>',
+  });
+
+  bm.add('hm-cta', {
+    label: 'CTA-knapp',
+    category: 'HM Motor',
+    content: '<a href="#" class="btn btn-blue btn-lg">Klicka här</a>',
+  });
+
+  bm.add('hm-card', {
+    label: 'Nyhetskort',
+    category: 'HM Motor',
+    content: `<div class="just-nu-card"><span class="just-nu-label">Nyheter</span><h3>Rubrik</h3><p>Beskrivning</p><a href="#">Läs mer →</a></div>`,
+  });
+
+  bm.add('hm-faq', {
+    label: 'FAQ-fråga',
+    category: 'HM Motor',
+    content: '<details class="faq-item"><summary>Ny fråga<span class="faq-toggle">+</span></summary><p>Svar här...</p></details>',
+  });
+
+  bm.add('hm-trust', {
+    label: 'Trust-signal',
+    category: 'HM Motor',
+    content: '<div class="hero-trust-item"><strong>99+</strong> nöjda kunder</div>',
+  });
+
+  // After canvas loads, init Lucide icons
+  editor.on('canvas:frame:load', ({ window: w }) => {
+    setTimeout(() => {
+      if (w.lucide) w.lucide.createIcons();
+    }, 500);
+  });
+
+  // Double-click to edit text inline
+  editor.on('component:selected', (model) => {
+    const el = model.getEl();
+    if (el && ['H1','H2','H3','H4','P','SPAN','A','SUMMARY','STRONG','LABEL','LI'].includes(el.tagName)) {
+      // Enable inline text editing
+      model.set('editable', true);
+    }
+  });
 }
 
-/* ── Data operations ── */
-function upd(file,key,val){
-  data[file][key]=val;
-  markDirty(file);
-}
-function updL(file,arrKey,idx,key,val){
-  data[file][arrKey][idx][key]=val;
-  markDirty(file);
-}
-function removeI(file,arrKey,idx){
-  data[file][arrKey].splice(idx,1);
-  markDirty(file);
-  openSection(activeSection);
-}
-function addI(file,arrKey){
-  const arr=data[file][arrKey];
-  const tpl=arr.length>0?Object.fromEntries(Object.keys(arr[0]).map(k=>[k,''])):
-    {hero:{bold:'',text:''},faq:{question:'',answer:''},about:{title:'',text:''},'just-nu':{label:'',title:'',text:'',link:'',link_text:''},services:{title:'',text:''}}[file]||{};
-  arr.push(tpl);
-  markDirty(file);
-  openSection(activeSection);
-}
+/* ── Actions ── */
+function undoAction() { if (editor) editor.UndoManager.undo(); }
+function redoAction() { if (editor) editor.UndoManager.redo(); }
 
-function markDirty(file){
-  dirty.add(file);
-  document.getElementById('globalSave').disabled=false;
-}
+async function saveChanges() {
+  if (!editor) return;
+  const btn = document.getElementById('saveBtn');
+  btn.textContent = 'Sparar...';
+  btn.disabled = true;
 
-/* ── Save ── */
-async function saveCurrent(){
-  if(!activeSection)return;
-  const btn=document.querySelector('.sidebar .save-btn:last-child');
-  btn.textContent='Sparar...';btn.disabled=true;
-  try{
-    await saveFile(activeSection);
-    dirty.delete(activeSection);
-    if(dirty.size===0)document.getElementById('globalSave').disabled=true;
-    toast('Sparat!','success');
-    btn.textContent='Sparat ✓';
-    // Reload preview
-    document.getElementById('previewFrame').contentWindow.location.reload();
-    setTimeout(()=>{btn.textContent='Spara '+SECTIONS.find(x=>x.id===activeSection).label;btn.disabled=false},2000);
-  }catch(e){
-    toast('Fel: '+e.message,'error');
-    btn.textContent='Försök igen';btn.disabled=false;
+  try {
+    // Get the full HTML
+    const html = editor.getHtml();
+    const css = editor.getCss();
+
+    // Reconstruct full page
+    const fullHTML = buildFullPage(html, css);
+
+    // Save via Git Gateway
+    const encoded = btoa(unescape(encodeURIComponent(fullHTML)));
+
+    // Get fresh SHA
+    const shaResp = await fetch('/.netlify/git/github/contents/index.html', {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    const shaData = await shaResp.json();
+    pageSha = shaData.sha;
+
+    const r = await fetch('/.netlify/git/github/contents/index.html', {
+      method: 'PUT',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: 'Visuell redigering via admin',
+        content: encoded,
+        sha: pageSha
+      })
+    });
+
+    if (!r.ok) throw new Error('Kunde inte spara');
+    const result = await r.json();
+    pageSha = result.content.sha;
+    toast('Sparat! Sajten uppdateras om ~30 sek.', 'success');
+  } catch (e) {
+    toast('Fel: ' + e.message, 'error');
   }
+
+  btn.textContent = 'Spara';
+  btn.disabled = false;
 }
 
-async function saveAll(){
-  const btn=document.getElementById('globalSave');
-  btn.textContent='Sparar...';btn.disabled=true;
-  try{
-    for(const f of dirty) await saveFile(f);
-    dirty.clear();
-    toast('Allt sparat!','success');
-    document.getElementById('previewFrame').contentWindow.location.reload();
-  }catch(e){toast('Fel: '+e.message,'error')}
-  btn.textContent='Spara';btn.disabled=dirty.size===0;
+function buildFullPage(bodyHTML, editorCSS) {
+  // We need to wrap the edited body back in the full HTML structure
+  // Start with original head, add edited body
+  return `<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HM Motor Krokom | Begagnade Bilar, Fyrhjulingar & ATV i Jämtland</title>
+<meta name="description" content="HM Motor i Krokom — Jämtlands mest pålitliga fordonshandlare sedan 1990. Begagnade bilar, CF Moto fyrhjulingar, mopeder, släpvagnar. Finansiering via Wasa Kredit.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://hmmotor.se/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v=5">
+<script src="https://unpkg.com/lucide@latest" defer><\/script>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js" defer><\/script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"><\/script>
+</head>
+<body>
+${bodyHTML}
+<script src="assets/js/supabase.js"><\/script>
+<script src="assets/js/content.js"><\/script>
+<script src="assets/js/main.js"><\/script>
+<script>
+if (window.netlifyIdentity) {
+  window.netlifyIdentity.on("init", user => {
+    if (!user) window.netlifyIdentity.on("login", () => document.location.href = "/admin/");
+  });
+}
+<\/script>
+</body>
+</html>`;
 }
 
-/* ── Helpers ── */
-function toast(msg,type){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.className='toast '+type+' show';
-  setTimeout(()=>t.classList.remove('show'),3000);
+/* ── Toast ── */
+function toast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 4000);
 }
 
 /* ── Init ── */
-if(window.netlifyIdentity) netlifyIdentity.on('init',()=>initAuth());
+if (window.netlifyIdentity) netlifyIdentity.on('init', () => initAuth());
 </script>
 </body>
 </html>
