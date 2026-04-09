@@ -31,7 +31,7 @@
 
 # Prevent indexing of admin pages
 [[headers]]
-  for = "/admin.html"
+  for = "/dashboard.html"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
 
