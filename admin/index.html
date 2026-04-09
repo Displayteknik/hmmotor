@@ -57,8 +57,33 @@
     .gjs-sm-sector-title,.gjs-clm-tags .gjs-sm-title{background:#252628 !important;color:#aaa !important;font-size:.7rem !important;text-transform:uppercase !important;letter-spacing:.05em !important}
     .gjs-field{background:#1a1b1e !important;border:1px solid #333 !important;border-radius:4px !important;color:#ddd !important}
     .gjs-field:focus-within{border-color:#2563eb !important}
-    .gjs-trt-trait{padding:4px 8px !important}
+    .gjs-trt-trait{padding:8px 12px !important}
+    .gjs-trt-trait .gjs-label{font-size:.75rem !important;font-weight:600 !important;color:#aaa !important;text-transform:uppercase !important;letter-spacing:.04em !important;margin-bottom:4px !important}
     .gjs-sm-properties{padding:8px !important}
+
+    /* Traits panel: bigger, cleaner */
+    .gjs-trt-traits{padding:8px !important}
+    .gjs-trt-trait .gjs-field{min-height:36px !important}
+    .gjs-trt-trait textarea.gjs-field{min-height:100px !important;resize:vertical !important;line-height:1.5 !important;padding:10px !important;font-size:.85rem !important}
+    .gjs-trt-trait input.gjs-field{padding:8px 10px !important;font-size:.85rem !important}
+
+    /* Right panel wider */
+    .gjs-pn-views-container{width:320px !important;min-width:320px !important}
+    .gjs-pn-views{width:320px !important}
+
+    /* Component settings header */
+    .gjs-traits-label{background:#252628 !important;padding:10px 14px !important;font-size:.8rem !important;font-weight:700 !important;color:#ccc !important;letter-spacing:.02em !important;border-bottom:1px solid #333 !important}
+
+    /* Make trait containers cleaner */
+    .gjs-trt-trait{border-bottom:1px solid #2a2b2e !important;margin:0 !important;padding:10px 14px !important}
+    .gjs-trt-trait:last-child{border-bottom:none !important}
+
+    /* Style manager sectors */
+    .gjs-sm-sector{border-bottom:1px solid #2a2b2e !important}
+    .gjs-sm-sector-title{padding:10px 14px !important;font-size:.75rem !important}
+
+    /* Hide less useful panels for simplicity */
+    .gjs-clm-tags{padding:8px 14px !important}
 
     /* Toast */
     .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);opacity:0;padding:10px 20px;border-radius:8px;font-size:.85rem;font-weight:500;color:#fff;z-index:9999;transition:all .3s;box-shadow:0 4px 12px rgba(0,0,0,.3)}
@@ -248,8 +273,8 @@ function initEditor(html) {
     const traits = [];
     if (TEXT_TAGS.includes(tag)) {
       traits.push({
-        type: 'text',
-        label: 'Text',
+        type: 'textarea',
+        label: 'Textinnehåll',
         name: 'content-text',
         changeProp: true,
         placeholder: 'Skriv text...',
