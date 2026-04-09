@@ -230,12 +230,77 @@ function initEditor(html) {
     }, 500);
   });
 
-  // Double-click to edit text inline
+  // Text tags that should show content editor
+  const TEXT_TAGS = ['H1','H2','H3','H4','H5','H6','P','SPAN','A','SUMMARY','STRONG','LABEL','LI','TD','TH','BUTTON','FIGCAPTION'];
+
+  // When selecting a component, show its text content as a trait
   editor.on('component:selected', (model) => {
     const el = model.getEl();
-    if (el && ['H1','H2','H3','H4','P','SPAN','A','SUMMARY','STRONG','LABEL','LI'].includes(el.tagName)) {
-      // Enable inline text editing
+    if (!el) return;
+    const tag = el.tagName;
+
+    // Enable inline editing for text
+    if (TEXT_TAGS.includes(tag)) {
       model.set('editable', true);
+    }
+
+    // Add content trait for text elements
+    const traits = [];
+    if (TEXT_TAGS.includes(tag)) {
+      traits.push({
+        type: 'text',
+        label: 'Text',
+        name: 'content-text',
+        changeProp: true,
+        placeholder: 'Skriv text...',
+      });
+    }
+
+    // Add href trait for links
+    if (tag === 'A') {
+      traits.push({ type: 'text', label: 'Länk (URL)', name: 'href', placeholder: 'https://...' });
+      traits.push({ type: 'select', label: 'Öppna i', name: 'target', options: [{value:'', name:'Samma flik'},{value:'_blank', name:'Ny flik'}] });
+    }
+
+    // Add src/alt for images
+    if (tag === 'IMG') {
+      traits.push({ type: 'text', label: 'Bild-URL', name: 'src', placeholder: 'https://...' });
+      traits.push({ type: 'text', label: 'Alt-text', name: 'alt', placeholder: 'Beskrivning...' });
+    }
+
+    if (traits.length) {
+      model.set('traits', traits);
+
+      // Set initial value for content-text trait
+      if (TEXT_TAGS.includes(tag)) {
+        // Get direct text (not children's text)
+        const directText = Array.from(el.childNodes)
+          .filter(n => n.nodeType === 3)
+          .map(n => n.textContent.trim())
+          .join(' ') || el.textContent.trim();
+        model.set('content-text', directText);
+      }
+
+      // Open traits panel (settings icon)
+      editor.Panels.getButton('views', 'open-tm')?.set('active', true);
+    }
+  });
+
+  // When content-text trait changes, update the component
+  editor.on('component:update:content-text', (model) => {
+    const newText = model.get('content-text');
+    if (newText !== undefined) {
+      const el = model.getEl();
+      if (el) {
+        // If element has child elements, only replace text nodes
+        const hasChildren = el.querySelector('*');
+        if (hasChildren) {
+          const textNode = Array.from(el.childNodes).find(n => n.nodeType === 3);
+          if (textNode) textNode.textContent = newText;
+        } else {
+          model.components(newText);
+        }
+      }
     }
   });
 }
