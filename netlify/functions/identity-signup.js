@@ -1,8 +1,17 @@
-// Auto-confirm new Identity signups
+// Netlify Identity event hook: auto-confirm signups and assign admin role
 exports.handler = async (event) => {
-  const data = JSON.parse(event.body);
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ app_metadata: { roles: ["admin"] } })
-  };
+  try {
+    const data = JSON.parse(event.body || '{}');
+    const { user } = data;
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        app_metadata: {
+          roles: ["admin"]
+        }
+      })
+    };
+  } catch (e) {
+    return { statusCode: 200, body: '{}' };
+  }
 };
