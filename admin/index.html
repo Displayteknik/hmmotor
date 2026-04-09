@@ -36,54 +36,82 @@
     .topbar .save-btn{background:#2563eb;color:#fff;border-color:#2563eb}
     .topbar .save-btn:hover{background:#1d4ed8}
 
-    /* GrapesJS overrides */
+    /* GrapesJS layout */
     #gjs{flex:1;overflow:hidden}
 
-    /* Make GrapesJS dark */
-    .gjs-one-bg{background:#1e1f22 !important}
+    /* ── Dark theme ── */
+    .gjs-one-bg{background:#1a1b1e !important}
     .gjs-two-color{color:#ddd !important}
-    .gjs-three-bg{background:#2a2b2e !important}
-    .gjs-four-color,.gjs-four-color-h:hover{color:#2563eb !important}
-    .gjs-pn-panel{border:none !important}
-    .gjs-pn-views,.gjs-pn-views-container{background:#1e1f22 !important}
-    .gjs-pn-options{background:#1e1f22 !important}
-    .gjs-cv-canvas{background:#e5e7eb !important}
-    .gjs-block{background:#2a2b2e !important;border:1px solid #333 !important;border-radius:6px !important;color:#ccc !important;padding:8px !important;min-height:auto !important}
-    .gjs-block:hover{border-color:#2563eb !important;color:#fff !important}
+    .gjs-three-bg{background:#222328 !important}
+    .gjs-four-color,.gjs-four-color-h:hover{color:#a78bfa !important}
+    .gjs-cv-canvas{background:#2a2b30 !important}
+
+    /* ── Panels ── */
+    .gjs-pn-panel{border:none !important;background:#1a1b1e !important}
+    .gjs-pn-views,.gjs-pn-views-container{background:#1a1b1e !important;border-left:1px solid #2a2b2e !important}
+    .gjs-pn-options{background:#1a1b1e !important}
+
+    /* Right panel 300px */
+    .gjs-pn-views-container{width:300px !important;min-width:300px !important}
+    .gjs-pn-views{width:300px !important}
+
+    /* Panel buttons (top icons) */
+    .gjs-pn-btn{border-radius:6px !important;padding:6px !important;margin:2px !important;color:#888 !important}
+    .gjs-pn-btn:hover{color:#ddd !important;background:rgba(255,255,255,.06) !important}
+    .gjs-pn-btn.gjs-pn-active{background:#a78bfa !important;color:#fff !important}
+
+    /* ── Blocks (draggable elements) ── */
+    .gjs-block{background:#222328 !important;border:1px solid #333 !important;border-radius:8px !important;color:#bbb !important;padding:10px 8px !important;min-height:auto !important;font-size:.75rem !important;transition:all .15s !important}
+    .gjs-block:hover{border-color:#a78bfa !important;color:#fff !important;background:#2a2b30 !important}
     .gjs-block__media{display:none !important}
     .gjs-blocks-cs{padding:8px !important}
-    .gjs-pn-btn{border-radius:4px !important}
-    .gjs-pn-btn.gjs-pn-active{background:#2563eb !important;color:#fff !important}
-    .gjs-sm-sector-title,.gjs-clm-tags .gjs-sm-title{background:#252628 !important;color:#aaa !important;font-size:.7rem !important;text-transform:uppercase !important;letter-spacing:.05em !important}
-    .gjs-field{background:#1a1b1e !important;border:1px solid #333 !important;border-radius:4px !important;color:#ddd !important}
-    .gjs-field:focus-within{border-color:#2563eb !important}
-    .gjs-trt-trait{padding:8px 12px !important}
-    .gjs-trt-trait .gjs-label{font-size:.75rem !important;font-weight:600 !important;color:#aaa !important;text-transform:uppercase !important;letter-spacing:.04em !important;margin-bottom:4px !important}
-    .gjs-sm-properties{padding:8px !important}
+    .gjs-block-category .gjs-title{background:#1a1b1e !important;color:#888 !important;font-size:.7rem !important;text-transform:uppercase !important;letter-spacing:.06em !important;padding:10px 12px !important;border-bottom:1px solid #2a2b2e !important}
 
-    /* Traits panel: bigger, cleaner */
-    .gjs-trt-traits{padding:8px !important}
-    .gjs-trt-trait .gjs-field{min-height:36px !important}
-    .gjs-trt-trait textarea.gjs-field{min-height:100px !important;resize:vertical !important;line-height:1.5 !important;padding:10px !important;font-size:.85rem !important}
-    .gjs-trt-trait input.gjs-field{padding:8px 10px !important;font-size:.85rem !important}
+    /* ── Layers (left panel) ── */
+    .gjs-layers{background:#1a1b1e !important}
+    .gjs-layer{border-bottom:1px solid #222 !important}
+    .gjs-layer-name{font-size:.78rem !important;padding:6px 4px !important}
+    .gjs-layer.gjs-selected .gjs-layer-name{background:rgba(167,139,250,.15) !important}
+    .gjs-layer-title{padding:4px 8px !important}
 
-    /* Right panel wider */
-    .gjs-pn-views-container{width:320px !important;min-width:320px !important}
-    .gjs-pn-views{width:320px !important}
-
-    /* Component settings header */
-    .gjs-traits-label{background:#252628 !important;padding:10px 14px !important;font-size:.8rem !important;font-weight:700 !important;color:#ccc !important;letter-spacing:.02em !important;border-bottom:1px solid #333 !important}
-
-    /* Make trait containers cleaner */
-    .gjs-trt-trait{border-bottom:1px solid #2a2b2e !important;margin:0 !important;padding:10px 14px !important}
-    .gjs-trt-trait:last-child{border-bottom:none !important}
-
-    /* Style manager sectors */
+    /* ── Style Manager (right panel sectors) ── */
     .gjs-sm-sector{border-bottom:1px solid #2a2b2e !important}
-    .gjs-sm-sector-title{padding:10px 14px !important;font-size:.75rem !important}
+    .gjs-sm-sector-title{background:#1e1f22 !important;color:#999 !important;font-size:.7rem !important;text-transform:uppercase !important;letter-spacing:.06em !important;padding:10px 14px !important;font-weight:600 !important}
+    .gjs-sm-sector.gjs-sm-open .gjs-sm-sector-title{color:#ddd !important}
+    .gjs-sm-properties{padding:8px 12px !important}
+    .gjs-sm-label{color:#888 !important;font-size:.7rem !important;font-weight:500 !important}
+    .gjs-field{background:#151618 !important;border:1px solid #333 !important;border-radius:6px !important;color:#ddd !important;font-size:.8rem !important}
+    .gjs-field:focus-within{border-color:#a78bfa !important;box-shadow:0 0 0 2px rgba(167,139,250,.15) !important}
+    .gjs-field-arrows{display:flex !important}
+    .gjs-input-holder input{padding:6px 8px !important}
+    .gjs-field select{padding:6px 8px !important;background:#151618 !important;color:#ddd !important}
 
-    /* Hide less useful panels for simplicity */
-    .gjs-clm-tags{padding:8px 14px !important}
+    /* ── Selector/Class manager ── */
+    .gjs-clm-tags{padding:8px 12px !important;background:#1a1b1e !important}
+    .gjs-clm-tag{background:#222328 !important;border-radius:4px !important;color:#bbb !important}
+
+    /* ── Traits (component settings) ── */
+    .gjs-trt-traits{padding:4px 0 !important}
+    .gjs-trt-trait{padding:8px 14px !important;border-bottom:1px solid #222 !important}
+    .gjs-trt-trait:last-child{border-bottom:none !important}
+    .gjs-trt-trait .gjs-label{font-size:.7rem !important;font-weight:600 !important;color:#999 !important;text-transform:uppercase !important;letter-spacing:.04em !important;margin-bottom:4px !important}
+    .gjs-trt-trait .gjs-field{min-height:34px !important}
+    .gjs-trt-trait textarea.gjs-field{min-height:80px !important;resize:vertical !important;line-height:1.5 !important;padding:8px 10px !important}
+
+    /* ── Scrollbar ── */
+    .gjs-pn-views-container ::-webkit-scrollbar{width:5px}
+    .gjs-pn-views-container ::-webkit-scrollbar-track{background:#1a1b1e}
+    .gjs-pn-views-container ::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+
+    /* Hide GrapesJS default panels (we use custom layout) */
+    .gjs-pn-views,.gjs-pn-views-container{display:none !important}
+
+    /* ── Rich text editor toolbar ── */
+    .gjs-rte-toolbar{background:#222 !important;border:1px solid #444 !important;border-radius:6px !important;box-shadow:0 4px 12px rgba(0,0,0,.3) !important}
+    .gjs-rte-actionbar{padding:4px !important}
+    .gjs-rte-action{color:#ccc !important;border-radius:4px !important}
+    .gjs-rte-action:hover{color:#fff !important;background:rgba(255,255,255,.1) !important}
+    .gjs-rte-active{color:#a78bfa !important}
 
     /* Toast */
     .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);opacity:0;padding:10px 20px;border-radius:8px;font-size:.85rem;font-weight:500;color:#fff;z-index:9999;transition:all .3s;box-shadow:0 4px 12px rgba(0,0,0,.3)}
@@ -115,7 +143,28 @@
       <button onclick="netlifyIdentity.logout();location.reload()" style="border-color:#555">Logga ut</button>
     </div>
   </div>
-  <div id="gjs"></div>
+  <div style="display:flex;flex:1;overflow:hidden">
+    <!-- Left panel: Layers + Blocks -->
+    <div id="left-panel" style="width:240px;min-width:240px;background:#1a1b1e;border-right:1px solid #2a2b2e;display:flex;flex-direction:column;overflow:hidden">
+      <div style="display:flex;border-bottom:1px solid #2a2b2e;flex-shrink:0">
+        <button class="tab-btn active" onclick="switchLeft('layers')" id="tab-layers" style="flex:1;padding:10px 0;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;background:none;border:none;color:#aaa;cursor:pointer;border-bottom:2px solid #a78bfa;font-family:inherit">Lager</button>
+        <button class="tab-btn" onclick="switchLeft('blocks')" id="tab-blocks" style="flex:1;padding:10px 0;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;background:none;border:none;color:#666;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit">Block</button>
+      </div>
+      <div id="layers-panel" style="flex:1;overflow-y:auto"></div>
+      <div id="blocks-panel" style="flex:1;overflow-y:auto;display:none"></div>
+    </div>
+    <!-- Canvas -->
+    <div id="gjs" style="flex:1"></div>
+    <!-- Right panel: Traits + Styles -->
+    <div id="right-panel" style="width:300px;min-width:300px;background:#1a1b1e;border-left:1px solid #2a2b2e;display:flex;flex-direction:column;overflow:hidden">
+      <div style="display:flex;border-bottom:1px solid #2a2b2e;flex-shrink:0">
+        <button class="tab-btn active" onclick="switchRight('traits')" id="tab-traits" style="flex:1;padding:10px 0;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;background:none;border:none;color:#aaa;cursor:pointer;border-bottom:2px solid #a78bfa;font-family:inherit">Innehåll</button>
+        <button class="tab-btn" onclick="switchRight('styles')" id="tab-styles" style="flex:1;padding:10px 0;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;background:none;border:none;color:#666;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit">Stilar</button>
+      </div>
+      <div id="traits-panel" style="flex:1;overflow-y:auto"></div>
+      <div id="styles-panel" style="flex:1;overflow-y:auto;display:none"></div>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -206,6 +255,23 @@ function initEditor(html) {
         formsOpts: false,
       }
     },
+    blockManager: { appendTo: '#blocks-panel' },
+    layerManager: { appendTo: '#layers-panel' },
+    selectorManager: { appendTo: '#styles-panel' },
+    styleManager: {
+      appendTo: '#styles-panel',
+      sectors: [
+        { name: 'Layout', open: true, properties: [
+          { extend: 'display', type: 'radio', defaults: 'block', options: [{value:'block',name:'Block'},{value:'flex',name:'Flex'},{value:'grid',name:'Grid'},{value:'inline',name:'Inline'},{value:'none',name:'Dölj'}] },
+          'flex-direction','flex-wrap','justify-content','align-items','align-content','gap',
+          'position','top','right','bottom','left','z-index','overflow'
+        ]},
+        { name: 'Storlek', open: false, properties: ['width','min-width','max-width','height','min-height','max-height','margin','padding'] },
+        { name: 'Typografi', open: false, properties: ['font-family','font-size','font-weight','letter-spacing','color','line-height','text-align','text-decoration','text-transform'] },
+        { name: 'Utseende', open: false, properties: ['background-color','background','border-radius','border','box-shadow','opacity'] },
+      ]
+    },
+    traitManager: { appendTo: '#traits-panel' },
     deviceManager: {
       devices: [
         { name: 'Desktop', width: '' },
@@ -306,8 +372,8 @@ function initEditor(html) {
         model.set('content-text', directText);
       }
 
-      // Open traits panel (settings icon)
-      editor.Panels.getButton('views', 'open-tm')?.set('active', true);
+      // Auto-switch to Innehåll tab
+      switchRight('traits');
     }
   });
 
@@ -328,6 +394,24 @@ function initEditor(html) {
       }
     }
   });
+}
+
+/* ── Tab switching ── */
+function switchLeft(tab) {
+  document.getElementById('layers-panel').style.display = tab === 'layers' ? 'block' : 'none';
+  document.getElementById('blocks-panel').style.display = tab === 'blocks' ? 'block' : 'none';
+  document.getElementById('tab-layers').style.color = tab === 'layers' ? '#aaa' : '#666';
+  document.getElementById('tab-layers').style.borderBottomColor = tab === 'layers' ? '#a78bfa' : 'transparent';
+  document.getElementById('tab-blocks').style.color = tab === 'blocks' ? '#aaa' : '#666';
+  document.getElementById('tab-blocks').style.borderBottomColor = tab === 'blocks' ? '#a78bfa' : 'transparent';
+}
+function switchRight(tab) {
+  document.getElementById('traits-panel').style.display = tab === 'traits' ? 'block' : 'none';
+  document.getElementById('styles-panel').style.display = tab === 'styles' ? 'block' : 'none';
+  document.getElementById('tab-traits').style.color = tab === 'traits' ? '#aaa' : '#666';
+  document.getElementById('tab-traits').style.borderBottomColor = tab === 'traits' ? '#a78bfa' : 'transparent';
+  document.getElementById('tab-styles').style.color = tab === 'styles' ? '#aaa' : '#666';
+  document.getElementById('tab-styles').style.borderBottomColor = tab === 'styles' ? '#a78bfa' : 'transparent';
 }
 
 /* ── Actions ── */
