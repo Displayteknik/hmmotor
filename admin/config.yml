@@ -1,0 +1,114 @@
+backend:
+  name: git-gateway
+  branch: main
+
+locale: "sv"
+
+media_folder: "assets/img/uploads"
+public_folder: "/assets/img/uploads"
+
+collections:
+  - name: "pages"
+    label: "Sidor"
+    description: "Redigera text och bilder på sajtens sidor"
+    files:
+      - name: "hero"
+        label: "Startsida — Hero"
+        file: "content/pages/hero.json"
+        fields:
+          - {label: "Badge-text (liten text ovanför rubrik)", name: "badge", widget: "string", default: "Auktoriserad CF Moto-återförsäljare"}
+          - {label: "Rubrik", name: "title", widget: "string"}
+          - {label: "Undertext", name: "subtitle", widget: "text"}
+          - {label: "Knapp 1 — text", name: "cta1_text", widget: "string"}
+          - {label: "Knapp 1 — länk", name: "cta1_url", widget: "string"}
+          - {label: "Knapp 2 — text", name: "cta2_text", widget: "string"}
+          - {label: "Knapp 2 — länk", name: "cta2_url", widget: "string"}
+          - {label: "Hero-bild (bakgrund)", name: "image_url", widget: "image", required: false}
+          - label: "Trust-signaler (under knapparna)"
+            name: "trust_items"
+            widget: "list"
+            fields:
+              - {label: "Fetstil-text", name: "bold", widget: "string"}
+              - {label: "Vanlig text", name: "text", widget: "string"}
+
+      - name: "faq"
+        label: "Vanliga frågor (FAQ)"
+        file: "content/pages/faq.json"
+        fields:
+          - label: "Frågor och svar"
+            name: "items"
+            widget: "list"
+            summary: "{{fields.question}}"
+            fields:
+              - {label: "Fråga", name: "question", widget: "string"}
+              - {label: "Svar", name: "answer", widget: "text"}
+
+      - name: "about"
+        label: "Om oss"
+        file: "content/pages/about.json"
+        fields:
+          - {label: "Rubrik", name: "title", widget: "string"}
+          - {label: "Intro-text", name: "intro", widget: "text"}
+          - label: "Tidslinje"
+            name: "timeline"
+            widget: "list"
+            summary: "{{fields.year}} — {{fields.title}}"
+            fields:
+              - {label: "År", name: "year", widget: "string"}
+              - {label: "Rubrik", name: "title", widget: "string"}
+              - {label: "Beskrivning", name: "text", widget: "text"}
+          - label: "Värderingar"
+            name: "values"
+            widget: "list"
+            summary: "{{fields.title}}"
+            fields:
+              - {label: "Rubrik", name: "title", widget: "string"}
+              - {label: "Beskrivning", name: "text", widget: "text"}
+
+      - name: "just-nu"
+        label: "Just nu — nyheter (startsida)"
+        file: "content/pages/just-nu.json"
+        fields:
+          - label: "Nyhetskort"
+            name: "cards"
+            widget: "list"
+            max: 3
+            summary: "{{fields.label}}: {{fields.title}}"
+            fields:
+              - {label: "Etikett (t.ex. Nyheter, Erbjudande, Säsong)", name: "label", widget: "string"}
+              - {label: "Rubrik", name: "title", widget: "string"}
+              - {label: "Beskrivning", name: "text", widget: "text"}
+              - {label: "Länk (URL eller tel:)", name: "link", widget: "string"}
+              - {label: "Länktext", name: "link_text", widget: "string", default: "Läs mer →"}
+
+      - name: "services"
+        label: "Varför HM Motor (startsida)"
+        file: "content/pages/services.json"
+        fields:
+          - {label: "Rubrik", name: "title", widget: "string"}
+          - {label: "Text stycke 1", name: "text1", widget: "text"}
+          - {label: "Text stycke 2", name: "text2", widget: "text"}
+          - label: "Punkter"
+            name: "points"
+            widget: "list"
+            summary: "{{fields.title}}"
+            fields:
+              - {label: "Rubrik", name: "title", widget: "string"}
+              - {label: "Text", name: "text", widget: "text"}
+
+  - name: "blog"
+    label: "Blogg"
+    label_singular: "Blogginlägg"
+    description: "Skriv och redigera blogginlägg"
+    folder: "content/blog"
+    create: true
+    slug: "{{slug}}"
+    sortable_fields: ["date", "title"]
+    summary: "{{title}} ({{date}})"
+    fields:
+      - {label: "Titel", name: "title", widget: "string"}
+      - {label: "Publiceringsdatum", name: "date", widget: "datetime", format: "YYYY-MM-DD"}
+      - {label: "Författare", name: "author", widget: "string", default: "Håkan Mikaelsson"}
+      - {label: "Sammanfattning (visas i listningen)", name: "excerpt", widget: "text"}
+      - {label: "Huvudbild", name: "image", widget: "image", required: false}
+      - {label: "Innehåll", name: "body", widget: "markdown"}

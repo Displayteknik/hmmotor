@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin | HM Motor</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v=5">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  body { background: var(--bg-light); }
+  .admin-wrap { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+
+  /* Login */
+  .admin-login {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-dark);
+    padding: 24px;
+  }
+  .login-card {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    padding: 40px 36px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .login-card h2 {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    margin-bottom: 4px;
+  }
+  .login-card .login-sub {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    margin-bottom: 24px;
+  }
+  .login-card .decap-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    color: var(--blue);
+    font-weight: 500;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .login-card .decap-link:hover { border-color: var(--blue); background: var(--blue-soft); }
+
+  /* Header bar */
+  .admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    padding: 16px 20px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+  .admin-header h1 {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .admin-header h1 img { height: 24px; }
+  .admin-header-links { display: flex; gap: 16px; align-items: center; font-size: 0.82rem; }
+  .admin-header-links a { color: var(--text-muted); transition: color 0.2s; }
+  .admin-header-links a:hover { color: var(--blue); }
+
+  /* Tabs */
+  .admin-tabs { display: flex; gap: 4px; margin-bottom: 24px; }
+  .admin-tab {
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: #fff;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .admin-tab:hover { border-color: var(--blue); color: var(--blue); }
+  .admin-tab.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+  /* Toolbar */
+  .admin-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .admin-count { font-size: 0.82rem; color: var(--text-muted); }
+
+  /* Table */
+  .admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: #fff; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border); }
+  .admin-table th { padding: 12px 16px; text-align: left; font-weight: 600; background: var(--bg-light); color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .admin-table td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: middle; }
+  .admin-table tr:hover td { background: rgba(29,92,168,0.02); }
+  .admin-table .thumb { width: 48px; height: 36px; border-radius: 4px; object-fit: cover; background: var(--bg-muted); }
+  .admin-table .actions { display: flex; gap: 6px; }
+  .admin-table .actions button {
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: #fff;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .admin-table .actions .edit:hover { border-color: var(--blue); color: var(--blue); }
+  .admin-table .actions .del:hover { border-color: #dc2626; color: #dc2626; }
+  .badge-featured { background: var(--accent-warm-soft); color: var(--accent-warm); padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; }
+  .badge-sold { background: #fef2f2; color: #dc2626; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; }
+
+  /* Modal */
+  .admin-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    padding: 24px;
+    overflow-y: auto;
+  }
+  .admin-modal.open { display: flex; align-items: flex-start; justify-content: center; padding-top: 60px; }
+  .admin-modal-content {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 720px;
+    padding: 32px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .admin-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .admin-modal-header h3 { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; }
+  .admin-modal-close { background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; padding: 4px 8px; }
+  .admin-modal-close:hover { color: var(--text-primary); }
+
+  /* Form rows */
+  .form-row { display: flex; gap: 12px; }
+  .form-row .form-group { flex: 1; }
+  .form-checkbox { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer; }
+  .form-checkbox input { width: 16px; height: 16px; accent-color: var(--blue); }
+
+  @media (max-width: 640px) {
+    .form-row { flex-direction: column; }
+    .admin-table { font-size: 0.78rem; }
+    .admin-table th, .admin-table td { padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="admin-login">
+  <div class="login-card">
+    <img src="assets/img/hm-motor-logo.png" alt="HM Motor" height="36" style="margin-bottom:20px">
+    <h2>Fordonshantering</h2>
+    <p class="login-sub">Logga in för att lägga till och redigera fordon.</p>
+    <a href="/admin/" class="decap-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Redigera sidor & blogg (Decap CMS)
+    </a>
+    <form onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label class="form-label" for="adminPassword">Lösenord</label>
+        <input class="form-input" type="password" id="adminPassword" required autofocus>
+      </div>
+      <p id="loginError" style="color:#dc2626;font-size:0.82rem;min-height:20px;margin:8px 0"></p>
+      <button type="submit" class="btn btn-blue" style="width:100%">Logga in</button>
+    </form>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel" class="admin-wrap" style="display:none">
+  <div class="admin-header">
+    <h1><img src="assets/img/hm-motor-logo.png" alt="HM Motor"> Admin</h1>
+    <div class="admin-header-links">
+      <a href="/admin/">Redigera sidor & blogg →</a>
+      <a href="/">← Sajten</a>
+    </div>
+  </div>
+
+  <div class="admin-tabs">
+    <button class="admin-tab active" data-tab="vehicles" onclick="switchTab('vehicles')">Fordon</button>
+    <button class="admin-tab" data-tab="blog" onclick="switchTab('blog')">Blogg</button>
+  </div>
+
+  <!-- Vehicles -->
+  <div id="vehiclesPanel">
+    <div class="admin-toolbar">
+      <button class="btn btn-blue btn-sm" onclick="showVehicleForm(null)">+ Lägg till fordon</button>
+      <span class="admin-count" id="vehicleCount"></span>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="admin-table">
+        <thead><tr><th></th><th>Titel</th><th>Kategori</th><th>Pris</th><th>Status</th><th>Åtgärder</th></tr></thead>
+        <tbody id="vehicleTableBody"><tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted)">Laddar fordon...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Blog -->
+  <div id="blogPanel" style="display:none">
+    <div class="admin-toolbar">
+      <button class="btn btn-blue btn-sm" onclick="showBlogForm(null)">+ Nytt inlägg</button>
+      <span class="admin-count" id="blogCount"></span>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="admin-table">
+        <thead><tr><th>Titel</th><th>Status</th><th>Datum</th><th>Åtgärder</th></tr></thead>
+        <tbody id="blogTableBody"><tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text-muted)">Laddar inlägg...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- VEHICLE MODAL -->
+<div class="admin-modal" id="vehicleModal">
+  <div class="admin-modal-content">
+    <div class="admin-modal-header">
+      <h3 id="vehicleFormTitle">Nytt fordon</h3>
+      <button class="admin-modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <form onsubmit="handleVehicleSubmit(event)">
+      <input type="hidden" id="v_id" name="v_id">
+      <div class="form-row">
+        <div class="form-group" style="flex:2">
+          <label class="form-label" for="v_title">Titel *</label>
+          <input class="form-input" id="v_title" name="v_title" required oninput="autoSlugVehicle()">
+        </div>
+        <div class="form-group" style="flex:1">
+          <label class="form-label" for="v_slug">Slug</label>
+          <input class="form-input" id="v_slug" name="v_slug" onfocus="this.dataset.manual='1'">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="v_category">Kategori *</label>
+          <select class="form-select" id="v_category" name="v_category" required>
+            <option value="car">Bil</option>
+            <option value="atv">ATV / Fyrhjuling</option>
+            <option value="utv">UTV / Side-by-side</option>
+            <option value="moped">Moped / Elcykel</option>
+            <option value="trailer">Släpvagn</option>
+            <option value="garden">Gräsklippare / Snöslunga</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="v_brand">Märke</label>
+          <input class="form-input" id="v_brand" name="v_brand">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="v_model">Modell</label>
+          <input class="form-input" id="v_model" name="v_model">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="v_year">Årsmodell</label>
+          <input class="form-input" id="v_year" name="v_year" type="number">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="v_price">Pris (kr)</label>
+          <input class="form-input" id="v_price" name="v_price" type="number">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="v_price_label">Prisetikett</label>
+          <input class="form-input" id="v_price_label" name="v_price_label" placeholder="Pris">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="v_mileage">Mätarställning</label>
+          <input class="form-input" id="v_mileage" name="v_mileage" placeholder="t.ex. 4 500 mil">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="v_fuel">Bränsle</label>
+          <input class="form-input" id="v_fuel" name="v_fuel" placeholder="t.ex. Bensin">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="v_transmission">Växellåda</label>
+          <input class="form-input" id="v_transmission" name="v_transmission" placeholder="t.ex. Automat">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="v_description">Beskrivning</label>
+        <textarea class="form-textarea" id="v_description" name="v_description" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Bild</label>
+        <div style="display:flex;gap:12px;align-items:start">
+          <div style="flex:1">
+            <input class="form-input" id="v_image_url" name="v_image_url" placeholder="Bild-URL eller ladda upp" oninput="updateImagePreview('v_image_url','v_image_preview')">
+            <input type="file" accept="image/*" style="margin-top:8px;font-size:0.82rem" onchange="handleImageUpload(this, 'v_image_url', 'v_image_preview')">
+          </div>
+          <div id="v_image_preview" style="flex-shrink:0"></div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="v_badge">Badge</label>
+          <input class="form-input" id="v_badge" name="v_badge" placeholder="t.ex. Ny, Populär">
+        </div>
+      </div>
+      <p style="font-weight:600;font-size:0.85rem;margin:16px 0 8px">Specifikationer</p>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="v_spec_motor">Motor</label>
+          <input class="form-input" id="v_spec_motor" name="v_spec_motor">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="v_spec_drivlina">Drivlina / Typ</label>
+          <input class="form-input" id="v_spec_drivlina" name="v_spec_drivlina">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="v_spec_utrustning">Utrustning</label>
+          <input class="form-input" id="v_spec_utrustning" name="v_spec_utrustning">
+        </div>
+      </div>
+      <div class="form-row" style="align-items:center;margin-top:12px">
+        <div class="form-group">
+          <label class="form-label" for="v_sort_order">Sorteringsordning</label>
+          <input class="form-input" id="v_sort_order" name="v_sort_order" type="number" value="100">
+        </div>
+        <label class="form-checkbox"><input type="checkbox" id="v_is_featured" name="v_is_featured"> Utvald (startsidan)</label>
+        <label class="form-checkbox"><input type="checkbox" id="v_is_sold" name="v_is_sold"> Såld</label>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;padding-top:16px;border-top:1px solid var(--border)">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeModal()">Avbryt</button>
+        <button type="submit" class="btn btn-blue">Spara fordon</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- BLOG MODAL -->
+<div class="admin-modal" id="blogModal">
+  <div class="admin-modal-content">
+    <div class="admin-modal-header">
+      <h3 id="blogFormTitle">Nytt inlägg</h3>
+      <button class="admin-modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <form onsubmit="handleBlogSubmit(event)">
+      <input type="hidden" id="b_id" name="b_id">
+      <input type="hidden" id="b_existing_published_at" name="b_existing_published_at">
+      <div class="form-row">
+        <div class="form-group" style="flex:2">
+          <label class="form-label" for="b_title">Titel *</label>
+          <input class="form-input" id="b_title" name="b_title" required oninput="autoSlugBlog()">
+        </div>
+        <div class="form-group" style="flex:1">
+          <label class="form-label" for="b_slug">Slug</label>
+          <input class="form-input" id="b_slug" name="b_slug" onfocus="this.dataset.manual='1'">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="b_excerpt">Sammanfattning</label>
+        <textarea class="form-textarea" id="b_excerpt" name="b_excerpt" rows="2" placeholder="Kort text som visas i blogglistan"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="b_content">Innehåll (markdown)</label>
+        <textarea class="form-textarea" id="b_content" name="b_content" rows="12" placeholder="## Rubrik&#10;&#10;Brödtext..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Bild</label>
+        <div style="display:flex;gap:12px;align-items:start">
+          <div style="flex:1">
+            <input class="form-input" id="b_image_url" name="b_image_url" placeholder="Bild-URL eller ladda upp" oninput="updateImagePreview('b_image_url','b_image_preview')">
+            <input type="file" accept="image/*" style="margin-top:8px;font-size:0.82rem" onchange="handleImageUpload(this, 'b_image_url', 'b_image_preview')">
+          </div>
+          <div id="b_image_preview" style="flex-shrink:0"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="b_author">Författare</label>
+        <input class="form-input" id="b_author" name="b_author" value="Håkan Mikaelsson">
+      </div>
+      <label class="form-checkbox" style="margin:12px 0"><input type="checkbox" id="b_published" name="b_published"> Publicerad</label>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;padding-top:16px;border-top:1px solid var(--border)">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeModal()">Avbryt</button>
+        <button type="submit" class="btn btn-blue">Spara inlägg</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="assets/js/supabase.js?v=3"></script>
+<script src="assets/js/admin.js?v=1"></script>
+</body>
+</html>

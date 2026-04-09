@@ -1,0 +1,15 @@
+{
+  "badge": "Auktoriserad CF Moto-återförsäljare",
+  "title": "Rätt fordon för jobb och fritid i Jämtland",
+  "subtitle": "Personlig rådgivning, inga genvägar. Vi har hjälpt kunder i Krokom med omnejd sedan 1990.",
+  "cta1_text": "Se fyrhjulingar",
+  "cta1_url": "fyrhjulingar.html",
+  "cta2_text": "Begagnade bilar",
+  "cta2_url": "bilar.html",
+  "image_url": "https://www.cfmoto.co.uk/wp-content/uploads/2025/04/CFORCE-1000-MV_Action-5.webp",
+  "trust_items": [
+    {"bold": "35+", "text": "års erfarenhet"},
+    {"bold": "14", "text": "ATV-modeller i lager"},
+    {"bold": "Wasa Kredit", "text": "Finansiering via"}
+  ]
+}

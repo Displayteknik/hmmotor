@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fordon | HM Motor Krokom</title>
+<meta name="description" content="Fordon hos HM Motor i Krokom.">
+<meta name="robots" content="index, follow">
+<meta property="og:locale" content="sv_SE">
+<meta name="geo.region" content="SE-Z">
+<meta property="og:image" content="https://hmmotor.se/assets/img/hm-motor-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v=5">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+/* ─── Magazine Product Page ─── */
+.pdp-hero {
+  position: relative;
+  background: var(--bg-dark);
+  min-height: 60vh;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+.pdp-hero-img {
+  position: absolute;
+  inset: 0;
+}
+.pdp-hero-img img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  padding: 24px;
+  background: var(--bg-light);
+}
+.pdp-hero-overlay {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  background: linear-gradient(to top, rgba(10,14,20,0.95) 0%, rgba(10,14,20,0.6) 60%, transparent 100%);
+  padding: 60px 0 32px;
+}
+.pdp-hero-content {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.pdp-hero-text h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+.pdp-hero-brand {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-warm);
+}
+.pdp-hero-price {
+  text-align: right;
+}
+.pdp-hero-price-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-on-dark-muted);
+}
+.pdp-hero-price-value {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
+  color: #fff;
+}
+
+/* Breadcrumb bar */
+.pdp-breadcrumb {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  padding: 12px 0;
+}
+.pdp-breadcrumb-inner {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.pdp-breadcrumb-inner a { color: var(--text-muted); transition: color 0.2s; }
+.pdp-breadcrumb-inner a:hover { color: var(--blue); }
+.pdp-breadcrumb-inner svg { width: 12px; height: 12px; opacity: 0.4; }
+
+/* Quick actions strip */
+.pdp-actions {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  padding: 16px 0;
+}
+.pdp-actions-inner {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.pdp-actions-inner .btn { flex-shrink: 0; }
+.pdp-actions-badges {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+.pdp-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.pdp-badge svg { width: 16px; height: 16px; color: var(--blue); }
+
+/* Image gallery section */
+.pdp-gallery-section {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 24px 32px;
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 12px;
+  min-height: 380px;
+}
+.pdp-thumbs-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  max-height: 400px;
+}
+.pdp-thumb {
+  width: 80px;
+  height: 60px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+  background: #fff;
+}
+.pdp-thumb:hover, .pdp-thumb.active {
+  opacity: 1;
+  border-color: var(--blue);
+}
+.pdp-thumb img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  padding: 4px;
+}
+.pdp-main-img {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.pdp-main-img img {
+  max-width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  padding: 16px;
+}
+.pdp-img-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 2;
+}
+.pdp-img-nav:hover { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.pdp-img-nav--prev { left: 12px; }
+.pdp-img-nav--next { right: 12px; }
+.pdp-img-counter {
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .pdp-gallery-section {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .pdp-thumbs-col {
+    flex-direction: row;
+    max-height: none;
+    overflow-x: auto;
+    order: 2;
+  }
+  .pdp-thumb { width: 64px; height: 48px; }
+  .pdp-main-img { order: 1; }
+}
+
+/* Editorial content */
+.pdp-editorial {
+  background: var(--bg-light);
+  padding: 48px 0;
+}
+.pdp-editorial-grid {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+.pdp-story h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  letter-spacing: -0.01em;
+}
+.pdp-story p {
+  color: var(--text-muted);
+  line-height: 1.8;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+}
+
+/* Specs card */
+.pdp-specs-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+}
+.pdp-specs-card h3 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--blue);
+  display: inline-block;
+}
+.pdp-spec-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.88rem;
+}
+.pdp-spec-row:last-child { border-bottom: none; }
+.pdp-spec-label { color: var(--text-muted); }
+.pdp-spec-value { font-weight: 600; color: var(--text-primary); text-align: right; }
+
+/* Financing callout */
+.pdp-finance {
+  background: var(--blue-soft);
+  border: 1px solid rgba(29,92,168,0.15);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-top: 20px;
+}
+.pdp-finance h4 {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--blue);
+  margin-bottom: 4px;
+}
+.pdp-finance p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Gallery thumbs in editorial */
+.pdp-gallery-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.pdp-gallery-thumb {
+  flex: 0 0 120px;
+  height: 80px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s, border-color 0.2s;
+}
+.pdp-gallery-thumb:hover, .pdp-gallery-thumb.active {
+  opacity: 1;
+  border-color: var(--blue);
+}
+.pdp-gallery-thumb img { width: 100%; height: 100%; object-fit: contain; background: var(--bg-light); }
+
+@media (max-width: 768px) {
+  .pdp-hero { min-height: 45vh; }
+  .pdp-hero-content { flex-direction: column; align-items: flex-start; }
+  .pdp-hero-price { text-align: left; }
+  .pdp-editorial-grid { grid-template-columns: 1fr; }
+  .pdp-actions-badges { margin-left: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar"><div class="top-bar-inner"><span class="top-bar-hours">Mån–Tor 08–17 · Fre 08–16</span><div class="top-bar-right"><a href="tel:+46703218232"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.11 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> 070-321 82 32</a><a href="mailto:info@hmmotor.se"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> info@hmmotor.se</a></div></div></div>
+
+<nav class="navbar" id="navbar"><div class="nav-container"><a href="/" class="nav-logo"><img src="assets/img/hm-motor-logo.png" alt="HM Motor — Mikaelssons Bil" height="38"></a><div class="nav-links" id="navLinks"><a href="bilar.html" class="nav-link">Bilar</a><a href="fyrhjulingar.html" class="nav-link">Fyrhjulingar</a><a href="mopeder.html" class="nav-link">Mopeder & Elcyklar</a><div class="nav-dropdown"><button class="nav-dropdown-toggle">Mer <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button><div class="nav-dropdown-menu"><a href="slapvagnar.html" class="nav-dropdown-item">Släpvagnar</a><a href="tradgard.html" class="nav-dropdown-item">Gräsklippare & Snöslungor</a><a href="blogg.html" class="nav-dropdown-item">Blogg</a></div></div><a href="om-oss.html" class="nav-link">Om oss</a><a href="kontakt.html" class="nav-link">Kontakt</a></div><a href="tel:+46703218232" class="nav-cta"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.11 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Ring Håkan</a><button class="hamburger" id="hamburger" aria-label="Meny"><span></span><span></span><span></span></button></div></nav>
+
+<!-- MAGAZINE PRODUCT PAGE -->
+<div id="productPage">
+
+  <!-- Hero: full-width image with model + price overlay -->
+  <div class="pdp-hero" id="pdpHero">
+    <div class="pdp-hero-img" id="heroImg">
+      <img id="mainImage" src="" alt="">
+    </div>
+    <div class="pdp-hero-overlay">
+      <div class="pdp-hero-content">
+        <div class="pdp-hero-text">
+          <div class="pdp-hero-brand" id="heroBrand"></div>
+          <h1 id="heroTitle">Laddar...</h1>
+        </div>
+        <div class="pdp-hero-price">
+          <div class="pdp-hero-price-label" id="heroPriceLabel"></div>
+          <div class="pdp-hero-price-value" id="heroPrice"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Breadcrumb -->
+  <div class="pdp-breadcrumb">
+    <div class="pdp-breadcrumb-inner">
+      <a href="/">Hem</a>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      <span id="breadcrumbCategory">Fordon</span>
+    </div>
+  </div>
+
+  <!-- Action strip -->
+  <div class="pdp-actions" id="pdpActions">
+    <div class="pdp-actions-inner">
+      <a href="tel:+46703218232" class="btn btn-blue">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.11 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Ring Håkan
+      </a>
+      <a href="kontakt.html" class="btn btn-outline btn-sm">Skicka förfrågan</a>
+      <div class="pdp-actions-badges">
+        <span class="pdp-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Garanti</span>
+        <span class="pdp-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg> Finansiering</span>
+        <span class="pdp-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 3h5v5M4 20 21 3"/></svg> Inbyte</span>
+        <span class="pdp-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Provkörning</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Gallery + Editorial -->
+  <div class="pdp-editorial">
+    <div class="pdp-gallery-section" id="pdpGallery">
+      <!-- Filled by JS: thumbnails left + large image right -->
+    </div>
+    <div class="pdp-editorial-grid">
+      <div class="pdp-story" id="pdpStory">
+        <!-- Filled by JS -->
+      </div>
+      <div>
+        <div class="pdp-specs-card" id="pdpSpecs">
+          <!-- Filled by JS -->
+        </div>
+        <div class="pdp-finance">
+          <h4>Finansiering via Wasa Kredit & Ecster</h4>
+          <p>Vi hjälper dig hitta en lösning som passar. Ring Håkan på 070-321 82 32 för att räkna på din månadskostnad.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <h2>Intresserad? Ring Håkan direkt.</h2>
+    <p>Boka provkörning eller få mer info om detta fordon.</p>
+    <div class="cta-actions">
+      <a href="tel:+46703218232" class="btn btn-blue btn-lg"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.11 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> 070-321 82 32</a>
+      <a href="kontakt.html" class="btn btn-outline-light btn-lg">Skicka en fråga</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand"><div class="footer-logo"><img src="assets/img/hm-motor-logo.png" alt="HM Motor" height="32" style="filter:brightness(0) invert(1);opacity:0.85"></div><p>Jämtlands fordonshandlare sedan 1990.</p></div><div class="footer-col"><h4>Sortiment</h4><a href="bilar.html">Bilar</a><a href="fyrhjulingar.html">Fyrhjulingar</a><a href="mopeder.html">Mopeder</a><a href="slapvagnar.html">Släpvagnar</a></div><div class="footer-col"><h4>Info</h4><a href="om-oss.html">Om oss</a><a href="blogg.html">Blogg</a><a href="kontakt.html">Kontakt</a></div><div class="footer-col"><h4>Kontakt</h4><p style="font-size:0.85rem">Krokomsporten 13, 835 32 Krokom</p><p><a href="tel:+46703218232">070-321 82 32</a></p><p><a href="mailto:info@hmmotor.se">info@hmmotor.se</a></p><p class="footer-hours">Mån–Tor 08–17 · Fre 08–16</p></div></div><div class="footer-bottom"><p>&copy; 2026 HM Motor</p></div></div></footer>
+
+<div class="mobile-cta"><a href="tel:+46703218232"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.11 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Ring Håkan — 070-321 82 32</a></div>
+
+<script src="assets/js/supabase.js?v=3"></script>
+<script src="assets/js/main.js?v=3"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get('slug') || window.location.hash.replace('#', '') || null;
+  if (!slug) {
+    document.getElementById('pdpStory').innerHTML = '<div class="empty-state"><p>Inget fordon valt. <a href="/" style="color:var(--blue)">Gå till startsidan</a></p></div>';
+    return;
+  }
+
+  const vehicle = await loadVehicleBySlug(slug);
+  if (!vehicle) {
+    document.getElementById('pdpStory').innerHTML = '<div class="empty-state"><p>Fordonet hittades inte.</p></div>';
+    return;
+  }
+
+  const v = vehicle;
+  const specs = v.specs || {};
+  const gallery = v.gallery || [];
+  const images = gallery.length ? gallery : (v.image_url ? [v.image_url] : []);
+  galleryImages = images; // populate global for nav
+
+  document.title = `${v.title} | HM Motor Krokom`;
+
+  // Category mappings (used by breadcrumbs, schema, etc)
+  const catNames = { car: 'Bilar', atv: 'Fyrhjulingar', utv: 'Fyrhjulingar', moped: 'Mopeder', trailer: 'Släpvagnar', garden: 'Gräsklippare' };
+  const catLinks = { car: 'bilar.html', atv: 'fyrhjulingar.html', utv: 'fyrhjulingar.html', moped: 'mopeder.html', trailer: 'slapvagnar.html', garden: 'tradgard.html' };
+
+  // Dynamic meta tags
+  const metaDesc = document.querySelector('meta[name="description"]');
+  if (metaDesc) metaDesc.content = `${v.title} — ${v.description || 'Hos HM Motor i Krokom.'} ${v.price ? formatPrice(v.price) + '.' : ''} Ring 070-321 82 32.`;
+
+  // Product schema (JSON-LD)
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": v.title,
+    "description": v.description || '',
+    "brand": { "@type": "Brand", "name": v.brand || 'HM Motor' },
+    "image": images[0] || '',
+    "url": window.location.href,
+    "offers": {
+      "@type": "Offer",
+      "price": v.price || 0,
+      "priceCurrency": "SEK",
+      "availability": v.is_sold ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
+      "seller": {
+        "@type": "AutoDealer",
+        "name": "HM Motor",
+        "address": { "@type": "PostalAddress", "streetAddress": "Krokomsporten 13", "addressLocality": "Krokom", "postalCode": "835 32", "addressCountry": "SE" }
+      }
+    }
+  };
+  if (v.year) schema.productionDate = String(v.year);
+  const schemaScript = document.createElement('script');
+  schemaScript.type = 'application/ld+json';
+  schemaScript.textContent = JSON.stringify(schema);
+  document.head.appendChild(schemaScript);
+
+  // BreadcrumbList schema
+  const bcSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Hem", "item": "https://hmmotor.se/" },
+      { "@type": "ListItem", "position": 2, "name": catNames[v.category] || 'Fordon', "item": "https://hmmotor.se/" + (catLinks[v.category] || '') },
+      { "@type": "ListItem", "position": 3, "name": v.title }
+    ]
+  };
+  const bcScript = document.createElement('script');
+  bcScript.type = 'application/ld+json';
+  bcScript.textContent = JSON.stringify(bcSchema);
+  document.head.appendChild(bcScript);
+
+  // Hero image
+  if (images.length) {
+    document.getElementById('mainImage').src = images[0];
+    document.getElementById('mainImage').alt = v.title;
+  }
+
+  // Hero text
+  const catLabel = { car: 'Begagnad bil', atv: 'ATV — Fyrhjuling', utv: 'UTV — Side-by-Side', moped: 'Moped / Elcykel', trailer: 'Släpvagn', garden: 'Trädgård' };
+  document.getElementById('heroBrand').textContent = (v.brand || '') + (catLabel[v.category] ? ' — ' + catLabel[v.category] : '');
+  document.getElementById('heroTitle').textContent = v.title;
+  document.getElementById('heroPriceLabel').textContent = v.price_label || 'Pris';
+  document.getElementById('heroPrice').textContent = v.price ? formatPrice(v.price) : 'Ring för pris';
+
+  // Breadcrumb
+  document.getElementById('breadcrumbCategory').innerHTML = `<a href="${catLinks[v.category] || '#'}">${catNames[v.category] || 'Fordon'}</a>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="m9 18 6-6-6-6"/></svg>
+    <span>${v.title}</span>`;
+
+  // Sold banner
+  if (v.is_sold) {
+    document.getElementById('pdpActions').querySelector('.pdp-actions-inner').insertAdjacentHTML('afterbegin',
+      '<span style="background:#fef2f2;color:#dc2626;padding:6px 14px;border-radius:6px;font-weight:700;font-size:0.82rem">SÅLD</span>');
+  }
+
+  // Image gallery
+  const galleryEl = document.getElementById('pdpGallery');
+  if (images.length) {
+    let galleryHtml = '';
+    // Thumbnails column
+    galleryHtml += '<div class="pdp-thumbs-col">';
+    images.forEach((img, i) => {
+      galleryHtml += `<div class="pdp-thumb ${i === 0 ? 'active' : ''}" data-idx="${i}" onclick="goToImage(${i})"><img src="${img}" alt="${v.title}" loading="lazy"></div>`;
+    });
+    // If only 1 image, show same thumb repeated for visual consistency
+    if (images.length === 1) {
+      galleryHtml += `<div class="pdp-thumb" style="opacity:0.2;pointer-events:none"><img src="${images[0]}" alt="" loading="lazy"></div>`;
+    }
+    galleryHtml += '</div>';
+    // Main image
+    galleryHtml += '<div class="pdp-main-img">';
+    galleryHtml += `<img id="galleryMainImg" src="${images[0]}" alt="${v.title}">`;
+    if (images.length > 1) {
+      galleryHtml += `<button class="pdp-img-nav pdp-img-nav--prev" onclick="navImage(-1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>`;
+      galleryHtml += `<button class="pdp-img-nav pdp-img-nav--next" onclick="navImage(1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>`;
+      galleryHtml += `<div class="pdp-img-counter"><span id="imgIdx">1</span> / ${images.length}</div>`;
+    }
+    galleryHtml += '</div>';
+    galleryEl.innerHTML = galleryHtml;
+  } else {
+    galleryEl.style.display = 'none';
+  }
+
+  // Editorial story
+  const storyEl = document.getElementById('pdpStory');
+  let storyHtml = `<h2>${v.title}</h2><p>${v.description || ''}</p>`;
+
+  if (v.category === 'atv' || v.category === 'utv') {
+    storyHtml += `<p>Alla våra CF Moto-fyrhjulingar levereras med full garanti och vi erbjuder provkörning direkt på plats i Krokom. Håkan hjälper dig hitta rätt modell — oavsett om det är för jobb i skogen, snöröjning eller helgäventyr med familjen.</p>`;
+  }
+  if (v.category === 'moped') {
+    storyHtml += `<p>Kom förbi och provkör — vi hjälper dig hitta rätt modell. Finansiering via Wasa Kredit och Ecster.</p>`;
+  }
+  if (v.category === 'trailer') {
+    storyHtml += `<p>Alla Respo-släpvagnar levereras med dokumentation och garanti. Vi hjälper dig välja rätt storlek och typ för just dina behov.</p>`;
+  }
+
+  storyEl.innerHTML = storyHtml;
+
+  // Specs card
+  const allSpecs = Object.entries(specs);
+  const specsEl = document.getElementById('pdpSpecs');
+  const specLabels = {
+    motor: 'Motor', effekt: 'Effekt', vridmoment: 'Vridmoment', cylvolym: 'Cylindervolym',
+    drivlina: 'Drivlina', markfrigång: 'Markfrigång', eps: 'Styrning',
+    körlägen: 'Körlägen', dragvikt: 'Dragvikt', bränsletank: 'Bränsletank',
+    vikt: 'Tjänstevikt', längd: 'Längd', bredd: 'Bredd', hjulbas: 'Hjulbas',
+    bromsar: 'Bromsar', utrustning: 'Standardutrustning', typ: 'Fordonstyp',
+    miltal: 'Miltal', drivmedel: 'Drivmedel', växellåda: 'Växellåda',
+    totalvikt: 'Totalvikt', mått: 'Mått', räckvidd: 'Räckvidd',
+    klippbredd: 'Klippbredd', arbetsbredd: 'Arbetsbredd', uppsamlare: 'Uppsamlare',
+    standard: 'Standard', användning: 'Användning', växlar: 'Växlar'
+  };
+
+  if (allSpecs.length) {
+    specsEl.innerHTML = '<h3>Specifikationer</h3>' + allSpecs.map(([key, val]) =>
+      `<div class="pdp-spec-row"><span class="pdp-spec-label">${specLabels[key] || key}</span><span class="pdp-spec-value">${val}</span></div>`
+    ).join('');
+  } else {
+    specsEl.innerHTML = '<h3>Specifikationer</h3><p style="color:var(--text-muted);font-size:0.88rem">Ring Håkan för detaljerade specifikationer.</p>';
+  }
+});
+
+let currentImgIdx = 0;
+let galleryImages = [];
+
+function goToImage(idx) {
+  if (idx < 0 || idx >= galleryImages.length) return;
+  currentImgIdx = idx;
+  document.getElementById('galleryMainImg').src = galleryImages[idx];
+  document.querySelectorAll('.pdp-thumb').forEach((t, i) => {
+    t.classList.toggle('active', i === idx);
+  });
+  // Also update hero main image
+  const heroImg = document.getElementById('mainImage');
+  if (heroImg) heroImg.src = galleryImages[idx];
+  // Update counter
+  const counter = document.getElementById('imgIdx');
+  if (counter) counter.textContent = idx + 1;
+}
+
+function navImage(dir) {
+  let next = currentImgIdx + dir;
+  if (next < 0) next = galleryImages.length - 1;
+  if (next >= galleryImages.length) next = 0;
+  goToImage(next);
+}
+
+function switchImage(src, thumbEl) {
+  const idx = galleryImages.indexOf(src);
+  if (idx >= 0) goToImage(idx);
+}
+</script>
+</body>
+</html>

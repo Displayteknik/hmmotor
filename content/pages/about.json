@@ -1,0 +1,15 @@
+{
+  "title": "Om HM Motor",
+  "intro": "Håkan Mikaelsson startade HM Motor med en enkel idé: ge kunderna ärliga affärer och rak kommunikation. Det har inte ändrats på 35 år.",
+  "timeline": [
+    {"year": "1990", "title": "Starten", "text": "Håkan Mikaelsson grundar HM Motor med fokus på begagnade bilar och personlig service. Från dag ett handlar det om ärliga affärer och rak kommunikation."},
+    {"year": "2004", "title": "Krokomsporten", "text": "Flytten till Krokomsporten ger plats för ett bredare sortiment med fyrhjulingar och mopeder. Krokom får en komplett fordonshandlare."},
+    {"year": "2010", "title": "CF Moto", "text": "Blir auktoriserad CF Moto-återförsäljare. ATV-sortimentet växer och HM Motor blir Jämtlands ledande val för fyrhjulingar och UTV."},
+    {"year": "Idag", "title": "Jämtlands bredaste", "text": "Med 14 ATV-modeller, 5 varumärken och 35+ års erfarenhet. Fortfarande samma personliga service — fortfarande Håkan du möter."}
+  ],
+  "values": [
+    {"title": "Personlig service", "text": "Alltid Håkan du möter. Ingen telefonväxel, inga mellanhänder. Direkt kontakt från första samtal till nyckelöverlämning."},
+    {"title": "Ärliga affärer", "text": "Inga dolda kostnader, rak kommunikation. Du vet vad du får och vad det kostar. Så har det alltid varit — så kommer det förbli."},
+    {"title": "Lokalt engagemang", "text": "Förankrade i Krokom och Jämtland. Vi stöttar lokala föreningar och sponsrar idrott. Det är här vi bor, jobbar och lever."}
+  ]
+}
