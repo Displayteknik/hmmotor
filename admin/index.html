@@ -11,20 +11,21 @@
   <script src="https://unpkg.com/grapesjs@0.21.13/dist/grapes.min.js"></script>
   <script src="https://unpkg.com/grapesjs-preset-webpage@1.0.3/dist/index.js"></script>
   <style>
+    /* ── Reset ── */
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Inter',sans-serif;background:#18191b;color:#ddd;height:100vh;overflow:hidden}
 
-    /* Login */
+    /* ── Login ── */
     #login{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#111}
     #login h1{font-size:1.4rem;font-weight:700;margin-bottom:.25rem;color:#fff}
     #login p{color:#888;font-size:.85rem;margin-bottom:2rem}
-    #login button{background:#2563eb;color:#fff;border:none;padding:12px 32px;font-size:.9rem;font-weight:600;border-radius:8px;cursor:pointer;font-family:inherit}
+    #login button{background:#2563eb;color:#fff;border:none;padding:12px 32px;font-size:.9rem;font-weight:600;border-radius:8px;cursor:pointer;font-family:inherit;transition:background .15s}
     #login button:hover{background:#1d4ed8}
 
-    /* Editor wrapper */
+    /* ── Editor wrapper ── */
     #editor-wrap{display:none;height:100vh;flex-direction:column}
 
-    /* Top bar */
+    /* ── Top bar ── */
     .topbar{height:46px;background:#1e1f22;border-bottom:1px solid #2a2b2e;display:flex;align-items:center;justify-content:space-between;padding:0 12px;flex-shrink:0;z-index:10}
     .topbar .left{display:flex;align-items:center;gap:10px}
     .topbar .brand{font-weight:700;font-size:.85rem;color:#fff}
@@ -36,75 +37,114 @@
     .topbar .save-btn{background:#2563eb;color:#fff;border-color:#2563eb}
     .topbar .save-btn:hover{background:#1d4ed8}
 
-    /* GrapesJS layout */
+    /* ── GrapesJS canvas ── */
     #gjs{flex:1;overflow:hidden}
 
-    /* ── Dark theme ── */
+    /* ── Dark theme base ── */
     .gjs-one-bg{background:#1a1b1e !important}
     .gjs-two-color{color:#ddd !important}
     .gjs-three-bg{background:#222328 !important}
     .gjs-four-color,.gjs-four-color-h:hover{color:#a78bfa !important}
     .gjs-cv-canvas{background:#2a2b30 !important}
 
-    /* ── Panels ── */
+    /* ── GrapesJS panels base ── */
     .gjs-pn-panel{border:none !important;background:#1a1b1e !important}
-    .gjs-pn-views,.gjs-pn-views-container{background:#1a1b1e !important;border-left:1px solid #2a2b2e !important}
-    .gjs-pn-options{background:#1a1b1e !important}
 
-    /* Right panel 300px */
-    .gjs-pn-views-container{width:300px !important;min-width:300px !important}
-    .gjs-pn-views{width:300px !important}
+    /* Hide the default right sidebar GrapesJS creates — we use custom panels */
+    .gjs-pn-views-container{display:none !important}
+    .gjs-pn-views{display:none !important}
 
-    /* Panel buttons (top icons) */
-    .gjs-pn-btn{border-radius:6px !important;padding:6px !important;margin:2px !important;color:#888 !important}
+    /* Keep the canvas toolbar (device/preview/undo/redo icons) */
+    .gjs-pn-commands,
+    .gjs-pn-options,
+    .gjs-pn-devices-c{
+      background:#1e1f22 !important;
+      border:none !important;
+    }
+
+    /* Panel buttons (canvas toolbar icons) */
+    .gjs-pn-btn{border-radius:6px !important;padding:6px !important;margin:2px !important;color:#888 !important;transition:all .15s !important}
     .gjs-pn-btn:hover{color:#ddd !important;background:rgba(255,255,255,.06) !important}
     .gjs-pn-btn.gjs-pn-active{background:#a78bfa !important;color:#fff !important}
 
     /* ── Blocks (draggable elements) ── */
-    .gjs-block{background:#222328 !important;border:1px solid #333 !important;border-radius:8px !important;color:#bbb !important;padding:10px 8px !important;min-height:auto !important;font-size:.75rem !important;transition:all .15s !important}
+    .gjs-block{background:#222328 !important;border:1px solid #2e2f33 !important;border-radius:8px !important;color:#bbb !important;padding:10px 8px !important;min-height:auto !important;font-size:.75rem !important;transition:all .15s !important;display:flex !important;flex-direction:column !important;align-items:center !important;gap:6px !important}
     .gjs-block:hover{border-color:#a78bfa !important;color:#fff !important;background:#2a2b30 !important}
-    .gjs-block__media{display:none !important}
-    .gjs-blocks-cs{padding:8px !important}
+    .gjs-block__media{display:flex !important;align-items:center;justify-content:center;width:28px !important;height:28px !important;flex-shrink:0}
+    .gjs-block__media svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+    .gjs-block-label{font-size:.72rem !important;line-height:1.2 !important}
+    .gjs-blocks-cs{padding:8px !important;gap:6px !important}
     .gjs-block-category .gjs-title{background:#1a1b1e !important;color:#888 !important;font-size:.7rem !important;text-transform:uppercase !important;letter-spacing:.06em !important;padding:10px 12px !important;border-bottom:1px solid #2a2b2e !important}
 
     /* ── Layers (left panel) ── */
     .gjs-layers{background:#1a1b1e !important}
-    .gjs-layer{border-bottom:1px solid #222 !important}
-    .gjs-layer-name{font-size:.78rem !important;padding:6px 4px !important}
-    .gjs-layer.gjs-selected .gjs-layer-name{background:rgba(167,139,250,.15) !important}
+    .gjs-layer{border-bottom:1px solid rgba(255,255,255,.04) !important;transition:background .1s !important}
+    .gjs-layer:hover{background:rgba(255,255,255,.03) !important}
+    .gjs-layer-name{font-size:.78rem !important;padding:6px 4px !important;color:#aaa !important}
+    .gjs-layer.gjs-selected{background:rgba(167,139,250,.08) !important;border-left:3px solid #a78bfa !important}
+    .gjs-layer.gjs-selected .gjs-layer-name{color:#ddd !important}
     .gjs-layer-title{padding:4px 8px !important}
+    .gjs-layer-caret{color:#666 !important}
 
     /* ── Style Manager (right panel sectors) ── */
     .gjs-sm-sector{border-bottom:1px solid #2a2b2e !important}
-    .gjs-sm-sector-title{background:#1e1f22 !important;color:#999 !important;font-size:.7rem !important;text-transform:uppercase !important;letter-spacing:.06em !important;padding:10px 14px !important;font-weight:600 !important}
+    .gjs-sm-sector-title{background:#1e1f22 !important;color:#999 !important;font-size:.7rem !important;text-transform:uppercase !important;letter-spacing:.06em !important;padding:10px 14px !important;font-weight:600 !important;cursor:pointer !important;transition:color .15s !important}
     .gjs-sm-sector.gjs-sm-open .gjs-sm-sector-title{color:#ddd !important}
-    .gjs-sm-properties{padding:8px 12px !important}
+    .gjs-sm-properties{padding:10px 14px !important}
     .gjs-sm-label{color:#888 !important;font-size:.7rem !important;font-weight:500 !important}
-    .gjs-field{background:#151618 !important;border:1px solid #333 !important;border-radius:6px !important;color:#ddd !important;font-size:.8rem !important}
+    .gjs-field{background:#151618 !important;border:1px solid #333 !important;border-radius:6px !important;color:#ddd !important;font-size:.82rem !important}
     .gjs-field:focus-within{border-color:#a78bfa !important;box-shadow:0 0 0 2px rgba(167,139,250,.15) !important}
     .gjs-field-arrows{display:flex !important}
-    .gjs-input-holder input{padding:6px 8px !important}
-    .gjs-field select{padding:6px 8px !important;background:#151618 !important;color:#ddd !important}
+    .gjs-input-holder input{padding:8px 12px !important;font-size:.85rem !important}
+    .gjs-field select{padding:8px 12px !important;background:#151618 !important;color:#ddd !important;font-size:.85rem !important}
+    .gjs-field-color-picker{border-radius:4px !important}
 
-    /* ── Selector/Class manager ── */
+    /* ── Selector / Class manager ── */
     .gjs-clm-tags{padding:8px 12px !important;background:#1a1b1e !important}
     .gjs-clm-tag{background:#222328 !important;border-radius:4px !important;color:#bbb !important}
+    .gjs-clm-sels-info{font-size:.7rem !important;color:#666 !important}
 
     /* ── Traits (component settings) ── */
     .gjs-trt-traits{padding:4px 0 !important}
-    .gjs-trt-trait{padding:8px 14px !important;border-bottom:1px solid #222 !important}
+    .gjs-trt-trait{padding:10px 16px !important;border-bottom:1px solid rgba(255,255,255,.04) !important;display:flex !important;flex-direction:column !important;gap:6px !important}
     .gjs-trt-trait:last-child{border-bottom:none !important}
-    .gjs-trt-trait .gjs-label{font-size:.7rem !important;font-weight:600 !important;color:#999 !important;text-transform:uppercase !important;letter-spacing:.04em !important;margin-bottom:4px !important}
-    .gjs-trt-trait .gjs-field{min-height:34px !important}
-    .gjs-trt-trait textarea.gjs-field{min-height:80px !important;resize:vertical !important;line-height:1.5 !important;padding:8px 10px !important}
+    .gjs-trt-trait .gjs-label{font-size:.7rem !important;font-weight:600 !important;color:#999 !important;text-transform:uppercase !important;letter-spacing:.04em !important;width:100% !important;white-space:normal !important;overflow:visible !important;text-overflow:unset !important;min-width:0 !important;flex:none !important}
+    .gjs-trt-trait .gjs-field{min-height:36px !important;width:100% !important}
+    .gjs-trt-trait textarea.gjs-field{min-height:120px !important;resize:vertical !important;line-height:1.6 !important;padding:10px 12px !important;font-size:.85rem !important}
+    .gjs-trt-trait input.gjs-field,
+    .gjs-trt-trait .gjs-field input{padding:8px 12px !important;font-size:.85rem !important}
 
-    /* ── Scrollbar ── */
-    .gjs-pn-views-container ::-webkit-scrollbar{width:5px}
-    .gjs-pn-views-container ::-webkit-scrollbar-track{background:#1a1b1e}
-    .gjs-pn-views-container ::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+    /* ── Element info header ── */
+    #element-info{
+      background:#1e1f22;padding:12px 16px;border-bottom:1px solid #2a2b2e;
+      display:flex;align-items:center;gap:8px;flex-shrink:0;min-height:44px;
+    }
+    #element-info .el-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    #element-info .el-tag{font-weight:700;font-size:.8rem;color:#ddd;text-transform:uppercase}
+    #element-info .el-classes{font-size:.72rem;color:#666;margin-left:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    #element-info .el-empty{font-size:.75rem;color:#555;font-style:italic}
 
-    /* Hide GrapesJS default panels (we use custom layout) */
-    .gjs-pn-views,.gjs-pn-views-container{display:none !important}
+    /* ── Tab buttons (shared) ── */
+    .panel-tabs{display:flex;border-bottom:1px solid #2a2b2e;flex-shrink:0}
+    .tab-btn{
+      flex:1;padding:10px 0;font-size:.72rem;font-weight:600;
+      text-transform:uppercase;letter-spacing:.05em;
+      background:none;border:none;color:#555;cursor:pointer;
+      border-bottom:2px solid transparent;font-family:inherit;
+      transition:color .15s, border-color .15s;
+    }
+    .tab-btn:hover{color:#999}
+    .tab-btn.active{color:#bbb;border-bottom-color:#a78bfa}
+
+    /* ── Scrollbars (all panels) ── */
+    #left-panel ::-webkit-scrollbar,
+    #right-panel ::-webkit-scrollbar{width:5px}
+    #left-panel ::-webkit-scrollbar-track,
+    #right-panel ::-webkit-scrollbar-track{background:#1a1b1e}
+    #left-panel ::-webkit-scrollbar-thumb,
+    #right-panel ::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+    #left-panel ::-webkit-scrollbar-thumb:hover,
+    #right-panel ::-webkit-scrollbar-thumb:hover{background:#444}
 
     /* ── Rich text editor toolbar ── */
     .gjs-rte-toolbar{background:#222 !important;border:1px solid #444 !important;border-radius:6px !important;box-shadow:0 4px 12px rgba(0,0,0,.3) !important}
@@ -113,10 +153,20 @@
     .gjs-rte-action:hover{color:#fff !important;background:rgba(255,255,255,.1) !important}
     .gjs-rte-active{color:#a78bfa !important}
 
-    /* Toast */
+    /* ── Composite/radio fields polish ── */
+    .gjs-sm-composite{padding:6px 0 !important}
+    .gjs-radio-item{border-radius:4px !important;transition:background .1s !important}
+    .gjs-radio-item:hover{background:rgba(255,255,255,.04) !important}
+    .gjs-radio-item input:checked + .gjs-radio-item-label{background:#a78bfa !important;color:#fff !important;border-radius:4px !important}
+
+    /* ── Toast ── */
     .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);opacity:0;padding:10px 20px;border-radius:8px;font-size:.85rem;font-weight:500;color:#fff;z-index:9999;transition:all .3s;box-shadow:0 4px 12px rgba(0,0,0,.3)}
     .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-    .toast.success{background:#059669}.toast.error{background:#dc2626}
+    .toast.success{background:#059669}
+    .toast.error{background:#dc2626}
+
+    /* ── Empty state for traits panel ── */
+    .traits-empty{padding:24px 16px;text-align:center;color:#555;font-size:.8rem;line-height:1.5}
   </style>
 </head>
 <body>
@@ -136,34 +186,43 @@
     </div>
     <div class="right">
       <a href="/dashboard">Fordon</a>
-      <a href="/" target="_blank">Visa sajten ↗</a>
-      <button onclick="undoAction()">↶ Ångra</button>
-      <button onclick="redoAction()">↷ Gör om</button>
+      <a href="/" target="_blank">Visa sajten &#8599;</a>
+      <button onclick="undoAction()">&#8630; Angra</button>
+      <button onclick="redoAction()">&#8631; Gor om</button>
       <button class="save-btn" id="saveBtn" onclick="saveChanges()">Spara</button>
       <button onclick="netlifyIdentity.logout();location.reload()" style="border-color:#555">Logga ut</button>
     </div>
   </div>
   <div style="display:flex;flex:1;overflow:hidden">
+
     <!-- Left panel: Layers + Blocks -->
     <div id="left-panel" style="width:240px;min-width:240px;background:#1a1b1e;border-right:1px solid #2a2b2e;display:flex;flex-direction:column;overflow:hidden">
-      <div style="display:flex;border-bottom:1px solid #2a2b2e;flex-shrink:0">
-        <button class="tab-btn active" onclick="switchLeft('layers')" id="tab-layers" style="flex:1;padding:10px 0;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;background:none;border:none;color:#aaa;cursor:pointer;border-bottom:2px solid #a78bfa;font-family:inherit">Lager</button>
-        <button class="tab-btn" onclick="switchLeft('blocks')" id="tab-blocks" style="flex:1;padding:10px 0;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;background:none;border:none;color:#666;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit">Block</button>
+      <div class="panel-tabs">
+        <button class="tab-btn active" onclick="switchLeft('layers')" id="tab-layers">Lager</button>
+        <button class="tab-btn" onclick="switchLeft('blocks')" id="tab-blocks">Block</button>
       </div>
       <div id="layers-panel" style="flex:1;overflow-y:auto"></div>
       <div id="blocks-panel" style="flex:1;overflow-y:auto;display:none"></div>
     </div>
+
     <!-- Canvas -->
     <div id="gjs" style="flex:1"></div>
-    <!-- Right panel: Traits + Styles -->
+
+    <!-- Right panel: Element info + Tabs (Innehall / Stilar) -->
     <div id="right-panel" style="width:300px;min-width:300px;background:#1a1b1e;border-left:1px solid #2a2b2e;display:flex;flex-direction:column;overflow:hidden">
-      <div style="display:flex;border-bottom:1px solid #2a2b2e;flex-shrink:0">
-        <button class="tab-btn active" onclick="switchRight('traits')" id="tab-traits" style="flex:1;padding:10px 0;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;background:none;border:none;color:#aaa;cursor:pointer;border-bottom:2px solid #a78bfa;font-family:inherit">Innehåll</button>
-        <button class="tab-btn" onclick="switchRight('styles')" id="tab-styles" style="flex:1;padding:10px 0;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;background:none;border:none;color:#666;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit">Stilar</button>
+      <div id="element-info">
+        <span class="el-empty">Klicka pa ett element</span>
       </div>
-      <div id="traits-panel" style="flex:1;overflow-y:auto"></div>
+      <div class="panel-tabs">
+        <button class="tab-btn active" onclick="switchRight('traits')" id="tab-traits">Innehall</button>
+        <button class="tab-btn" onclick="switchRight('styles')" id="tab-styles">Stilar</button>
+      </div>
+      <div id="traits-panel" style="flex:1;overflow-y:auto">
+        <div class="traits-empty">Markera ett element for att redigera innehall</div>
+      </div>
       <div id="styles-panel" style="flex:1;overflow-y:auto;display:none"></div>
     </div>
+
   </div>
 </div>
 
@@ -172,7 +231,9 @@
 <script>
 let editor, token, pageSha;
 
-/* ── Auth ── */
+/* ================================================================
+   AUTH
+   ================================================================ */
 function initAuth() {
   const u = netlifyIdentity.currentUser();
   if (u) startApp(u);
@@ -189,7 +250,9 @@ async function startApp(user) {
   await loadPageAndInit();
 }
 
-/* ── Load page HTML from GitHub ── */
+/* ================================================================
+   LOAD PAGE HTML FROM GITHUB
+   ================================================================ */
 async function loadPageAndInit() {
   try {
     const r = await fetch('/.netlify/git/github/contents/index.html', {
@@ -207,13 +270,26 @@ async function loadPageAndInit() {
   }
 }
 
-/* ── GrapesJS Init ── */
+/* ================================================================
+   BLOCK SVG ICONS
+   ================================================================ */
+const BLOCK_ICONS = {
+  section: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>',
+  cta: '<svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="10" rx="5"/><line x1="8" y1="12" x2="16" y2="12"/></svg>',
+  card: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="7" y1="14" x2="17" y2="14"/><line x1="7" y1="17" x2="13" y2="17"/></svg>',
+  faq: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 0 1 4.87.5c0 1.5-2.37 2-2.37 3"/><circle cx="12" cy="16.5" r=".5" fill="currentColor"/></svg>',
+  trust: '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
+};
+
+/* ================================================================
+   GRAPESJS INIT
+   ================================================================ */
 function initEditor(html) {
-  // Extract body content and styles
+  // Parse the incoming HTML
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
 
-  // Get external CSS links
+  // Gather external CSS links
   const cssLinks = [];
   doc.querySelectorAll('link[rel="stylesheet"]').forEach(l => {
     let href = l.getAttribute('href');
@@ -221,7 +297,7 @@ function initEditor(html) {
     if (href) cssLinks.push(href);
   });
 
-  // Get body HTML (exclude scripts)
+  // Get body HTML without scripts
   const bodyClone = doc.body.cloneNode(true);
   bodyClone.querySelectorAll('script').forEach(s => s.remove());
   const bodyHTML = bodyClone.innerHTML;
@@ -262,13 +338,23 @@ function initEditor(html) {
       appendTo: '#styles-panel',
       sectors: [
         { name: 'Layout', open: true, properties: [
-          { extend: 'display', type: 'radio', defaults: 'block', options: [{value:'block',name:'Block'},{value:'flex',name:'Flex'},{value:'grid',name:'Grid'},{value:'inline',name:'Inline'},{value:'none',name:'Dölj'}] },
+          { extend: 'display', type: 'radio', defaults: 'block', options: [
+            {value:'block',name:'Block'},{value:'flex',name:'Flex'},{value:'grid',name:'Grid'},
+            {value:'inline',name:'Inline'},{value:'none',name:'Dolj'}
+          ]},
           'flex-direction','flex-wrap','justify-content','align-items','align-content','gap',
           'position','top','right','bottom','left','z-index','overflow'
         ]},
-        { name: 'Storlek', open: false, properties: ['width','min-width','max-width','height','min-height','max-height','margin','padding'] },
-        { name: 'Typografi', open: false, properties: ['font-family','font-size','font-weight','letter-spacing','color','line-height','text-align','text-decoration','text-transform'] },
-        { name: 'Utseende', open: false, properties: ['background-color','background','border-radius','border','box-shadow','opacity'] },
+        { name: 'Storlek', open: false, properties: [
+          'width','min-width','max-width','height','min-height','max-height','margin','padding'
+        ]},
+        { name: 'Typografi', open: false, properties: [
+          'font-family','font-size','font-weight','letter-spacing','color','line-height',
+          'text-align','text-decoration','text-transform'
+        ]},
+        { name: 'Utseende', open: false, properties: [
+          'background-color','background','border-radius','border','box-shadow','opacity'
+        ]},
       ]
     },
     traitManager: { appendTo: '#traits-panel' },
@@ -281,50 +367,127 @@ function initEditor(html) {
     },
   });
 
-  // Add custom blocks for HM Motor components
+  /* ── Custom HM Motor blocks ── */
   const bm = editor.BlockManager;
 
   bm.add('hm-section', {
     label: 'Sektion',
     category: 'HM Motor',
-    content: '<section class="section section--white"><div class="container"><div class="section-header"><h2>Ny sektion</h2></div><p>Innehåll här...</p></div></section>',
+    media: BLOCK_ICONS.section,
+    content: '<section class="section section--white"><div class="container"><div class="section-header"><h2>Ny sektion</h2></div><p>Innehall har...</p></div></section>',
   });
 
   bm.add('hm-cta', {
     label: 'CTA-knapp',
     category: 'HM Motor',
-    content: '<a href="#" class="btn btn-blue btn-lg">Klicka här</a>',
+    media: BLOCK_ICONS.cta,
+    content: '<a href="#" class="btn btn-blue btn-lg">Klicka har</a>',
   });
 
   bm.add('hm-card', {
     label: 'Nyhetskort',
     category: 'HM Motor',
-    content: `<div class="just-nu-card"><span class="just-nu-label">Nyheter</span><h3>Rubrik</h3><p>Beskrivning</p><a href="#">Läs mer →</a></div>`,
+    media: BLOCK_ICONS.card,
+    content: '<div class="just-nu-card"><span class="just-nu-label">Nyheter</span><h3>Rubrik</h3><p>Beskrivning</p><a href="#">Las mer &rarr;</a></div>',
   });
 
   bm.add('hm-faq', {
-    label: 'FAQ-fråga',
+    label: 'FAQ-fraga',
     category: 'HM Motor',
-    content: '<details class="faq-item"><summary>Ny fråga<span class="faq-toggle">+</span></summary><p>Svar här...</p></details>',
+    media: BLOCK_ICONS.faq,
+    content: '<details class="faq-item"><summary>Ny fraga<span class="faq-toggle">+</span></summary><p>Svar har...</p></details>',
   });
 
   bm.add('hm-trust', {
     label: 'Trust-signal',
     category: 'HM Motor',
-    content: '<div class="hero-trust-item"><strong>99+</strong> nöjda kunder</div>',
+    media: BLOCK_ICONS.trust,
+    content: '<div class="hero-trust-item"><strong>99+</strong> nojda kunder</div>',
   });
 
-  // After canvas loads, init Lucide icons
+  /* ── Lucide icons init after canvas loads ── */
   editor.on('canvas:frame:load', ({ window: w }) => {
     setTimeout(() => {
       if (w.lucide) w.lucide.createIcons();
     }, 500);
   });
 
-  // Text tags that should show content editor
+  /* ── Semantic layer names ── */
+  function setSemanticName(comp) {
+    const el = comp.getEl();
+    if (!el) return;
+    const tag = (el.tagName || '').toLowerCase();
+    if (!tag || tag === 'body') return;
+
+    // Build a meaningful name
+    const classes = comp.getClasses();
+    const firstClass = classes.length ? '.' + classes[0] : '';
+    let name = tag + firstClass;
+
+    // For text-only elements, show a snippet of text
+    const TEXT_ELEMENTS = ['h1','h2','h3','h4','h5','h6','p','span','a','button','label','li','summary'];
+    if (TEXT_ELEMENTS.includes(tag) && !firstClass) {
+      const text = (el.textContent || '').trim();
+      if (text.length > 0) {
+        name = tag + ': ' + text.substring(0, 22) + (text.length > 22 ? '...' : '');
+      }
+    }
+
+    comp.set('custom-name', name);
+  }
+
+  // Apply semantic names after init
+  editor.on('load', () => {
+    const wrapper = editor.DomComponents.getWrapper();
+    if (wrapper) {
+      wrapper.onAll(comp => setSemanticName(comp));
+    }
+  });
+
+  // Apply to newly added components
+  editor.on('component:add', (comp) => {
+    setTimeout(() => setSemanticName(comp), 50);
+  });
+
+  /* ── Element info header ── */
+  const TAG_COLORS = {
+    'SECTION':'#a78bfa','HEADER':'#a78bfa','FOOTER':'#a78bfa','NAV':'#a78bfa','MAIN':'#a78bfa','ARTICLE':'#a78bfa','ASIDE':'#a78bfa',
+    'DIV':'#666','SPAN':'#666',
+    'H1':'#f59e0b','H2':'#f59e0b','H3':'#f59e0b','H4':'#f59e0b','H5':'#f59e0b','H6':'#f59e0b',
+    'P':'#22d3ee','A':'#3b82f6','BUTTON':'#3b82f6',
+    'IMG':'#10b981','VIDEO':'#10b981','SVG':'#10b981',
+    'UL':'#ec4899','OL':'#ec4899','LI':'#ec4899',
+    'FORM':'#ef4444','INPUT':'#ef4444','TEXTAREA':'#ef4444','SELECT':'#ef4444',
+    'DETAILS':'#f97316','SUMMARY':'#f97316',
+  };
+
+  function updateElementInfo(model) {
+    const infoEl = document.getElementById('element-info');
+    if (!model) {
+      infoEl.innerHTML = '<span class="el-empty">Klicka pa ett element</span>';
+      return;
+    }
+    const el = model.getEl();
+    if (!el) return;
+
+    const tag = el.tagName;
+    const classes = model.getClasses();
+    const dotColor = TAG_COLORS[tag] || '#666';
+    const classText = classes.length ? classes.map(c => '.' + c).join(' ') : '';
+
+    infoEl.innerHTML =
+      '<span class="el-dot" style="background:' + dotColor + '"></span>' +
+      '<span class="el-tag">' + tag + '</span>' +
+      (classText ? '<span class="el-classes">' + classText + '</span>' : '');
+  }
+
+  editor.on('component:selected', updateElementInfo);
+  editor.on('component:deselected', () => updateElementInfo(null));
+
+  /* ── Text tags that show content editor ── */
   const TEXT_TAGS = ['H1','H2','H3','H4','H5','H6','P','SPAN','A','SUMMARY','STRONG','LABEL','LI','TD','TH','BUTTON','FIGCAPTION'];
 
-  // When selecting a component, show its text content as a trait
+  /* ── When selecting a component, configure traits ── */
   editor.on('component:selected', (model) => {
     const el = model.getEl();
     if (!el) return;
@@ -335,25 +498,25 @@ function initEditor(html) {
       model.set('editable', true);
     }
 
-    // Add content trait for text elements
+    // Build trait list
     const traits = [];
     if (TEXT_TAGS.includes(tag)) {
       traits.push({
         type: 'textarea',
-        label: 'Textinnehåll',
+        label: 'Textinnehall',
         name: 'content-text',
         changeProp: true,
         placeholder: 'Skriv text...',
       });
     }
 
-    // Add href trait for links
+    // Link traits
     if (tag === 'A') {
-      traits.push({ type: 'text', label: 'Länk (URL)', name: 'href', placeholder: 'https://...' });
-      traits.push({ type: 'select', label: 'Öppna i', name: 'target', options: [{value:'', name:'Samma flik'},{value:'_blank', name:'Ny flik'}] });
+      traits.push({ type: 'text', label: 'Lank (URL)', name: 'href', placeholder: 'https://...' });
+      traits.push({ type: 'select', label: 'Oppna i', name: 'target', options: [{value:'', name:'Samma flik'},{value:'_blank', name:'Ny flik'}] });
     }
 
-    // Add src/alt for images
+    // Image traits
     if (tag === 'IMG') {
       traits.push({ type: 'text', label: 'Bild-URL', name: 'src', placeholder: 'https://...' });
       traits.push({ type: 'text', label: 'Alt-text', name: 'alt', placeholder: 'Beskrivning...' });
@@ -362,9 +525,8 @@ function initEditor(html) {
     if (traits.length) {
       model.set('traits', traits);
 
-      // Set initial value for content-text trait
+      // Set initial value for content-text
       if (TEXT_TAGS.includes(tag)) {
-        // Get direct text (not children's text)
         const directText = Array.from(el.childNodes)
           .filter(n => n.nodeType === 3)
           .map(n => n.textContent.trim())
@@ -372,18 +534,20 @@ function initEditor(html) {
         model.set('content-text', directText);
       }
 
-      // Auto-switch to Innehåll tab
+      // Auto-switch to Innehall tab
       switchRight('traits');
+    } else {
+      // No traits — show empty state or switch to styles
+      model.set('traits', []);
     }
   });
 
-  // When content-text trait changes, update the component
+  /* ── When content-text changes, update component ── */
   editor.on('component:update:content-text', (model) => {
     const newText = model.get('content-text');
     if (newText !== undefined) {
       const el = model.getEl();
       if (el) {
-        // If element has child elements, only replace text nodes
         const hasChildren = el.querySelector('*');
         if (hasChildren) {
           const textNode = Array.from(el.childNodes).find(n => n.nodeType === 3);
@@ -396,25 +560,38 @@ function initEditor(html) {
   });
 }
 
-/* ── Tab switching ── */
+/* ================================================================
+   TAB SWITCHING
+   ================================================================ */
 function switchLeft(tab) {
-  document.getElementById('layers-panel').style.display = tab === 'layers' ? 'block' : 'none';
-  document.getElementById('blocks-panel').style.display = tab === 'blocks' ? 'block' : 'none';
-  document.getElementById('tab-layers').style.color = tab === 'layers' ? '#aaa' : '#666';
-  document.getElementById('tab-layers').style.borderBottomColor = tab === 'layers' ? '#a78bfa' : 'transparent';
-  document.getElementById('tab-blocks').style.color = tab === 'blocks' ? '#aaa' : '#666';
-  document.getElementById('tab-blocks').style.borderBottomColor = tab === 'blocks' ? '#a78bfa' : 'transparent';
-}
-function switchRight(tab) {
-  document.getElementById('traits-panel').style.display = tab === 'traits' ? 'block' : 'none';
-  document.getElementById('styles-panel').style.display = tab === 'styles' ? 'block' : 'none';
-  document.getElementById('tab-traits').style.color = tab === 'traits' ? '#aaa' : '#666';
-  document.getElementById('tab-traits').style.borderBottomColor = tab === 'traits' ? '#a78bfa' : 'transparent';
-  document.getElementById('tab-styles').style.color = tab === 'styles' ? '#aaa' : '#666';
-  document.getElementById('tab-styles').style.borderBottomColor = tab === 'styles' ? '#a78bfa' : 'transparent';
+  const layersPanel = document.getElementById('layers-panel');
+  const blocksPanel = document.getElementById('blocks-panel');
+  const tabLayers = document.getElementById('tab-layers');
+  const tabBlocks = document.getElementById('tab-blocks');
+
+  layersPanel.style.display = tab === 'layers' ? 'block' : 'none';
+  blocksPanel.style.display = tab === 'blocks' ? 'block' : 'none';
+
+  tabLayers.classList.toggle('active', tab === 'layers');
+  tabBlocks.classList.toggle('active', tab === 'blocks');
 }
 
-/* ── Actions ── */
+function switchRight(tab) {
+  const traitsPanel = document.getElementById('traits-panel');
+  const stylesPanel = document.getElementById('styles-panel');
+  const tabTraits = document.getElementById('tab-traits');
+  const tabStyles = document.getElementById('tab-styles');
+
+  traitsPanel.style.display = tab === 'traits' ? 'block' : 'none';
+  stylesPanel.style.display = tab === 'styles' ? 'block' : 'none';
+
+  tabTraits.classList.toggle('active', tab === 'traits');
+  tabStyles.classList.toggle('active', tab === 'styles');
+}
+
+/* ================================================================
+   ACTIONS
+   ================================================================ */
 function undoAction() { if (editor) editor.UndoManager.undo(); }
 function redoAction() { if (editor) editor.UndoManager.redo(); }
 
@@ -425,14 +602,9 @@ async function saveChanges() {
   btn.disabled = true;
 
   try {
-    // Get the full HTML
     const html = editor.getHtml();
     const css = editor.getCss();
-
-    // Reconstruct full page
     const fullHTML = buildFullPage(html, css);
-
-    // Save via Git Gateway
     const encoded = btoa(unescape(encodeURIComponent(fullHTML)));
 
     // Get fresh SHA
@@ -465,15 +637,13 @@ async function saveChanges() {
 }
 
 function buildFullPage(bodyHTML, editorCSS) {
-  // We need to wrap the edited body back in the full HTML structure
-  // Start with original head, add edited body
   return `<!DOCTYPE html>
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HM Motor Krokom | Begagnade Bilar, Fyrhjulingar & ATV i Jämtland</title>
-<meta name="description" content="HM Motor i Krokom — Jämtlands mest pålitliga fordonshandlare sedan 1990. Begagnade bilar, CF Moto fyrhjulingar, mopeder, släpvagnar. Finansiering via Wasa Kredit.">
+<title>HM Motor Krokom | Begagnade Bilar, Fyrhjulingar & ATV i Jamtland</title>
+<meta name="description" content="HM Motor i Krokom — Jamtlands mest palitliga fordonshandlare sedan 1990. Begagnade bilar, CF Moto fyrhjulingar, mopeder, slapvagnar. Finansiering via Wasa Kredit.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://hmmotor.se/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -500,7 +670,9 @@ if (window.netlifyIdentity) {
 </html>`;
 }
 
-/* ── Toast ── */
+/* ================================================================
+   TOAST
+   ================================================================ */
 function toast(msg, type) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -508,7 +680,9 @@ function toast(msg, type) {
   setTimeout(() => t.classList.remove('show'), 4000);
 }
 
-/* ── Init ── */
+/* ================================================================
+   INIT
+   ================================================================ */
 if (window.netlifyIdentity) netlifyIdentity.on('init', () => initAuth());
 </script>
 </body>
