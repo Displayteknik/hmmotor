@@ -13,102 +13,116 @@
   <style>
     /* ── Reset ── */
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Inter',sans-serif;background:#18191b;color:#ddd;height:100vh;overflow:hidden}
+    body{font-family:'Inter',sans-serif;background:#111113;color:#e4e4e7;height:100vh;overflow:hidden}
 
     /* ── Login ── */
-    #login{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#111}
+    #login{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#111113}
     #login h1{font-size:1.4rem;font-weight:700;margin-bottom:.25rem;color:#fff}
-    #login p{color:#888;font-size:.85rem;margin-bottom:2rem}
-    #login button{background:#2563eb;color:#fff;border:none;padding:12px 32px;font-size:.9rem;font-weight:600;border-radius:8px;cursor:pointer;font-family:inherit;transition:background .15s}
-    #login button:hover{background:#1d4ed8}
+    #login p{color:#71717a;font-size:.85rem;margin-bottom:2rem}
+    #login button{background:#4ade80;color:#09090b;border:none;padding:12px 32px;font-size:.9rem;font-weight:600;border-radius:8px;cursor:pointer;font-family:inherit;transition:background .15s}
+    #login button:hover{background:#22c55e}
 
     /* ── Editor wrapper ── */
     #editor-wrap{display:none;height:100vh;flex-direction:column}
 
     /* ── Top bar ── */
-    .topbar{height:46px;background:#1e1f22;border-bottom:1px solid #2a2b2e;display:flex;align-items:center;justify-content:space-between;padding:0 12px;flex-shrink:0;z-index:10}
+    .topbar{height:46px;background:#18181b;border-bottom:1px solid #27272a;display:flex;align-items:center;justify-content:space-between;padding:0 12px;flex-shrink:0;z-index:10}
     .topbar .left{display:flex;align-items:center;gap:10px}
     .topbar .brand{font-weight:700;font-size:.85rem;color:#fff}
-    .topbar .sep{color:#444}
-    .topbar .mode{color:#888;font-size:.8rem}
+    .topbar .sep{color:#3f3f46}
+    .topbar .mode{color:#71717a;font-size:.8rem}
     .topbar .right{display:flex;align-items:center;gap:6px}
-    .topbar button,.topbar a{font-size:.78rem;font-weight:500;font-family:inherit;padding:6px 12px;border-radius:6px;cursor:pointer;border:1px solid #333;background:#2a2b2e;color:#ccc;text-decoration:none;transition:all .15s}
-    .topbar button:hover,.topbar a:hover{background:#333;color:#fff}
-    .topbar .save-btn{background:#2563eb;color:#fff;border-color:#2563eb}
-    .topbar .save-btn:hover{background:#1d4ed8}
+    .topbar button,.topbar a{font-size:.78rem;font-weight:500;font-family:inherit;padding:6px 12px;border-radius:6px;cursor:pointer;border:1px solid #27272a;background:#18181b;color:#a1a1aa;text-decoration:none;transition:all .15s}
+    .topbar button:hover,.topbar a:hover{background:#27272a;color:#e4e4e7}
+    .topbar .save-btn{background:#4ade80;color:#09090b;border-color:#4ade80;font-weight:600}
+    .topbar .save-btn:hover{background:#22c55e;border-color:#22c55e}
 
     /* ── GrapesJS canvas ── */
     #gjs{flex:1;overflow:hidden}
 
     /* ── Dark theme base ── */
-    .gjs-one-bg{background:#1a1b1e !important}
-    .gjs-two-color{color:#ddd !important}
-    .gjs-three-bg{background:#222328 !important}
-    .gjs-four-color,.gjs-four-color-h:hover{color:#a78bfa !important}
-    .gjs-cv-canvas{background:#2a2b30 !important}
+    .gjs-one-bg{background:#18181b !important}
+    .gjs-two-color{color:#e4e4e7 !important}
+    .gjs-three-bg{background:#27272a !important}
+    .gjs-four-color,.gjs-four-color-h:hover{color:#4ade80 !important}
+    .gjs-cv-canvas{background:#1a1a1e !important}
 
     /* ── GrapesJS panels base ── */
-    .gjs-pn-panel{border:none !important;background:#1a1b1e !important}
+    .gjs-pn-panel{border:none !important;background:#18181b !important}
 
-    /* Hide the default right sidebar GrapesJS creates — we use custom panels */
+    /* Hide the default right sidebar GrapesJS creates */
     .gjs-pn-views-container{display:none !important}
     .gjs-pn-views{display:none !important}
 
-    /* Keep the canvas toolbar (device/preview/undo/redo icons) */
+    /* Keep the canvas toolbar */
     .gjs-pn-commands,
     .gjs-pn-options,
     .gjs-pn-devices-c{
-      background:#1e1f22 !important;
+      background:#18181b !important;
       border:none !important;
     }
 
     /* Panel buttons (canvas toolbar icons) */
-    .gjs-pn-btn{border-radius:6px !important;padding:6px !important;margin:2px !important;color:#888 !important;transition:all .15s !important}
-    .gjs-pn-btn:hover{color:#ddd !important;background:rgba(255,255,255,.06) !important}
-    .gjs-pn-btn.gjs-pn-active{background:#a78bfa !important;color:#fff !important}
+    .gjs-pn-btn{border-radius:6px !important;padding:6px !important;margin:2px !important;color:#71717a !important;transition:all .15s !important}
+    .gjs-pn-btn:hover{color:#e4e4e7 !important;background:rgba(255,255,255,.06) !important}
+    .gjs-pn-btn.gjs-pn-active{background:#4ade80 !important;color:#09090b !important}
+
+    /* ── Green selection outlines ── */
+    .gjs-selected{outline:2px solid #4ade80 !important;outline-offset:2px}
+    .gjs-hovered{outline:1px dashed #4ade80 !important}
+
+    /* ── Element toolbar ── */
+    .gjs-toolbar{background:#18181b;border:1px solid #27272a;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+    .gjs-toolbar-item{color:#a1a1aa}
+    .gjs-toolbar-item:hover{color:#4ade80}
+
+    /* ── Badge/label ── */
+    .gjs-badge{background:#4ade80;color:#09090b;font-weight:600;border-radius:4px;padding:2px 8px;font-size:11px}
 
     /* ── Blocks (draggable elements) ── */
-    .gjs-block{background:#222328 !important;border:1px solid #2e2f33 !important;border-radius:8px !important;color:#bbb !important;padding:10px 8px !important;min-height:auto !important;font-size:.75rem !important;transition:all .15s !important;display:flex !important;flex-direction:column !important;align-items:center !important;gap:6px !important}
-    .gjs-block:hover{border-color:#a78bfa !important;color:#fff !important;background:#2a2b30 !important}
+    .gjs-blocks-cs{padding:8px !important;display:grid !important;grid-template-columns:1fr 1fr !important;gap:6px !important}
+    .gjs-block{background:#18181b !important;border:1px solid #27272a !important;border-radius:8px !important;color:#a1a1aa !important;padding:10px 8px !important;min-height:auto !important;font-size:.75rem !important;transition:all .15s !important;display:flex !important;flex-direction:column !important;align-items:center !important;gap:6px !important;width:auto !important}
+    .gjs-block:hover{border-color:#4ade80 !important;color:#e4e4e7 !important;background:#1c2a1f !important}
     .gjs-block__media{display:flex !important;align-items:center;justify-content:center;width:28px !important;height:28px !important;flex-shrink:0}
     .gjs-block__media svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
     .gjs-block-label{font-size:.72rem !important;line-height:1.2 !important}
-    .gjs-blocks-cs{padding:8px !important;gap:6px !important}
-    .gjs-block-category .gjs-title{background:#1a1b1e !important;color:#888 !important;font-size:.7rem !important;text-transform:uppercase !important;letter-spacing:.06em !important;padding:10px 12px !important;border-bottom:1px solid #2a2b2e !important}
+    .gjs-block-category .gjs-title{background:#111113 !important;color:#71717a !important;font-size:.7rem !important;text-transform:uppercase !important;letter-spacing:.06em !important;padding:10px 12px !important;border-bottom:1px solid #27272a !important}
 
     /* ── Layers (left panel) ── */
-    .gjs-layers{background:#1a1b1e !important}
-    .gjs-layer{border-bottom:1px solid rgba(255,255,255,.04) !important;transition:background .1s !important}
-    .gjs-layer:hover{background:rgba(255,255,255,.03) !important}
-    .gjs-layer-name{font-size:.78rem !important;padding:6px 4px !important;color:#aaa !important}
-    .gjs-layer.gjs-selected{background:rgba(167,139,250,.08) !important;border-left:3px solid #a78bfa !important}
-    .gjs-layer.gjs-selected .gjs-layer-name{color:#ddd !important}
+    .gjs-layers{background:#18181b !important}
+    .gjs-layer{border-bottom:1px solid rgba(255,255,255,.03) !important;transition:background .1s !important;position:relative}
+    .gjs-layer:hover{background:rgba(74,222,128,.03) !important}
+    .gjs-layer-name{font-size:.78rem !important;padding:6px 4px !important;color:#a1a1aa !important}
+    .gjs-layer.gjs-selected{background:rgba(74,222,128,.08) !important;border-left:3px solid #4ade80 !important}
+    .gjs-layer.gjs-selected .gjs-layer-name{color:#e4e4e7 !important}
     .gjs-layer-title{padding:4px 8px !important}
-    .gjs-layer-caret{color:#666 !important}
+    .gjs-layer-caret{color:#52525b !important}
+    /* Indent lines for hierarchy */
+    .gjs-layer-children{border-left:1px solid #27272a !important;margin-left:12px !important}
 
     /* ── Style Manager (right panel sectors) ── */
-    .gjs-sm-sector{border-bottom:1px solid #2a2b2e !important}
-    .gjs-sm-sector-title{background:#1e1f22 !important;color:#999 !important;font-size:.7rem !important;text-transform:uppercase !important;letter-spacing:.06em !important;padding:10px 14px !important;font-weight:600 !important;cursor:pointer !important;transition:color .15s !important}
-    .gjs-sm-sector.gjs-sm-open .gjs-sm-sector-title{color:#ddd !important}
+    .gjs-sm-sector{border-bottom:1px solid #27272a !important}
+    .gjs-sm-sector-title{background:#111113 !important;color:#71717a !important;font-size:.7rem !important;text-transform:uppercase !important;letter-spacing:.06em !important;padding:10px 14px !important;font-weight:600 !important;cursor:pointer !important;transition:color .15s !important}
+    .gjs-sm-sector.gjs-sm-open .gjs-sm-sector-title{color:#e4e4e7 !important}
     .gjs-sm-properties{padding:10px 14px !important}
-    .gjs-sm-label{color:#888 !important;font-size:.7rem !important;font-weight:500 !important}
-    .gjs-field{background:#151618 !important;border:1px solid #333 !important;border-radius:6px !important;color:#ddd !important;font-size:.82rem !important}
-    .gjs-field:focus-within{border-color:#a78bfa !important;box-shadow:0 0 0 2px rgba(167,139,250,.15) !important}
+    .gjs-sm-label{color:#71717a !important;font-size:.7rem !important;font-weight:500 !important}
+    .gjs-field{background:#09090b !important;border:1px solid #27272a !important;border-radius:6px !important;color:#e4e4e7 !important;font-size:.82rem !important;transition:border-color .15s, box-shadow .15s !important}
+    .gjs-field:focus-within{border-color:#4ade80 !important;box-shadow:0 0 0 2px rgba(74,222,128,.15) !important}
     .gjs-field-arrows{display:flex !important}
     .gjs-input-holder input{padding:8px 12px !important;font-size:.85rem !important}
-    .gjs-field select{padding:8px 12px !important;background:#151618 !important;color:#ddd !important;font-size:.85rem !important}
+    .gjs-field select{padding:8px 12px !important;background:#09090b !important;color:#e4e4e7 !important;font-size:.85rem !important}
     .gjs-field-color-picker{border-radius:4px !important}
 
     /* ── Selector / Class manager ── */
-    .gjs-clm-tags{padding:8px 12px !important;background:#1a1b1e !important}
-    .gjs-clm-tag{background:#222328 !important;border-radius:4px !important;color:#bbb !important}
-    .gjs-clm-sels-info{font-size:.7rem !important;color:#666 !important}
+    .gjs-clm-tags{padding:8px 12px !important;background:#18181b !important}
+    .gjs-clm-tag{background:#1a3a24 !important;border-radius:4px !important;color:#4ade80 !important;border:1px solid rgba(74,222,128,.2) !important}
+    .gjs-clm-sels-info{font-size:.7rem !important;color:#52525b !important}
 
     /* ── Traits (component settings) ── */
     .gjs-trt-traits{padding:4px 0 !important}
     .gjs-trt-trait{padding:10px 16px !important;border-bottom:1px solid rgba(255,255,255,.04) !important;display:flex !important;flex-direction:column !important;gap:6px !important}
     .gjs-trt-trait:last-child{border-bottom:none !important}
-    .gjs-trt-trait .gjs-label{font-size:.7rem !important;font-weight:600 !important;color:#999 !important;text-transform:uppercase !important;letter-spacing:.04em !important;width:100% !important;white-space:normal !important;overflow:visible !important;text-overflow:unset !important;min-width:0 !important;flex:none !important}
+    .gjs-trt-trait .gjs-label{font-size:.7rem !important;font-weight:600 !important;color:#71717a !important;text-transform:uppercase !important;letter-spacing:.04em !important;width:100% !important;white-space:normal !important;overflow:visible !important;text-overflow:unset !important;min-width:0 !important;flex:none !important}
     .gjs-trt-trait .gjs-field{min-height:36px !important;width:100% !important}
     .gjs-trt-trait textarea.gjs-field{min-height:120px !important;resize:vertical !important;line-height:1.6 !important;padding:10px 12px !important;font-size:.85rem !important}
     .gjs-trt-trait input.gjs-field,
@@ -116,48 +130,50 @@
 
     /* ── Element info header ── */
     #element-info{
-      background:#1e1f22;padding:12px 16px;border-bottom:1px solid #2a2b2e;
-      display:flex;align-items:center;gap:8px;flex-shrink:0;min-height:44px;
+      background:#111113;padding:12px 16px;border-bottom:1px solid #27272a;
+      display:flex;align-items:center;gap:8px;flex-shrink:0;min-height:44px;flex-wrap:wrap;
     }
-    #element-info .el-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-    #element-info .el-tag{font-weight:700;font-size:.8rem;color:#ddd;text-transform:uppercase}
-    #element-info .el-classes{font-size:.72rem;color:#666;margin-left:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    #element-info .el-empty{font-size:.75rem;color:#555;font-style:italic}
+    #element-info .el-icon{width:20px;height:20px;color:#4ade80;flex-shrink:0}
+    #element-info .el-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    #element-info .el-tag{font-weight:700;font-size:.75rem;color:#e4e4e7;text-transform:uppercase;letter-spacing:.03em}
+    #element-info .el-classes{display:flex;gap:4px;flex-wrap:wrap}
+    #element-info .el-class-pill{font-size:.65rem;color:#4ade80;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);border-radius:4px;padding:1px 6px;font-weight:500}
+    #element-info .el-empty{font-size:.75rem;color:#52525b;font-style:italic}
 
     /* ── Tab buttons (shared) ── */
-    .panel-tabs{display:flex;border-bottom:1px solid #2a2b2e;flex-shrink:0}
+    .panel-tabs{display:flex;border-bottom:1px solid #27272a;flex-shrink:0;background:#111113}
     .tab-btn{
       flex:1;padding:10px 0;font-size:.72rem;font-weight:600;
       text-transform:uppercase;letter-spacing:.05em;
-      background:none;border:none;color:#555;cursor:pointer;
+      background:none;border:none;color:#52525b;cursor:pointer;
       border-bottom:2px solid transparent;font-family:inherit;
       transition:color .15s, border-color .15s;
     }
-    .tab-btn:hover{color:#999}
-    .tab-btn.active{color:#bbb;border-bottom-color:#a78bfa}
+    .tab-btn:hover{color:#a1a1aa}
+    .tab-btn.active{color:#4ade80;border-bottom-color:#4ade80}
 
     /* ── Scrollbars (all panels) ── */
     #left-panel ::-webkit-scrollbar,
     #right-panel ::-webkit-scrollbar{width:5px}
     #left-panel ::-webkit-scrollbar-track,
-    #right-panel ::-webkit-scrollbar-track{background:#1a1b1e}
+    #right-panel ::-webkit-scrollbar-track{background:#18181b}
     #left-panel ::-webkit-scrollbar-thumb,
-    #right-panel ::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+    #right-panel ::-webkit-scrollbar-thumb{background:#27272a;border-radius:3px}
     #left-panel ::-webkit-scrollbar-thumb:hover,
-    #right-panel ::-webkit-scrollbar-thumb:hover{background:#444}
+    #right-panel ::-webkit-scrollbar-thumb:hover{background:#3f3f46}
 
     /* ── Rich text editor toolbar ── */
-    .gjs-rte-toolbar{background:#222 !important;border:1px solid #444 !important;border-radius:6px !important;box-shadow:0 4px 12px rgba(0,0,0,.3) !important}
+    .gjs-rte-toolbar{background:#18181b !important;border:1px solid #27272a !important;border-radius:6px !important;box-shadow:0 4px 12px rgba(0,0,0,.4) !important}
     .gjs-rte-actionbar{padding:4px !important}
-    .gjs-rte-action{color:#ccc !important;border-radius:4px !important}
-    .gjs-rte-action:hover{color:#fff !important;background:rgba(255,255,255,.1) !important}
-    .gjs-rte-active{color:#a78bfa !important}
+    .gjs-rte-action{color:#a1a1aa !important;border-radius:4px !important}
+    .gjs-rte-action:hover{color:#e4e4e7 !important;background:rgba(255,255,255,.08) !important}
+    .gjs-rte-active{color:#4ade80 !important}
 
     /* ── Composite/radio fields polish ── */
     .gjs-sm-composite{padding:6px 0 !important}
     .gjs-radio-item{border-radius:4px !important;transition:background .1s !important}
     .gjs-radio-item:hover{background:rgba(255,255,255,.04) !important}
-    .gjs-radio-item input:checked + .gjs-radio-item-label{background:#a78bfa !important;color:#fff !important;border-radius:4px !important}
+    .gjs-radio-item input:checked + .gjs-radio-item-label{background:#4ade80 !important;color:#09090b !important;border-radius:4px !important;font-weight:600 !important}
 
     /* ── Toast ── */
     .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);opacity:0;padding:10px 20px;border-radius:8px;font-size:.85rem;font-weight:500;color:#fff;z-index:9999;transition:all .3s;box-shadow:0 4px 12px rgba(0,0,0,.3)}
@@ -166,7 +182,10 @@
     .toast.error{background:#dc2626}
 
     /* ── Empty state for traits panel ── */
-    .traits-empty{padding:24px 16px;text-align:center;color:#555;font-size:.8rem;line-height:1.5}
+    .traits-empty{padding:24px 16px;text-align:center;color:#52525b;font-size:.8rem;line-height:1.5}
+
+    /* ── Section headers in left panel ── */
+    .panel-section-header{padding:10px 14px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#52525b;border-bottom:1px solid #27272a;background:#111113}
   </style>
 </head>
 <body>
@@ -190,13 +209,13 @@
       <button onclick="undoAction()">&#8630; Angra</button>
       <button onclick="redoAction()">&#8631; Gor om</button>
       <button class="save-btn" id="saveBtn" onclick="saveChanges()">Spara</button>
-      <button onclick="netlifyIdentity.logout();location.reload()" style="border-color:#555">Logga ut</button>
+      <button onclick="netlifyIdentity.logout();location.reload()" style="border-color:#3f3f46">Logga ut</button>
     </div>
   </div>
   <div style="display:flex;flex:1;overflow:hidden">
 
     <!-- Left panel: Layers + Blocks -->
-    <div id="left-panel" style="width:240px;min-width:240px;background:#1a1b1e;border-right:1px solid #2a2b2e;display:flex;flex-direction:column;overflow:hidden">
+    <div id="left-panel" style="width:240px;min-width:240px;background:#18181b;border-right:1px solid #27272a;display:flex;flex-direction:column;overflow:hidden">
       <div class="panel-tabs">
         <button class="tab-btn active" onclick="switchLeft('layers')" id="tab-layers">Lager</button>
         <button class="tab-btn" onclick="switchLeft('blocks')" id="tab-blocks">Block</button>
@@ -208,17 +227,17 @@
     <!-- Canvas -->
     <div id="gjs" style="flex:1"></div>
 
-    <!-- Right panel: Element info + Tabs (Innehall / Stilar) -->
-    <div id="right-panel" style="width:300px;min-width:300px;background:#1a1b1e;border-left:1px solid #2a2b2e;display:flex;flex-direction:column;overflow:hidden">
+    <!-- Right panel: Element info + Tabs (Egenskaper / Stilar) -->
+    <div id="right-panel" style="width:320px;min-width:320px;background:#18181b;border-left:1px solid #27272a;display:flex;flex-direction:column;overflow:hidden">
       <div id="element-info">
         <span class="el-empty">Klicka pa ett element</span>
       </div>
       <div class="panel-tabs">
-        <button class="tab-btn active" onclick="switchRight('traits')" id="tab-traits">Innehall</button>
         <button class="tab-btn" onclick="switchRight('styles')" id="tab-styles">Stilar</button>
+        <button class="tab-btn active" onclick="switchRight('traits')" id="tab-traits">Egenskaper</button>
       </div>
       <div id="traits-panel" style="flex:1;overflow-y:auto">
-        <div class="traits-empty">Markera ett element for att redigera innehall</div>
+        <div class="traits-empty">Markera ett element for att redigera egenskaper</div>
       </div>
       <div id="styles-panel" style="flex:1;overflow-y:auto;display:none"></div>
     </div>
@@ -280,6 +299,49 @@ const BLOCK_ICONS = {
   faq: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 0 1 4.87.5c0 1.5-2.37 2-2.37 3"/><circle cx="12" cy="16.5" r=".5" fill="currentColor"/></svg>',
   trust: '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
 };
+
+/* ── Layer icons by element type ── */
+const LAYER_ICONS = {
+  section: '<svg viewBox="0 0 24 24" width="14" height="14"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" fill="none" stroke-width="1.5"/><line x1="3" y1="9" x2="21" y2="9" stroke="currentColor" stroke-width="1.5"/></svg>',
+  div: '<svg viewBox="0 0 24 24" width="14" height="14"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" fill="none" stroke-width="1.5"/></svg>',
+  h: '<svg viewBox="0 0 24 24" width="14" height="14"><text x="5" y="18" font-size="16" font-weight="700" fill="currentColor" font-family="Inter,sans-serif">H</text></svg>',
+  p: '<svg viewBox="0 0 24 24" width="14" height="14"><line x1="4" y1="7" x2="20" y2="7" stroke="currentColor" stroke-width="1.5"/><line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="1.5"/><line x1="4" y1="17" x2="14" y2="17" stroke="currentColor" stroke-width="1.5"/></svg>',
+  a: '<svg viewBox="0 0 24 24" width="14" height="14"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  img: '<svg viewBox="0 0 24 24" width="14" height="14"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" fill="none" stroke-width="1.5"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" fill="none" stroke-width="1.5"/></svg>',
+  nav: '<svg viewBox="0 0 24 24" width="14" height="14"><circle cx="12" cy="12" r="9" stroke="currentColor" fill="none" stroke-width="1.5"/><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36z" stroke="currentColor" fill="none" stroke-width="1.5"/></svg>',
+  header: '<svg viewBox="0 0 24 24" width="14" height="14"><rect x="3" y="3" width="18" height="7" rx="1" stroke="currentColor" fill="none" stroke-width="1.5"/><rect x="3" y="14" width="18" height="7" rx="1" stroke="currentColor" fill="none" stroke-width="1.5"/></svg>',
+  details: '<svg viewBox="0 0 24 24" width="14" height="14"><line x1="8" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.5"/><line x1="8" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.5"/><line x1="8" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="1.5"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg>',
+  footer: '<svg viewBox="0 0 24 24" width="14" height="14"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" fill="none" stroke-width="1.5"/><line x1="3" y1="15" x2="21" y2="15" stroke="currentColor" stroke-width="1.5"/></svg>',
+  span: '<svg viewBox="0 0 24 24" width="14" height="14"><text x="6" y="17" font-size="13" fill="currentColor" font-family="Inter,sans-serif">Aa</text></svg>',
+  button: '<svg viewBox="0 0 24 24" width="14" height="14"><rect x="3" y="7" width="18" height="10" rx="5" stroke="currentColor" fill="none" stroke-width="1.5"/></svg>',
+  form: '<svg viewBox="0 0 24 24" width="14" height="14"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" fill="none" stroke-width="1.5"/><line x1="7" y1="8" x2="17" y2="8" stroke="currentColor" stroke-width="1.5"/><line x1="7" y1="12" x2="17" y2="12" stroke="currentColor" stroke-width="1.5"/><line x1="7" y1="16" x2="12" y2="16" stroke="currentColor" stroke-width="1.5"/></svg>',
+  ul: '<svg viewBox="0 0 24 24" width="14" height="14"><line x1="9" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="1.5"/><line x1="9" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="1.5"/><line x1="9" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="1.5"/><circle cx="5" cy="6" r="1.5" fill="currentColor"/><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="5" cy="18" r="1.5" fill="currentColor"/></svg>',
+  video: '<svg viewBox="0 0 24 24" width="14" height="14"><rect x="2" y="4" width="15" height="16" rx="2" stroke="currentColor" fill="none" stroke-width="1.5"/><path d="M17 9l5-3v12l-5-3z" stroke="currentColor" fill="none" stroke-width="1.5"/></svg>',
+  svg: '<svg viewBox="0 0 24 24" width="14" height="14"><polygon points="12,2 22,22 2,22" stroke="currentColor" fill="none" stroke-width="1.5"/></svg>',
+  input: '<svg viewBox="0 0 24 24" width="14" height="14"><rect x="3" y="7" width="18" height="10" rx="2" stroke="currentColor" fill="none" stroke-width="1.5"/><line x1="7" y1="12" x2="7" y2="12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+};
+
+function getLayerIcon(tag) {
+  const t = tag.toLowerCase();
+  if (t === 'section') return LAYER_ICONS.section;
+  if (t === 'nav') return LAYER_ICONS.nav;
+  if (t === 'header') return LAYER_ICONS.header;
+  if (t === 'footer') return LAYER_ICONS.footer;
+  if (t === 'div') return LAYER_ICONS.div;
+  if (/^h[1-6]$/.test(t)) return LAYER_ICONS.h;
+  if (t === 'p') return LAYER_ICONS.p;
+  if (t === 'a') return LAYER_ICONS.a;
+  if (t === 'img') return LAYER_ICONS.img;
+  if (t === 'details' || t === 'summary') return LAYER_ICONS.details;
+  if (t === 'span' || t === 'strong' || t === 'em' || t === 'label') return LAYER_ICONS.span;
+  if (t === 'button') return LAYER_ICONS.button;
+  if (t === 'form' || t === 'textarea' || t === 'select') return LAYER_ICONS.form;
+  if (t === 'input') return LAYER_ICONS.input;
+  if (t === 'ul' || t === 'ol' || t === 'li') return LAYER_ICONS.ul;
+  if (t === 'video') return LAYER_ICONS.video;
+  if (t === 'svg') return LAYER_ICONS.svg;
+  return LAYER_ICONS.div;
+}
 
 /* ================================================================
    GRAPESJS INIT
@@ -413,23 +475,64 @@ function initEditor(html) {
   });
 
   /* ── Semantic layer names ── */
+  const SEMANTIC_NAMES = {
+    'section': 'Section', 'header': 'Header Section', 'footer': 'Footer Section',
+    'nav': 'Navbar', 'main': 'Main Content', 'article': 'Article', 'aside': 'Sidebar',
+  };
+
   function setSemanticName(comp) {
     const el = comp.getEl();
     if (!el) return;
     const tag = (el.tagName || '').toLowerCase();
     if (!tag || tag === 'body') return;
 
-    // Build a meaningful name
     const classes = comp.getClasses();
-    const firstClass = classes.length ? '.' + classes[0] : '';
-    let name = tag + firstClass;
+    const firstClass = classes.length ? classes[0] : '';
+    let name = '';
 
-    // For text-only elements, show a snippet of text
-    const TEXT_ELEMENTS = ['h1','h2','h3','h4','h5','h6','p','span','a','button','label','li','summary'];
-    if (TEXT_ELEMENTS.includes(tag) && !firstClass) {
+    // Try semantic name first
+    if (SEMANTIC_NAMES[tag]) {
+      name = SEMANTIC_NAMES[tag];
+    } else if (/^h[1-6]$/.test(tag)) {
+      // Count headings of same level for numbering
+      name = tag.toUpperCase() + ' Heading';
+    } else if (tag === 'p') {
+      name = 'P Description';
+    } else if (tag === 'a') {
+      name = 'Link';
+    } else if (tag === 'img') {
+      name = 'Image';
+    } else if (tag === 'div') {
+      if (firstClass) {
+        // Convert class to readable name
+        name = firstClass.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      } else {
+        name = 'Div Block';
+      }
+    } else if (tag === 'details') {
+      name = 'FAQ Item';
+    } else if (tag === 'summary') {
+      name = 'FAQ Question';
+    } else if (tag === 'button') {
+      name = 'Button';
+    } else if (tag === 'span') {
+      name = firstClass ? firstClass.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Span';
+    } else if (tag === 'ul' || tag === 'ol') {
+      name = 'List';
+    } else if (tag === 'li') {
+      name = 'List Item';
+    } else if (tag === 'strong' || tag === 'em') {
+      name = tag === 'strong' ? 'Bold' : 'Italic';
+    } else {
+      name = tag.toUpperCase();
+    }
+
+    // For text elements, append a snippet
+    const TEXT_ELEMENTS = ['h1','h2','h3','h4','h5','h6','p','a','button','label','li','summary'];
+    if (TEXT_ELEMENTS.includes(tag)) {
       const text = (el.textContent || '').trim();
-      if (text.length > 0) {
-        name = tag + ': ' + text.substring(0, 22) + (text.length > 22 ? '...' : '');
+      if (text.length > 0 && text.length < 30) {
+        name += ': "' + text.substring(0, 20) + (text.length > 20 ? '...' : '') + '"';
       }
     }
 
@@ -449,18 +552,7 @@ function initEditor(html) {
     setTimeout(() => setSemanticName(comp), 50);
   });
 
-  /* ── Element info header ── */
-  const TAG_COLORS = {
-    'SECTION':'#a78bfa','HEADER':'#a78bfa','FOOTER':'#a78bfa','NAV':'#a78bfa','MAIN':'#a78bfa','ARTICLE':'#a78bfa','ASIDE':'#a78bfa',
-    'DIV':'#666','SPAN':'#666',
-    'H1':'#f59e0b','H2':'#f59e0b','H3':'#f59e0b','H4':'#f59e0b','H5':'#f59e0b','H6':'#f59e0b',
-    'P':'#22d3ee','A':'#3b82f6','BUTTON':'#3b82f6',
-    'IMG':'#10b981','VIDEO':'#10b981','SVG':'#10b981',
-    'UL':'#ec4899','OL':'#ec4899','LI':'#ec4899',
-    'FORM':'#ef4444','INPUT':'#ef4444','TEXTAREA':'#ef4444','SELECT':'#ef4444',
-    'DETAILS':'#f97316','SUMMARY':'#f97316',
-  };
-
+  /* ── Element info header with icon + class pills ── */
   function updateElementInfo(model) {
     const infoEl = document.getElementById('element-info');
     if (!model) {
@@ -470,15 +562,22 @@ function initEditor(html) {
     const el = model.getEl();
     if (!el) return;
 
-    const tag = el.tagName;
+    const tag = el.tagName.toLowerCase();
     const classes = model.getClasses();
-    const dotColor = TAG_COLORS[tag] || '#666';
-    const classText = classes.length ? classes.map(c => '.' + c).join(' ') : '';
+    const icon = getLayerIcon(tag);
 
-    infoEl.innerHTML =
-      '<span class="el-dot" style="background:' + dotColor + '"></span>' +
-      '<span class="el-tag">' + tag + '</span>' +
-      (classText ? '<span class="el-classes">' + classText + '</span>' : '');
+    let html = '<span class="el-icon">' + icon + '</span>';
+    html += '<span class="el-tag">' + tag + '</span>';
+
+    if (classes.length) {
+      html += '<span class="el-classes">';
+      classes.forEach(c => {
+        html += '<span class="el-class-pill">.' + c + '</span>';
+      });
+      html += '</span>';
+    }
+
+    infoEl.innerHTML = html;
   }
 
   editor.on('component:selected', updateElementInfo);
@@ -487,16 +586,29 @@ function initEditor(html) {
   /* ── Text tags that show content editor ── */
   const TEXT_TAGS = ['H1','H2','H3','H4','H5','H6','P','SPAN','A','SUMMARY','STRONG','LABEL','LI','TD','TH','BUTTON','FIGCAPTION'];
 
-  /* ── When selecting a component, configure traits ── */
+  /* ── Single click to inline-edit text ── */
   editor.on('component:selected', (model) => {
     const el = model.getEl();
     if (!el) return;
     const tag = el.tagName;
 
-    // Enable inline editing for text
     if (TEXT_TAGS.includes(tag)) {
       model.set('editable', true);
+      // Trigger inline editing immediately
+      setTimeout(() => {
+        const elInCanvas = model.getEl();
+        if (elInCanvas) {
+          model.trigger('active');
+        }
+      }, 100);
     }
+  });
+
+  /* ── When selecting a component, configure traits ── */
+  editor.on('component:selected', (model) => {
+    const el = model.getEl();
+    if (!el) return;
+    const tag = el.tagName;
 
     // Build trait list
     const traits = [];
@@ -534,7 +646,7 @@ function initEditor(html) {
         model.set('content-text', directText);
       }
 
-      // Auto-switch to Innehall tab
+      // Auto-switch to Egenskaper tab
       switchRight('traits');
     } else {
       // No traits — show empty state or switch to styles
