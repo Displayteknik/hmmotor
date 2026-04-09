@@ -3,7 +3,7 @@
    Simple client-side admin for vehicles & blog posts
    ═══════════════════════════════════════════════════════ */
 
-const ADMIN_PASSWORD = 'hmmotor2026';
+const ADMIN_PASSWORD = 'HMmotor2026!';
 
 /* ─── Auth ─── */
 
