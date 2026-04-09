@@ -4,14 +4,174 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HM Motor — Redigera sajten</title>
-  <!-- Netlify Identity Widget -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <style>
+    /* ── HM Motor CMS Theme ── */
+    :root {
+      --hm-dark: #0a0e17;
+      --hm-card: #111827;
+      --hm-border: #1e293b;
+      --hm-blue: #1d5ca8;
+      --hm-blue-light: #3b82f6;
+      --hm-gold: #d4a843;
+      --hm-text: #e2e8f0;
+      --hm-muted: #94a3b8;
+      --hm-radius: 10px;
+    }
+
+    /* Login screen */
+    body {
+      margin: 0;
+      background: var(--hm-dark);
+      font-family: 'Inter', -apple-system, sans-serif;
+    }
+
+    /* Netlify Identity widget styling */
+    .netlify-identity-widget {
+      font-family: 'Inter', sans-serif !important;
+    }
+
+    /* ── CMS Frame ── */
+    [data-slate-editor] { font-family: 'Inter', sans-serif !important; }
+
+    /* Top bar */
+    header[class*="AppHeader"],
+    div[class*="AppHeader"],
+    nav[class*="Navbar"] {
+      background: var(--hm-dark) !important;
+      border-bottom: 1px solid var(--hm-border) !important;
+    }
+
+    /* Main background */
+    main, [class*="MainView"], [id="nc-root"] {
+      background: var(--hm-dark) !important;
+    }
+
+    /* Sidebar */
+    aside, [class*="Sidebar"], div[class*="CollectionPane"] {
+      background: var(--hm-card) !important;
+      border-right: 1px solid var(--hm-border) !important;
+    }
+
+    /* Cards & panels */
+    [class*="Card"], [class*="ListCard"], [class*="EntryCard"] {
+      background: var(--hm-card) !important;
+      border: 1px solid var(--hm-border) !important;
+      border-radius: var(--hm-radius) !important;
+    }
+
+    /* Editor pane */
+    [class*="EditorControlPane"], [class*="ControlPaneContainer"] {
+      background: var(--hm-card) !important;
+    }
+
+    /* Preview pane */
+    [class*="PreviewPaneFrame"], [class*="PreviewPane"] {
+      background: #fff !important;
+      border-radius: var(--hm-radius) !important;
+      margin: 12px !important;
+    }
+
+    /* Buttons - publish */
+    [class*="PublishButton"] button,
+    button[class*="ToolbarButton"][class*="published"] {
+      background: var(--hm-blue) !important;
+      border-color: var(--hm-blue) !important;
+      border-radius: 8px !important;
+    }
+
+    /* Input fields */
+    [class*="ControlContainer"] input,
+    [class*="ControlContainer"] textarea,
+    [class*="ControlContainer"] select {
+      background: var(--hm-dark) !important;
+      border: 1px solid var(--hm-border) !important;
+      border-radius: 8px !important;
+      color: var(--hm-text) !important;
+      padding: 10px 14px !important;
+      font-family: 'Inter', sans-serif !important;
+      transition: border-color 0.2s !important;
+    }
+
+    [class*="ControlContainer"] input:focus,
+    [class*="ControlContainer"] textarea:focus {
+      border-color: var(--hm-blue-light) !important;
+      outline: none !important;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+    }
+
+    /* Labels */
+    [class*="ControlContainer"] label {
+      color: var(--hm-muted) !important;
+      font-weight: 600 !important;
+      font-size: 0.75rem !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.05em !important;
+      font-family: 'Space Grotesk', sans-serif !important;
+    }
+
+    /* Toolbar */
+    [class*="ToolbarContainer"], [class*="EditorToolbar"] {
+      background: var(--hm-dark) !important;
+      border-bottom: 1px solid var(--hm-border) !important;
+    }
+
+    /* Status badges */
+    [class*="StatusLabel"], [class*="WorkflowStatus"] {
+      border-radius: 20px !important;
+      font-family: 'Space Grotesk', sans-serif !important;
+      font-weight: 600 !important;
+    }
+
+    /* Collection list items */
+    [class*="ListCardLink"], [class*="CollectionEntry"] {
+      border-bottom: 1px solid var(--hm-border) !important;
+    }
+    [class*="ListCardLink"]:hover, [class*="CollectionEntry"]:hover {
+      background: rgba(29, 92, 168, 0.08) !important;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--hm-dark); }
+    ::-webkit-scrollbar-thumb { background: var(--hm-border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--hm-muted); }
+
+    /* Logo in header */
+    [class*="AppHeader"] a[href="/"] {
+      font-family: 'Space Grotesk', sans-serif !important;
+      font-weight: 700 !important;
+      font-size: 1.1rem !important;
+    }
+
+    /* Back to site link */
+    a[href="/"],
+    a[href="/dashboard"] {
+      color: var(--hm-muted) !important;
+      text-decoration: none !important;
+    }
+    a[href="/"]:hover,
+    a[href="/dashboard"]:hover {
+      color: var(--hm-gold) !important;
+    }
+
+    /* Media library */
+    [class*="MediaLibrary"] {
+      background: var(--hm-dark) !important;
+    }
+
+    /* Toast notifications */
+    [class*="Toast"], [class*="Notification"] {
+      border-radius: var(--hm-radius) !important;
+      font-family: 'Inter', sans-serif !important;
+    }
+  </style>
 </head>
 <body>
-  <!-- Decap CMS -->
   <script src="https://unpkg.com/decap-cms@^3.3.0/dist/decap-cms.js"></script>
   <script>
-    // Redirect to /admin/ after login
     if (window.netlifyIdentity) {
       window.netlifyIdentity.on("init", user => {
         if (!user) window.netlifyIdentity.on("login", () => document.location.href = "/admin/");
