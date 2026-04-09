@@ -8,415 +8,417 @@
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --bg:#f8f9fb;--white:#fff;--border:#e5e7eb;--border-focus:#3b82f6;
-      --text:#111827;--text-secondary:#6b7280;--text-tertiary:#9ca3af;
-      --blue:#2563eb;--blue-hover:#1d4ed8;--blue-light:#eff6ff;--blue-ring:rgba(37,99,235,.15);
-      --green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;
-      --radius:8px;--shadow:0 1px 3px rgba(0,0,0,.08);--shadow-lg:0 4px 12px rgba(0,0,0,.1);
-    }
-    body{margin:0;background:var(--bg);font-family:'Inter',-apple-system,sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
+    :root{--blue:#2563eb;--blue-hover:#1d4ed8;--blue-ring:rgba(37,99,235,.12);--green:#059669;--red:#dc2626;--border:#e5e7eb;--text:#111827;--text-sec:#6b7280;--text-dim:#9ca3af;--bg:#f3f4f6;--white:#fff;--radius:8px}
+    body{margin:0;font-family:'Inter',-apple-system,sans-serif;color:var(--text);background:var(--bg);height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
 
-    /* ── Login ── */
-    #login{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#fff}
+    /* Login */
+    #login{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#fff}
     #login h1{font-size:1.5rem;font-weight:700;margin-bottom:.25rem}
-    #login p{color:var(--text-secondary);font-size:.9rem;margin-bottom:2rem}
-    #login button{background:var(--blue);color:#fff;border:none;padding:12px 32px;font-size:.9rem;font-weight:600;border-radius:var(--radius);cursor:pointer;font-family:inherit;transition:background .15s}
+    #login p{color:var(--text-sec);font-size:.9rem;margin-bottom:2rem}
+    #login button{background:var(--blue);color:#fff;border:none;padding:12px 32px;font-size:.9rem;font-weight:600;border-radius:var(--radius);cursor:pointer;font-family:inherit}
     #login button:hover{background:var(--blue-hover)}
 
-    /* ── Top bar ── */
-    .topbar{background:#fff;border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:50}
-    .topbar .left{display:flex;align-items:center;gap:16px}
-    .topbar .brand{font-weight:700;font-size:.95rem;color:var(--text);text-decoration:none}
-    .topbar .sep{color:var(--border);font-weight:300}
-    .topbar .page-title{color:var(--text-secondary);font-size:.85rem;font-weight:500}
-    .topbar .right{display:flex;align-items:center;gap:12px}
-    .topbar a{color:var(--text-secondary);text-decoration:none;font-size:.8rem;font-weight:500;padding:6px 10px;border-radius:6px;transition:all .15s}
-    .topbar a:hover{color:var(--text);background:var(--bg)}
-    .topbar .logout{color:var(--text-tertiary);cursor:pointer;background:none;border:none;font-size:.8rem;font-family:inherit;padding:6px 10px;border-radius:6px}
-    .topbar .logout:hover{color:var(--red);background:var(--red-bg)}
+    /* Layout */
+    #app{display:none;height:100vh;flex-direction:column}
+    .toolbar{height:48px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0}
+    .toolbar .left{display:flex;align-items:center;gap:12px}
+    .toolbar .brand{font-weight:700;font-size:.9rem}
+    .toolbar .sep{color:#ddd}
+    .toolbar .mode{font-size:.8rem;color:var(--text-sec);font-weight:500}
+    .toolbar .right{display:flex;align-items:center;gap:8px}
+    .toolbar a,.toolbar button{font-size:.8rem;font-weight:500;font-family:inherit;text-decoration:none;padding:6px 12px;border-radius:6px;cursor:pointer;border:none;transition:all .15s}
+    .toolbar a{color:var(--text-sec);background:none}
+    .toolbar a:hover{color:var(--text);background:var(--bg)}
+    .toolbar .save-btn{background:var(--blue);color:#fff}
+    .toolbar .save-btn:hover{background:var(--blue-hover)}
+    .toolbar .save-btn:disabled{opacity:.4;cursor:default}
+    .toolbar .logout{color:var(--text-dim);background:none}
 
-    /* ── Main ── */
-    .main{max-width:720px;margin:0 auto;padding:40px 24px 80px}
+    /* Split view */
+    .split{display:flex;flex:1;overflow:hidden}
+    .preview-pane{flex:1;position:relative;background:#e5e5e5}
+    .preview-pane iframe{width:100%;height:100%;border:none}
 
-    /* ── Section block ── */
-    .block{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
-    .block-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;user-select:none;transition:background .1s}
-    .block-head:hover{background:#fafbfc}
-    .block-head h2{font-size:.9rem;font-weight:600;display:flex;align-items:center;gap:10px}
-    .block-head h2 .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-    .block-head .preview{color:var(--text-tertiary);font-size:.8rem;max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .block-head .arrow{color:var(--text-tertiary);font-size:.7rem;transition:transform .2s}
-    .block.open .block-head .arrow{transform:rotate(180deg)}
-    .block.open .block-head{border-bottom:1px solid var(--border)}
-    .block-body{display:none;padding:20px}
-    .block.open .block-body{display:block}
+    /* Sidebar */
+    .sidebar{width:380px;background:#fff;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:transform .25s ease;flex-shrink:0}
+    .sidebar.closed{transform:translateX(380px);margin-left:-380px}
+    .sidebar-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    .sidebar-head h3{font-size:.9rem;font-weight:700;display:flex;align-items:center;gap:8px}
+    .sidebar-head h3 .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+    .sidebar-head button{background:none;border:none;font-size:1.2rem;color:var(--text-dim);cursor:pointer;width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center}
+    .sidebar-head button:hover{background:var(--bg);color:var(--text)}
+    .sidebar-body{flex:1;overflow-y:auto;padding:16px 20px 80px}
 
-    /* ── Fields ── */
-    .field{margin-bottom:16px}
-    .field:last-child{margin-bottom:0}
-    .field label{display:block;font-size:.75rem;font-weight:600;color:var(--text-secondary);margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em}
-    .field input,.field textarea{width:100%;border:1.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;font-size:.9rem;font-family:inherit;color:var(--text);background:#fff;transition:border-color .15s,box-shadow .15s;resize:vertical}
-    .field input:focus,.field textarea:focus{outline:none;border-color:var(--border-focus);box-shadow:0 0 0 3px var(--blue-ring)}
-    .field input::placeholder,.field textarea::placeholder{color:var(--text-tertiary)}
-    .field textarea{min-height:72px;line-height:1.6}
-    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media(max-width:600px){.field-row{grid-template-columns:1fr}}
+    /* Sidebar fields */
+    .s-field{margin-bottom:14px}
+    .s-field label{display:block;font-size:.7rem;font-weight:600;color:var(--text-sec);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+    .s-field input,.s-field textarea{width:100%;border:1.5px solid var(--border);border-radius:var(--radius);padding:9px 12px;font-size:.85rem;font-family:inherit;color:var(--text);transition:border .15s,box-shadow .15s;resize:vertical;background:#fff}
+    .s-field input:focus,.s-field textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-ring)}
+    .s-field textarea{min-height:64px;line-height:1.5}
+    .s-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-    /* ── List items ── */
-    .list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-    .list-header span{font-size:.75rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.03em}
-    .list-item{border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;position:relative;background:#fff;transition:border-color .15s}
-    .list-item:hover{border-color:#d1d5db}
-    .list-item .remove-btn{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--text-tertiary);font-size:1.1rem;cursor:pointer;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:all .15s}
-    .list-item .remove-btn:hover{color:var(--red);background:var(--red-bg)}
-    .list-item .field{margin-bottom:10px}
-    .list-item .field:last-child{margin-bottom:0}
+    /* List in sidebar */
+    .s-list-item{border:1.5px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:8px;position:relative}
+    .s-list-item:hover{border-color:#d1d5db}
+    .s-list-item .s-remove{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--text-dim);font-size:1rem;cursor:pointer;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:4px}
+    .s-list-item .s-remove:hover{color:var(--red);background:#fef2f2}
+    .s-list-item .s-field{margin-bottom:8px}
+    .s-list-item .s-field:last-child{margin-bottom:0}
+    .s-add{display:flex;align-items:center;justify-content:center;gap:4px;width:100%;padding:8px;border:1.5px dashed var(--border);border-radius:var(--radius);background:none;color:var(--blue);font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px}
+    .s-add:hover{background:#eff6ff;border-color:var(--blue)}
 
-    /* ── Buttons ── */
-    .add-btn{display:inline-flex;align-items:center;gap:6px;color:var(--blue);font-size:.8rem;font-weight:600;background:none;border:1.5px dashed var(--border);border-radius:var(--radius);padding:8px 14px;cursor:pointer;font-family:inherit;transition:all .15s;width:100%;justify-content:center}
-    .add-btn:hover{background:var(--blue-light);border-color:var(--blue)}
-    .save-bar{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding-top:16px;border-top:1px solid var(--border);margin-top:16px}
-    .save-btn{background:var(--blue);color:#fff;border:none;padding:10px 24px;font-size:.85rem;font-weight:600;border-radius:var(--radius);cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:6px}
-    .save-btn:hover{background:var(--blue-hover);box-shadow:var(--shadow-lg)}
-    .save-btn:disabled{opacity:.5;cursor:not-allowed}
-    .save-btn.saving{background:var(--text-secondary)}
-    .save-status{font-size:.8rem;color:var(--text-tertiary)}
+    /* Section picker (when no section selected) */
+    .section-list{padding:8px 0}
+    .section-item{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;border-radius:var(--radius);transition:background .1s;margin-bottom:2px}
+    .section-item:hover{background:var(--bg)}
+    .section-item .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .section-item .info{flex:1}
+    .section-item .info h4{font-size:.85rem;font-weight:600}
+    .section-item .info span{font-size:.75rem;color:var(--text-dim)}
+    .section-item .arrow{color:var(--text-dim);font-size:.7rem}
 
-    /* ── Toast ── */
-    .toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:var(--radius);font-size:.85rem;font-weight:500;color:#fff;z-index:999;transform:translateY(80px);opacity:0;transition:all .3s ease;box-shadow:var(--shadow-lg)}
-    .toast.show{transform:translateY(0);opacity:1}
-    .toast.success{background:var(--green)}
-    .toast.error{background:var(--red)}
+    /* Overlay highlights */
+    .edit-overlay{position:absolute;pointer-events:none;border:2px solid var(--blue);border-radius:6px;background:rgba(37,99,235,.06);z-index:10;transition:all .2s ease}
+    .edit-overlay .edit-label{position:absolute;top:-28px;left:-2px;background:var(--blue);color:#fff;font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:4px 4px 0 0;white-space:nowrap;pointer-events:auto;cursor:pointer}
 
-    /* ── Loading ── */
-    .loading{text-align:center;padding:60px 20px;color:var(--text-tertiary);font-size:.9rem}
-    .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .6s linear infinite;margin:0 auto 12px}
+    /* Toast */
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);opacity:0;padding:10px 20px;border-radius:var(--radius);font-size:.85rem;font-weight:500;color:#fff;z-index:999;transition:all .3s;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+    .toast.success{background:var(--green)}.toast.error{background:var(--red)}
+
+    /* Loading */
+    .loading{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-dim);font-size:.9rem;gap:10px}
+    .spinner{width:20px;height:20px;border:2.5px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .6s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
 
-<!-- Login -->
 <div id="login">
   <h1>HM Motor</h1>
   <p>Logga in för att redigera sajten</p>
   <button onclick="netlifyIdentity.open('login')">Logga in</button>
 </div>
 
-<!-- App -->
-<div id="app" style="display:none">
-  <div class="topbar">
+<div id="app">
+  <div class="toolbar">
     <div class="left">
-      <a href="/" class="brand">HM Motor</a>
+      <span class="brand">HM Motor</span>
       <span class="sep">/</span>
-      <span class="page-title">Redigera sajten</span>
+      <span class="mode">Visuell redigering</span>
     </div>
     <div class="right">
-      <a href="/dashboard">Fordon &amp; blogg</a>
-      <a href="/" target="_blank">Visa sajten ↗</a>
+      <a href="/dashboard">Fordonshantering</a>
+      <button class="save-btn" id="globalSave" onclick="saveAll()" disabled>Spara</button>
       <button class="logout" id="logoutBtn">Logga ut</button>
     </div>
   </div>
-  <div class="main" id="content">
-    <div class="loading"><div class="spinner"></div>Laddar innehåll...</div>
+  <div class="split">
+    <div class="preview-pane" id="previewPane">
+      <div class="loading"><div class="spinner"></div>Laddar sajten...</div>
+    </div>
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <h3 id="sidebarTitle">Välj sektion</h3>
+        <button onclick="closeSidebar()" title="Stäng">×</button>
+      </div>
+      <div class="sidebar-body" id="sidebarBody">
+        <div class="section-list" id="sectionList"></div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-const FILES = ['hero','faq','about','just-nu','services'];
-const LABELS = {hero:'Startsidan',faq:'Vanliga frågor',about:'Om oss','just-nu':'Just nu','services':'Varför HM Motor'};
-const DOTS = {hero:'#2563eb',faq:'#8b5cf6',about:'#059669','just-nu':'#f59e0b',services:'#ec4899'};
-let data = {}, shas = {}, token = '';
+const SECTIONS = [
+  { id:'hero', label:'Startsida — Hero', color:'#2563eb', anchor:'hero' },
+  { id:'faq', label:'Vanliga frågor', color:'#8b5cf6', anchor:'faq' },
+  { id:'about', label:'Om oss', color:'#059669', anchor:null },
+  { id:'just-nu', label:'Just nu — Nyheter', color:'#f59e0b', anchor:'just-nu' },
+  { id:'services', label:'Varför HM Motor', color:'#ec4899', anchor:'services' }
+];
+
+let data={}, shas={}, token='', dirty=new Set(), activeSection=null;
 
 /* ── Auth ── */
-function initAuth() {
-  const user = netlifyIdentity.currentUser();
-  if (user) { startApp(user); return; }
-  document.getElementById('login').style.display = 'flex';
-  netlifyIdentity.on('login', u => startApp(u));
+function initAuth(){
+  const u=netlifyIdentity.currentUser();
+  if(u){startApp(u);return}
+  document.getElementById('login').style.display='flex';
+  netlifyIdentity.on('login',u=>startApp(u));
 }
 
-async function startApp(user) {
-  const t = await user.jwt();
-  token = t;
-  document.getElementById('login').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  document.getElementById('logoutBtn').onclick = () => { netlifyIdentity.logout(); location.reload(); };
-  loadAll();
+async function startApp(user){
+  token=await user.jwt();
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').style.display='flex';
+  document.getElementById('logoutBtn').onclick=()=>{netlifyIdentity.logout();location.reload()};
+  await loadAll();
 }
 
 /* ── API ── */
-async function loadFile(name) {
-  const r = await fetch(`/.netlify/git/github/contents/content/pages/${name}.json`, {
-    headers: { Authorization: 'Bearer ' + token }
-  });
-  if (!r.ok) throw new Error('Kunde inte ladda ' + name);
-  const j = await r.json();
-  shas[name] = j.sha;
-  data[name] = JSON.parse(atob(j.content));
+async function loadFile(name){
+  const r=await fetch(`/.netlify/git/github/contents/content/pages/${name}.json`,{headers:{Authorization:'Bearer '+token}});
+  if(!r.ok)throw new Error('Load failed: '+name);
+  const j=await r.json();
+  shas[name]=j.sha;
+  data[name]=JSON.parse(atob(j.content));
 }
 
-async function saveFile(name) {
-  const body = JSON.stringify(data[name], null, 2) + '\n';
-  const r = await fetch(`/.netlify/git/github/contents/content/pages/${name}.json`, {
-    method: 'PUT',
-    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: `Uppdatera ${LABELS[name]}`, content: btoa(unescape(encodeURIComponent(body))), sha: shas[name] })
+async function saveFile(name){
+  const body=JSON.stringify(data[name],null,2)+'\n';
+  const r=await fetch(`/.netlify/git/github/contents/content/pages/${name}.json`,{
+    method:'PUT',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+    body:JSON.stringify({message:`Uppdatera ${name}`,content:btoa(unescape(encodeURIComponent(body))),sha:shas[name]})
   });
-  if (!r.ok) throw new Error('Kunde inte spara');
-  const j = await r.json();
-  shas[name] = j.content.sha;
+  if(!r.ok)throw new Error('Save failed');
+  const j=await r.json();
+  shas[name]=j.content.sha;
 }
 
-/* ── Render ── */
-async function loadAll() {
-  try {
-    await Promise.all(FILES.map(f => loadFile(f)));
-    render();
-  } catch (e) {
-    document.getElementById('content').innerHTML = `<div class="loading" style="color:var(--red)">Fel: ${e.message}</div>`;
+/* ── Load ── */
+async function loadAll(){
+  try{
+    await Promise.all(SECTIONS.map(s=>loadFile(s.id)));
+    initPreview();
+    renderSectionList();
+  }catch(e){
+    document.getElementById('previewPane').innerHTML=`<div class="loading" style="color:var(--red)">Fel: ${e.message}</div>`;
   }
 }
 
-function render() {
-  const c = document.getElementById('content');
-  c.innerHTML = FILES.map(f => {
-    const preview = getPreview(f);
-    return `<div class="block" id="block-${f}">
-      <div class="block-head" onclick="toggle('${f}')">
-        <h2><span class="dot" style="background:${DOTS[f]}"></span>${LABELS[f]}</h2>
-        <div style="display:flex;align-items:center;gap:12px">
-          <span class="preview">${preview}</span>
-          <span class="arrow">▼</span>
-        </div>
-      </div>
-      <div class="block-body">${renderFields(f)}</div>
-    </div>`;
-  }).join('');
+/* ── Preview iframe ── */
+function initPreview(){
+  const pane=document.getElementById('previewPane');
+  pane.innerHTML='<iframe id="previewFrame" src="/"></iframe>';
+  const frame=document.getElementById('previewFrame');
+  frame.onload=()=>{
+    try{
+      const doc=frame.contentDocument;
+      // Add click handlers to editable sections
+      addEditableOverlays(doc);
+    }catch(e){console.warn('iframe access blocked',e)}
+  };
 }
 
-function getPreview(f) {
-  if (f === 'hero') return esc(data.hero.title);
-  if (f === 'faq') return data.faq.items.length + ' frågor';
-  if (f === 'about') return esc(data.about.title);
-  if (f === 'just-nu') return data['just-nu'].cards.length + ' nyheter';
-  if (f === 'services') return esc(data.services.title);
+function addEditableOverlays(doc){
+  // Mark sections clickable
+  const map={
+    hero:doc.querySelector('.hero, [class*="hero"], section:first-of-type'),
+    faq:doc.getElementById('faq')||doc.querySelector('[class*="faq"]'),
+    'just-nu':doc.getElementById('just-nu')||doc.querySelector('[class*="just-nu"]'),
+    services:doc.getElementById('services')||doc.querySelector('.services, [class*="varfor"]'),
+  };
+
+  // Add edit-mode styles to iframe
+  const style=doc.createElement('style');
+  style.textContent=`
+    [data-editable]{cursor:pointer;position:relative;transition:outline .15s}
+    [data-editable]:hover{outline:2px solid #2563eb;outline-offset:4px;border-radius:4px}
+    [data-editable]:hover::after{content:attr(data-edit-label);position:absolute;top:-24px;left:0;background:#2563eb;color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;font-family:Inter,sans-serif;z-index:9999;white-space:nowrap}
+  `;
+  doc.head.appendChild(style);
+
+  // Find sections by various selectors
+  const sections=doc.querySelectorAll('section, [id]');
+  sections.forEach(el=>{
+    const id=el.id||el.className;
+    SECTIONS.forEach(s=>{
+      if(id&&(id.includes(s.anchor||s.id)||el.className.includes(s.anchor||s.id))){
+        el.setAttribute('data-editable',s.id);
+        el.setAttribute('data-edit-label','✏️ '+s.label);
+        el.addEventListener('click',(e)=>{
+          e.preventDefault();
+          e.stopPropagation();
+          openSection(s.id);
+        });
+      }
+    });
+  });
+}
+
+/* ── Section list ── */
+function renderSectionList(){
+  const el=document.getElementById('sectionList');
+  el.innerHTML=SECTIONS.map(s=>`
+    <div class="section-item" onclick="openSection('${s.id}')">
+      <span class="dot" style="background:${s.color}"></span>
+      <div class="info"><h4>${s.label}</h4><span>${getSummary(s.id)}</span></div>
+      <span class="arrow">›</span>
+    </div>`).join('');
+}
+
+function getSummary(id){
+  if(id==='hero')return esc(data.hero.title||'');
+  if(id==='faq')return data.faq.items.length+' frågor';
+  if(id==='about')return esc(data.about.title||'');
+  if(id==='just-nu')return data['just-nu'].cards.length+' nyheter';
+  if(id==='services')return esc(data.services.title||'');
   return '';
 }
 
-function renderFields(f) {
-  if (f === 'hero') return renderHero();
-  if (f === 'faq') return renderFAQ();
-  if (f === 'about') return renderAbout();
-  if (f === 'just-nu') return renderJustNu();
-  if (f === 'services') return renderServices();
+/* ── Sidebar editing ── */
+function openSection(id){
+  activeSection=id;
+  const s=SECTIONS.find(x=>x.id===id);
+  document.getElementById('sidebarTitle').innerHTML=`<span class="dot" style="background:${s.color}"></span>${s.label}`;
+  document.getElementById('sidebarBody').innerHTML=renderEditor(id);
+  document.getElementById('sidebar').classList.remove('closed');
+
+  // Scroll iframe to section
+  try{
+    const frame=document.getElementById('previewFrame');
+    const el=frame.contentDocument.querySelector(`[data-editable="${id}"]`)||frame.contentDocument.getElementById(s.anchor||id);
+    if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){}
 }
 
-function renderHero() {
-  const d = data.hero;
-  return `
-    ${field('Badge', d.badge, 'hero.badge')}
-    ${field('Rubrik', d.title, 'hero.title')}
-    ${textarea('Undertext', d.subtitle, 'hero.subtitle')}
-    <div class="field-row">
-      ${field('Knapp 1 — text', d.cta1_text, 'hero.cta1_text')}
-      ${field('Knapp 1 — länk', d.cta1_url, 'hero.cta1_url')}
-    </div>
-    <div class="field-row">
-      ${field('Knapp 2 — text', d.cta2_text, 'hero.cta2_text')}
-      ${field('Knapp 2 — länk', d.cta2_url, 'hero.cta2_url')}
-    </div>
-    ${field('Bakgrundsbild (URL)', d.image_url, 'hero.image_url')}
-    ${listSection('Trust-signaler', d.trust_items, 'hero.trust_items', ['bold:Fetstil', 'text:Text'])}
-    ${saveBar('hero')}`;
+function closeSidebar(){
+  activeSection=null;
+  document.getElementById('sidebarTitle').textContent='Välj sektion';
+  document.getElementById('sidebarBody').innerHTML='<div class="section-list" id="sectionList"></div>';
+  renderSectionList();
 }
 
-function renderFAQ() {
-  const d = data.faq;
-  return `
-    ${listSection('Frågor & svar', d.items, 'faq.items', ['question:Fråga', 'answer:Svar|textarea'])}
-    ${saveBar('faq')}`;
+function renderEditor(id){
+  let h='';
+  if(id==='hero'){
+    const d=data.hero;
+    h+=sf('Badge',d.badge,'hero','badge');
+    h+=sf('Rubrik',d.title,'hero','title');
+    h+=st('Undertext',d.subtitle,'hero','subtitle');
+    h+=`<div class="s-row">${sf('Knapp 1',d.cta1_text,'hero','cta1_text')}${sf('Länk 1',d.cta1_url,'hero','cta1_url')}</div>`;
+    h+=`<div class="s-row">${sf('Knapp 2',d.cta2_text,'hero','cta2_text')}${sf('Länk 2',d.cta2_url,'hero','cta2_url')}</div>`;
+    h+=sf('Bild-URL',d.image_url,'hero','image_url');
+    h+=listEditor('Trust-signaler',d.trust_items,'hero','trust_items',['bold:Fetstil','text:Text']);
+  } else if(id==='faq'){
+    h+=listEditor('Frågor & svar',data.faq.items,'faq','items',['question:Fråga','answer:Svar|ta']);
+  } else if(id==='about'){
+    const d=data.about;
+    h+=sf('Rubrik',d.title,'about','title');
+    h+=st('Intro',d.intro,'about','intro');
+    h+=listEditor('Tidslinje',d.timeline,'about','timeline',['year:År','title:Rubrik','text:Text|ta']);
+    h+=listEditor('Värderingar',d.values,'about','values',['title:Rubrik','text:Text|ta']);
+  } else if(id==='just-nu'){
+    h+=listEditor('Nyhetskort',data['just-nu'].cards,'just-nu','cards',['label:Etikett','title:Rubrik','text:Text|ta','link:Länk','link_text:Länktext']);
+  } else if(id==='services'){
+    const d=data.services;
+    h+=sf('Rubrik',d.title,'services','title');
+    h+=st('Text 1',d.text1,'services','text1');
+    h+=st('Text 2',d.text2,'services','text2');
+    h+=listEditor('Punkter',d.points,'services','points',['title:Rubrik','text:Text|ta']);
+  }
+  h+=`<div style="margin-top:20px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:flex-end">
+    <button class="save-btn" onclick="saveCurrent()" style="background:var(--blue);color:#fff;border:none;padding:10px 24px;font-size:.85rem;font-weight:600;border-radius:var(--radius);cursor:pointer;font-family:inherit">Spara ${SECTIONS.find(x=>x.id===id).label}</button>
+  </div>`;
+  return h;
 }
 
-function renderAbout() {
-  const d = data.about;
-  return `
-    ${field('Rubrik', d.title, 'about.title')}
-    ${textarea('Introduktion', d.intro, 'about.intro')}
-    ${listSection('Tidslinje', d.timeline, 'about.timeline', ['year:År', 'title:Rubrik', 'text:Beskrivning|textarea'])}
-    ${listSection('Värderingar', d.values, 'about.values', ['title:Rubrik', 'text:Beskrivning|textarea'])}
-    ${saveBar('about')}`;
+/* Field helpers */
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function sf(label,val,file,key){
+  return `<div class="s-field"><label>${label}</label><input type="text" value="${esc(val||'')}" oninput="upd('${file}','${key}',this.value)"></div>`;
+}
+function st(label,val,file,key){
+  return `<div class="s-field"><label>${label}</label><textarea oninput="upd('${file}','${key}',this.value)">${esc(val||'')}</textarea></div>`;
 }
 
-function renderJustNu() {
-  const d = data['just-nu'];
-  return `
-    ${listSection('Nyhetskort (max 3)', d.cards, 'just-nu.cards', ['label:Etikett', 'title:Rubrik', 'text:Beskrivning|textarea', 'link:Länk', 'link_text:Länktext'])}
-    ${saveBar('just-nu')}`;
-}
-
-function renderServices() {
-  const d = data.services;
-  return `
-    ${field('Rubrik', d.title, 'services.title')}
-    ${textarea('Text stycke 1', d.text1, 'services.text1')}
-    ${textarea('Text stycke 2', d.text2, 'services.text2')}
-    ${listSection('Punkter', d.points, 'services.points', ['title:Rubrik', 'text:Text|textarea'])}
-    ${saveBar('services')}`;
-}
-
-/* ── Field helpers ── */
-function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-function field(label, value, path) {
-  return `<div class="field"><label>${label}</label><input type="text" value="${esc(value||'')}" onchange="setVal('${path}',this.value)" oninput="setVal('${path}',this.value)"></div>`;
-}
-
-function textarea(label, value, path) {
-  return `<div class="field"><label>${label}</label><textarea onchange="setVal('${path}',this.value)" oninput="setVal('${path}',this.value)">${esc(value||'')}</textarea></div>`;
-}
-
-function listSection(label, items, path, fieldDefs) {
-  const maxNote = path === 'just-nu.cards' ? 3 : 999;
-  let html = `<div style="margin-top:16px">
-    <div class="list-header"><span>${label}</span></div>`;
-  items.forEach((item, i) => {
-    html += `<div class="list-item">
-      <button class="remove-btn" onclick="removeItem('${path}',${i})" title="Ta bort">×</button>`;
-    fieldDefs.forEach(fd => {
-      const [key, rest] = fd.split(':');
-      const [lbl, type] = rest.split('|');
-      const val = item[key] || '';
-      const p = `${path}.${i}.${key}`;
-      if (type === 'textarea') {
-        html += `<div class="field"><label>${lbl}</label><textarea onchange="setListVal('${path}',${i},'${key}',this.value)" oninput="setListVal('${path}',${i},'${key}',this.value)">${esc(val)}</textarea></div>`;
-      } else {
-        html += `<div class="field"><label>${lbl}</label><input type="text" value="${esc(val)}" onchange="setListVal('${path}',${i},'${key}',this.value)" oninput="setListVal('${path}',${i},'${key}',this.value)"></div>`;
+function listEditor(label,items,file,arrKey,fields){
+  let h=`<div style="margin-top:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+    <label style="font-size:.7rem;font-weight:600;color:var(--text-sec);text-transform:uppercase;letter-spacing:.04em">${label}</label>
+  </div>`;
+  items.forEach((item,i)=>{
+    h+=`<div class="s-list-item"><button class="s-remove" onclick="removeI('${file}','${arrKey}',${i})">×</button>`;
+    fields.forEach(fd=>{
+      const[k,rest]=fd.split(':');
+      const[lbl,type]=rest.split('|');
+      const v=item[k]||'';
+      if(type==='ta'){
+        h+=`<div class="s-field"><label>${lbl}</label><textarea oninput="updL('${file}','${arrKey}',${i},'${k}',this.value)">${esc(v)}</textarea></div>`;
+      }else{
+        h+=`<div class="s-field"><label>${lbl}</label><input type="text" value="${esc(v)}" oninput="updL('${file}','${arrKey}',${i},'${k}',this.value)"></div>`;
       }
     });
-    html += '</div>';
+    h+='</div>';
   });
-  if (items.length < maxNote) {
-    html += `<button class="add-btn" onclick="addItem('${path}')">+ Lägg till</button>`;
-  }
-  html += '</div>';
-  return html;
+  const max=arrKey==='cards'?3:99;
+  if(items.length<max) h+=`<button class="s-add" onclick="addI('${file}','${arrKey}')">+ Lägg till</button>`;
+  h+='</div>';
+  return h;
 }
 
-function saveBar(file) {
-  return `<div class="save-bar">
-    <span class="save-status" id="status-${file}"></span>
-    <button class="save-btn" id="savebtn-${file}" onclick="save('${file}')">Spara ändringar</button>
-  </div>`;
+/* ── Data operations ── */
+function upd(file,key,val){
+  data[file][key]=val;
+  markDirty(file);
+}
+function updL(file,arrKey,idx,key,val){
+  data[file][arrKey][idx][key]=val;
+  markDirty(file);
+}
+function removeI(file,arrKey,idx){
+  data[file][arrKey].splice(idx,1);
+  markDirty(file);
+  openSection(activeSection);
+}
+function addI(file,arrKey){
+  const arr=data[file][arrKey];
+  const tpl=arr.length>0?Object.fromEntries(Object.keys(arr[0]).map(k=>[k,''])):
+    {hero:{bold:'',text:''},faq:{question:'',answer:''},about:{title:'',text:''},'just-nu':{label:'',title:'',text:'',link:'',link_text:''},services:{title:'',text:''}}[file]||{};
+  arr.push(tpl);
+  markDirty(file);
+  openSection(activeSection);
 }
 
-/* ── Data ops ── */
-function setVal(path, val) {
-  const parts = path.split('.');
-  const file = parts[0] === 'just-nu' ? 'just-nu' : parts[0];
-  const key = parts[0] === 'just-nu' ? parts.slice(1).join('.') : parts.slice(1).join('.');
-  let obj = data[file];
-  const keys = key.split('.');
-  for (let i = 0; i < keys.length - 1; i++) obj = obj[keys[i]];
-  obj[keys[keys.length - 1]] = val;
-}
-
-function setListVal(path, idx, key, val) {
-  const file = path.includes('just-nu') ? 'just-nu' : path.split('.')[0];
-  const arrKey = path.split('.').slice(file === 'just-nu' ? 1 : 1).join('.');
-  let arr = data[file];
-  arrKey.split('.').forEach(k => arr = arr[k]);
-  arr[idx][key] = val;
-}
-
-function getArr(path) {
-  const file = path.includes('just-nu') ? 'just-nu' : path.split('.')[0];
-  const arrKey = path.split('.').slice(file === 'just-nu' ? 1 : 1).join('.');
-  let arr = data[file];
-  arrKey.split('.').forEach(k => arr = arr[k]);
-  return { file, arr };
-}
-
-function removeItem(path, idx) {
-  const { file, arr } = getArr(path);
-  arr.splice(idx, 1);
-  render();
-  const block = document.getElementById('block-' + file);
-  if (block) block.classList.add('open');
-}
-
-function addItem(path) {
-  const { file, arr } = getArr(path);
-  // Create empty item with same keys as first item or defaults
-  if (arr.length > 0) {
-    const template = {};
-    Object.keys(arr[0]).forEach(k => template[k] = '');
-    arr.push(template);
-  } else {
-    // Defaults per section
-    const defaults = {
-      'hero.trust_items': { bold: '', text: '' },
-      'faq.items': { question: '', answer: '' },
-      'about.timeline': { year: '', title: '', text: '' },
-      'about.values': { title: '', text: '' },
-      'just-nu.cards': { label: '', title: '', text: '', link: '', link_text: '' },
-      'services.points': { title: '', text: '' }
-    };
-    arr.push(defaults[path] || {});
-  }
-  render();
-  const block = document.getElementById('block-' + file);
-  if (block) block.classList.add('open');
+function markDirty(file){
+  dirty.add(file);
+  document.getElementById('globalSave').disabled=false;
 }
 
 /* ── Save ── */
-async function save(file) {
-  const btn = document.getElementById('savebtn-' + file);
-  const status = document.getElementById('status-' + file);
-  btn.disabled = true;
-  btn.classList.add('saving');
-  btn.textContent = 'Sparar...';
-  status.textContent = '';
-  try {
-    await saveFile(file);
-    toast('Sparat!', 'success');
-    status.textContent = 'Sparat just nu';
-    status.style.color = 'var(--green)';
-    // Update preview
-    const block = document.getElementById('block-' + file);
-    const prev = block.querySelector('.preview');
-    if (prev) prev.textContent = getPreview(file);
-  } catch (e) {
-    toast('Kunde inte spara: ' + e.message, 'error');
-    status.textContent = 'Misslyckades';
-    status.style.color = 'var(--red)';
-  } finally {
-    btn.disabled = false;
-    btn.classList.remove('saving');
-    btn.textContent = 'Spara ändringar';
+async function saveCurrent(){
+  if(!activeSection)return;
+  const btn=document.querySelector('.sidebar .save-btn:last-child');
+  btn.textContent='Sparar...';btn.disabled=true;
+  try{
+    await saveFile(activeSection);
+    dirty.delete(activeSection);
+    if(dirty.size===0)document.getElementById('globalSave').disabled=true;
+    toast('Sparat!','success');
+    btn.textContent='Sparat ✓';
+    // Reload preview
+    document.getElementById('previewFrame').contentWindow.location.reload();
+    setTimeout(()=>{btn.textContent='Spara '+SECTIONS.find(x=>x.id===activeSection).label;btn.disabled=false},2000);
+  }catch(e){
+    toast('Fel: '+e.message,'error');
+    btn.textContent='Försök igen';btn.disabled=false;
   }
 }
 
-/* ── UI helpers ── */
-function toggle(f) {
-  document.getElementById('block-' + f).classList.toggle('open');
+async function saveAll(){
+  const btn=document.getElementById('globalSave');
+  btn.textContent='Sparar...';btn.disabled=true;
+  try{
+    for(const f of dirty) await saveFile(f);
+    dirty.clear();
+    toast('Allt sparat!','success');
+    document.getElementById('previewFrame').contentWindow.location.reload();
+  }catch(e){toast('Fel: '+e.message,'error')}
+  btn.textContent='Spara';btn.disabled=dirty.size===0;
 }
 
-function toast(msg, type) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast ' + type + ' show';
-  setTimeout(() => t.classList.remove('show'), 3000);
+/* ── Helpers ── */
+function toast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast '+type+' show';
+  setTimeout(()=>t.classList.remove('show'),3000);
 }
 
 /* ── Init ── */
-if (window.netlifyIdentity) {
-  netlifyIdentity.on('init', () => initAuth());
-}
+if(window.netlifyIdentity) netlifyIdentity.on('init',()=>initAuth());
 </script>
 </body>
 </html>
