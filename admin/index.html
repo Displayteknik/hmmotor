@@ -3,1011 +3,420 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HM Motor — Redigera sajten</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <title>HM Motor — Redigera</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <style>
-    /* ── Reset & Base ── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#f8f9fb;--white:#fff;--border:#e5e7eb;--border-focus:#3b82f6;
+      --text:#111827;--text-secondary:#6b7280;--text-tertiary:#9ca3af;
+      --blue:#2563eb;--blue-hover:#1d4ed8;--blue-light:#eff6ff;--blue-ring:rgba(37,99,235,.15);
+      --green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;
+      --radius:8px;--shadow:0 1px 3px rgba(0,0,0,.08);--shadow-lg:0 4px 12px rgba(0,0,0,.1);
+    }
+    body{margin:0;background:var(--bg);font-family:'Inter',-apple-system,sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
 
-    :root {
-      --bg: #0a0e17;
-      --card: #111827;
-      --card-hover: #151d2e;
-      --border: #1e293b;
-      --border-light: #2a3548;
-      --blue: #1d5ca8;
-      --blue-light: #3b82f6;
-      --blue-glow: rgba(59, 130, 246, 0.15);
-      --gold: #d4a843;
-      --gold-dim: rgba(212, 168, 67, 0.15);
-      --text: #e2e8f0;
-      --text-dim: #94a3b8;
-      --text-muted: #64748b;
-      --success: #22c55e;
-      --success-bg: rgba(34, 197, 94, 0.12);
-      --error: #ef4444;
-      --error-bg: rgba(239, 68, 68, 0.12);
-      --radius: 12px;
-      --radius-sm: 8px;
-      --shadow: 0 4px 24px rgba(0,0,0,0.3);
-      --transition: 0.2s ease;
-    }
+    /* ── Login ── */
+    #login{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#fff}
+    #login h1{font-size:1.5rem;font-weight:700;margin-bottom:.25rem}
+    #login p{color:var(--text-secondary);font-size:.9rem;margin-bottom:2rem}
+    #login button{background:var(--blue);color:#fff;border:none;padding:12px 32px;font-size:.9rem;font-weight:600;border-radius:var(--radius);cursor:pointer;font-family:inherit;transition:background .15s}
+    #login button:hover{background:var(--blue-hover)}
 
-    body {
-      margin: 0;
-      background: var(--bg);
-      font-family: 'Inter', -apple-system, sans-serif;
-      color: var(--text);
-      line-height: 1.6;
-      min-height: 100vh;
-    }
+    /* ── Top bar ── */
+    .topbar{background:#fff;border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:50}
+    .topbar .left{display:flex;align-items:center;gap:16px}
+    .topbar .brand{font-weight:700;font-size:.95rem;color:var(--text);text-decoration:none}
+    .topbar .sep{color:var(--border);font-weight:300}
+    .topbar .page-title{color:var(--text-secondary);font-size:.85rem;font-weight:500}
+    .topbar .right{display:flex;align-items:center;gap:12px}
+    .topbar a{color:var(--text-secondary);text-decoration:none;font-size:.8rem;font-weight:500;padding:6px 10px;border-radius:6px;transition:all .15s}
+    .topbar a:hover{color:var(--text);background:var(--bg)}
+    .topbar .logout{color:var(--text-tertiary);cursor:pointer;background:none;border:none;font-size:.8rem;font-family:inherit;padding:6px 10px;border-radius:6px}
+    .topbar .logout:hover{color:var(--red);background:var(--red-bg)}
 
-    h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; font-weight: 600; }
+    /* ── Main ── */
+    .main{max-width:720px;margin:0 auto;padding:40px 24px 80px}
 
-    /* ── Scrollbar ── */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    /* ── Section block ── */
+    .block{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
+    .block-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;user-select:none;transition:background .1s}
+    .block-head:hover{background:#fafbfc}
+    .block-head h2{font-size:.9rem;font-weight:600;display:flex;align-items:center;gap:10px}
+    .block-head h2 .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .block-head .preview{color:var(--text-tertiary);font-size:.8rem;max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .block-head .arrow{color:var(--text-tertiary);font-size:.7rem;transition:transform .2s}
+    .block.open .block-head .arrow{transform:rotate(180deg)}
+    .block.open .block-head{border-bottom:1px solid var(--border)}
+    .block-body{display:none;padding:20px}
+    .block.open .block-body{display:block}
 
-    /* ── Login Screen ── */
-    #login-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 2rem;
-    }
-    #login-screen .logo-area {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
-    #login-screen .logo-area h1 {
-      font-size: 2rem;
-      color: var(--text);
-      margin-bottom: 0.25rem;
-    }
-    #login-screen .logo-area span {
-      color: var(--gold);
-    }
-    #login-screen .logo-area p {
-      color: var(--text-dim);
-      font-size: 0.95rem;
-    }
-    #login-btn {
-      background: var(--blue);
-      color: #fff;
-      border: none;
-      padding: 14px 40px;
-      font-size: 1rem;
-      font-weight: 600;
-      font-family: 'Space Grotesk', sans-serif;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: all var(--transition);
-    }
-    #login-btn:hover {
-      background: var(--blue-light);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
-    }
+    /* ── Fields ── */
+    .field{margin-bottom:16px}
+    .field:last-child{margin-bottom:0}
+    .field label{display:block;font-size:.75rem;font-weight:600;color:var(--text-secondary);margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em}
+    .field input,.field textarea{width:100%;border:1.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;font-size:.9rem;font-family:inherit;color:var(--text);background:#fff;transition:border-color .15s,box-shadow .15s;resize:vertical}
+    .field input:focus,.field textarea:focus{outline:none;border-color:var(--border-focus);box-shadow:0 0 0 3px var(--blue-ring)}
+    .field input::placeholder,.field textarea::placeholder{color:var(--text-tertiary)}
+    .field textarea{min-height:72px;line-height:1.6}
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media(max-width:600px){.field-row{grid-template-columns:1fr}}
 
-    /* ── Admin Layout ── */
-    #admin-app { display: none; }
-
-    /* Header */
-    .admin-header {
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
-      padding: 0 1.5rem;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .admin-header .left { display: flex; align-items: center; gap: 1.25rem; }
-    .admin-header .brand {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 1.15rem;
-      color: var(--text);
-      text-decoration: none;
-    }
-    .admin-header .brand span { color: var(--gold); }
-    .admin-header .nav-links { display: flex; gap: 0.25rem; }
-    .admin-header .nav-links a {
-      color: var(--text-dim);
-      text-decoration: none;
-      font-size: 0.85rem;
-      padding: 6px 12px;
-      border-radius: 6px;
-      transition: all var(--transition);
-    }
-    .admin-header .nav-links a:hover {
-      color: var(--text);
-      background: rgba(255,255,255,0.05);
-    }
-    .admin-header .right { display: flex; align-items: center; gap: 1rem; }
-    .admin-header .user-info {
-      color: var(--text-dim);
-      font-size: 0.85rem;
-    }
-    #logout-btn {
-      background: transparent;
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-      padding: 6px 16px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all var(--transition);
-    }
-    #logout-btn:hover {
-      color: var(--error);
-      border-color: var(--error);
-    }
-
-    /* Main content */
-    .admin-main {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 2rem 1.5rem 4rem;
-    }
-    .admin-main > h2 {
-      font-size: 1.5rem;
-      margin-bottom: 0.25rem;
-    }
-    .admin-main > p {
-      color: var(--text-dim);
-      font-size: 0.9rem;
-      margin-bottom: 2rem;
-    }
-
-    /* ── Section Cards ── */
-    .section-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      margin-bottom: 1rem;
-      overflow: hidden;
-      transition: border-color var(--transition);
-    }
-    .section-card:hover { border-color: var(--border-light); }
-    .section-card.open { border-color: var(--blue); }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.15rem 1.5rem;
-      cursor: pointer;
-      user-select: none;
-      transition: background var(--transition);
-    }
-    .section-header:hover { background: var(--card-hover); }
-    .section-header .left-info { display: flex; align-items: center; gap: 0.85rem; }
-    .section-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.15rem;
-      flex-shrink: 0;
-    }
-    .section-header .section-meta h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      line-height: 1.3;
-    }
-    .section-header .section-meta .preview-text {
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      margin-top: 2px;
-      max-width: 450px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .chevron {
-      color: var(--text-muted);
-      font-size: 1.2rem;
-      transition: transform 0.25s ease;
-      flex-shrink: 0;
-    }
-    .section-card.open .chevron { transform: rotate(180deg); }
-
-    .section-body {
-      display: none;
-      padding: 0 1.5rem 1.5rem;
-      border-top: 1px solid var(--border);
-    }
-    .section-card.open .section-body { display: block; }
-
-    /* ── Form Elements ── */
-    .field-group {
-      margin-top: 1.25rem;
-    }
-    .field-group label {
-      display: block;
-      color: var(--text-dim);
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-family: 'Space Grotesk', sans-serif;
-      margin-bottom: 6px;
-    }
-    .field-group input[type="text"],
-    .field-group input[type="url"],
-    .field-group textarea {
-      width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      padding: 10px 14px;
-      font-size: 0.9rem;
-      font-family: 'Inter', sans-serif;
-      transition: border-color var(--transition), box-shadow var(--transition);
-      resize: vertical;
-    }
-    .field-group input:focus,
-    .field-group textarea:focus {
-      outline: none;
-      border-color: var(--blue-light);
-      box-shadow: 0 0 0 3px var(--blue-glow);
-    }
-    .field-group textarea { min-height: 80px; line-height: 1.5; }
-    .field-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-    @media (max-width: 600px) {
-      .field-row { grid-template-columns: 1fr; }
-    }
-
-    /* ── List Items ── */
-    .list-section { margin-top: 1.25rem; }
-    .list-section > .list-label {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.75rem;
-    }
-    .list-section > .list-label span {
-      color: var(--text-dim);
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-family: 'Space Grotesk', sans-serif;
-    }
-    .list-item {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 1rem 1.15rem;
-      margin-bottom: 0.75rem;
-      position: relative;
-    }
-    .list-item .item-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.75rem;
-    }
-    .list-item .item-number {
-      color: var(--text-muted);
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-family: 'Space Grotesk', sans-serif;
-    }
-    .list-item .field-group { margin-top: 0.75rem; }
-    .list-item .field-group:first-child { margin-top: 0; }
+    /* ── List items ── */
+    .list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .list-header span{font-size:.75rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.03em}
+    .list-item{border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;position:relative;background:#fff;transition:border-color .15s}
+    .list-item:hover{border-color:#d1d5db}
+    .list-item .remove-btn{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--text-tertiary);font-size:1.1rem;cursor:pointer;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+    .list-item .remove-btn:hover{color:var(--red);background:var(--red-bg)}
+    .list-item .field{margin-bottom:10px}
+    .list-item .field:last-child{margin-bottom:0}
 
     /* ── Buttons ── */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 18px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      font-family: 'Space Grotesk', sans-serif;
-      border: none;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: all var(--transition);
-    }
-    .btn-primary {
-      background: var(--blue);
-      color: #fff;
-    }
-    .btn-primary:hover {
-      background: var(--blue-light);
-      box-shadow: 0 2px 12px rgba(59,130,246,0.25);
-    }
-    .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .btn-outline {
-      background: transparent;
-      color: var(--text-dim);
-      border: 1px solid var(--border);
-    }
-    .btn-outline:hover {
-      border-color: var(--text-muted);
-      color: var(--text);
-    }
-    .btn-danger {
-      background: transparent;
-      color: var(--error);
-      border: 1px solid transparent;
-      padding: 4px 10px;
-      font-size: 0.78rem;
-    }
-    .btn-danger:hover {
-      background: var(--error-bg);
-    }
-    .btn-add {
-      background: transparent;
-      color: var(--blue-light);
-      border: 1px dashed var(--border);
-      width: 100%;
-      padding: 10px;
-      justify-content: center;
-      font-size: 0.85rem;
-    }
-    .btn-add:hover {
-      border-color: var(--blue-light);
-      background: var(--blue-glow);
-    }
-
-    .save-row {
-      margin-top: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .save-status {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-    }
+    .add-btn{display:inline-flex;align-items:center;gap:6px;color:var(--blue);font-size:.8rem;font-weight:600;background:none;border:1.5px dashed var(--border);border-radius:var(--radius);padding:8px 14px;cursor:pointer;font-family:inherit;transition:all .15s;width:100%;justify-content:center}
+    .add-btn:hover{background:var(--blue-light);border-color:var(--blue)}
+    .save-bar{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding-top:16px;border-top:1px solid var(--border);margin-top:16px}
+    .save-btn{background:var(--blue);color:#fff;border:none;padding:10px 24px;font-size:.85rem;font-weight:600;border-radius:var(--radius);cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:6px}
+    .save-btn:hover{background:var(--blue-hover);box-shadow:var(--shadow-lg)}
+    .save-btn:disabled{opacity:.5;cursor:not-allowed}
+    .save-btn.saving{background:var(--text-secondary)}
+    .save-status{font-size:.8rem;color:var(--text-tertiary)}
 
     /* ── Toast ── */
-    #toast-container {
-      position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    .toast {
-      padding: 12px 20px;
-      border-radius: var(--radius-sm);
-      font-size: 0.88rem;
-      font-weight: 500;
-      box-shadow: var(--shadow);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      animation: toastIn 0.3s ease;
-      max-width: 380px;
-    }
-    .toast.success {
-      background: #0d2818;
-      border: 1px solid #166534;
-      color: #86efac;
-    }
-    .toast.error {
-      background: #2a0a0a;
-      border: 1px solid #991b1b;
-      color: #fca5a5;
-    }
-    @keyframes toastIn {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:var(--radius);font-size:.85rem;font-weight:500;color:#fff;z-index:999;transform:translateY(80px);opacity:0;transition:all .3s ease;box-shadow:var(--shadow-lg)}
+    .toast.show{transform:translateY(0);opacity:1}
+    .toast.success{background:var(--green)}
+    .toast.error{background:var(--red)}
 
     /* ── Loading ── */
-    .loading-overlay {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 4rem 2rem;
-      color: var(--text-dim);
-      gap: 1rem;
-    }
-    .spinner {
-      width: 36px;
-      height: 36px;
-      border: 3px solid var(--border);
-      border-top-color: var(--blue-light);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── Section-specific icon backgrounds ── */
-    .icon-hero { background: var(--blue-glow); color: var(--blue-light); }
-    .icon-faq { background: rgba(168, 85, 247, 0.12); color: #a855f7; }
-    .icon-about { background: var(--gold-dim); color: var(--gold); }
-    .icon-news { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
-    .icon-services { background: rgba(244, 114, 182, 0.12); color: #f472b6; }
-
-    /* ── Mobile ── */
-    @media (max-width: 640px) {
-      .admin-header { padding: 0 1rem; }
-      .admin-header .nav-links { display: none; }
-      .admin-main { padding: 1.25rem 1rem 3rem; }
-      .section-header { padding: 1rem 1.15rem; }
-      .section-body { padding: 0 1.15rem 1.15rem; }
-      .section-header .preview-text { max-width: 200px; }
-    }
+    .loading{text-align:center;padding:60px 20px;color:var(--text-tertiary);font-size:.9rem}
+    .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .6s linear infinite;margin:0 auto 12px}
+    @keyframes spin{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
 
-<!-- ════ LOGIN SCREEN ════ -->
-<div id="login-screen">
-  <div class="logo-area">
-    <h1>HM <span>Motor</span></h1>
-    <p>Administrationspanel</p>
-  </div>
-  <button id="login-btn" onclick="netlifyIdentity.open()">Logga in</button>
+<!-- Login -->
+<div id="login">
+  <h1>HM Motor</h1>
+  <p>Logga in för att redigera sajten</p>
+  <button onclick="netlifyIdentity.open('login')">Logga in</button>
 </div>
 
-<!-- ════ ADMIN APP ════ -->
-<div id="admin-app">
-
-  <!-- Header -->
-  <header class="admin-header">
+<!-- App -->
+<div id="app" style="display:none">
+  <div class="topbar">
     <div class="left">
-      <a href="/" class="brand">HM <span>Motor</span></a>
-      <nav class="nav-links">
-        <a href="/" target="_blank">Visa sajten</a>
-      </nav>
+      <a href="/" class="brand">HM Motor</a>
+      <span class="sep">/</span>
+      <span class="page-title">Redigera sajten</span>
     </div>
     <div class="right">
-      <span class="user-info" id="user-email"></span>
-      <button id="logout-btn" onclick="handleLogout()">Logga ut</button>
+      <a href="/dashboard">Fordon &amp; blogg</a>
+      <a href="/" target="_blank">Visa sajten ↗</a>
+      <button class="logout" id="logoutBtn">Logga ut</button>
     </div>
-  </header>
-
-  <!-- Main -->
-  <main class="admin-main">
-    <h2>Redigera innehall</h2>
-    <p>Klicka pa en sektion for att redigera. Andringarna sparas direkt till sajten.</p>
-
-    <!-- Loading state -->
-    <div id="loading" class="loading-overlay">
-      <div class="spinner"></div>
-      <span>Laddar innehall...</span>
-    </div>
-
-    <!-- Sections container -->
-    <div id="sections" style="display:none;">
-
-      <!-- ── 1. HERO ── -->
-      <div class="section-card" data-section="hero">
-        <div class="section-header" onclick="toggleSection(this)">
-          <div class="left-info">
-            <div class="section-icon icon-hero">&#9733;</div>
-            <div class="section-meta">
-              <h3>Startsida &mdash; Hero</h3>
-              <div class="preview-text" id="preview-hero"></div>
-            </div>
-          </div>
-          <div class="chevron">&#9662;</div>
-        </div>
-        <div class="section-body" id="body-hero"></div>
-      </div>
-
-      <!-- ── 2. FAQ ── -->
-      <div class="section-card" data-section="faq">
-        <div class="section-header" onclick="toggleSection(this)">
-          <div class="left-info">
-            <div class="section-icon icon-faq">?</div>
-            <div class="section-meta">
-              <h3>Vanliga fragor (FAQ)</h3>
-              <div class="preview-text" id="preview-faq"></div>
-            </div>
-          </div>
-          <div class="chevron">&#9662;</div>
-        </div>
-        <div class="section-body" id="body-faq"></div>
-      </div>
-
-      <!-- ── 3. ABOUT ── -->
-      <div class="section-card" data-section="about">
-        <div class="section-header" onclick="toggleSection(this)">
-          <div class="left-info">
-            <div class="section-icon icon-about">&#9830;</div>
-            <div class="section-meta">
-              <h3>Om oss</h3>
-              <div class="preview-text" id="preview-about"></div>
-            </div>
-          </div>
-          <div class="chevron">&#9662;</div>
-        </div>
-        <div class="section-body" id="body-about"></div>
-      </div>
-
-      <!-- ── 4. JUST NU ── -->
-      <div class="section-card" data-section="just-nu">
-        <div class="section-header" onclick="toggleSection(this)">
-          <div class="left-info">
-            <div class="section-icon icon-news">&#9998;</div>
-            <div class="section-meta">
-              <h3>Just nu &mdash; Nyheter</h3>
-              <div class="preview-text" id="preview-just-nu"></div>
-            </div>
-          </div>
-          <div class="chevron">&#9662;</div>
-        </div>
-        <div class="section-body" id="body-just-nu"></div>
-      </div>
-
-      <!-- ── 5. SERVICES ── -->
-      <div class="section-card" data-section="services">
-        <div class="section-header" onclick="toggleSection(this)">
-          <div class="left-info">
-            <div class="section-icon icon-services">&#10003;</div>
-            <div class="section-meta">
-              <h3>Varfor HM Motor</h3>
-              <div class="preview-text" id="preview-services"></div>
-            </div>
-          </div>
-          <div class="chevron">&#9662;</div>
-        </div>
-        <div class="section-body" id="body-services"></div>
-      </div>
-
-    </div>
-  </main>
+  </div>
+  <div class="main" id="content">
+    <div class="loading"><div class="spinner"></div>Laddar innehåll...</div>
+  </div>
 </div>
 
-<!-- Toast container -->
-<div id="toast-container"></div>
+<!-- Toast -->
+<div class="toast" id="toast"></div>
 
 <script>
-// ════════════════════════════════════════
-// HM Motor Admin — Custom CMS
-// ════════════════════════════════════════
+const FILES = ['hero','faq','about','just-nu','services'];
+const LABELS = {hero:'Startsidan',faq:'Vanliga frågor',about:'Om oss','just-nu':'Just nu','services':'Varför HM Motor'};
+const DOTS = {hero:'#2563eb',faq:'#8b5cf6',about:'#059669','just-nu':'#f59e0b',services:'#ec4899'};
+let data = {}, shas = {}, token = '';
 
-const API_BASE = '/.netlify/git/github/contents/content/pages';
-const FILES = ['hero', 'faq', 'about', 'just-nu', 'services'];
-
-// State: content + SHA per file
-const state = {};
-
-// ── Auth ──
-function getToken() {
+/* ── Auth ── */
+function initAuth() {
   const user = netlifyIdentity.currentUser();
-  if (!user) return null;
-  return user.token.access_token;
+  if (user) { startApp(user); return; }
+  document.getElementById('login').style.display = 'flex';
+  netlifyIdentity.on('login', u => startApp(u));
 }
 
-async function refreshToken() {
-  const user = netlifyIdentity.currentUser();
-  if (!user) return null;
+async function startApp(user) {
+  const t = await user.jwt();
+  token = t;
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('logoutBtn').onclick = () => { netlifyIdentity.logout(); location.reload(); };
+  loadAll();
+}
+
+/* ── API ── */
+async function loadFile(name) {
+  const r = await fetch(`/.netlify/git/github/contents/content/pages/${name}.json`, {
+    headers: { Authorization: 'Bearer ' + token }
+  });
+  if (!r.ok) throw new Error('Kunde inte ladda ' + name);
+  const j = await r.json();
+  shas[name] = j.sha;
+  data[name] = JSON.parse(atob(j.content));
+}
+
+async function saveFile(name) {
+  const body = JSON.stringify(data[name], null, 2) + '\n';
+  const r = await fetch(`/.netlify/git/github/contents/content/pages/${name}.json`, {
+    method: 'PUT',
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: `Uppdatera ${LABELS[name]}`, content: btoa(unescape(encodeURIComponent(body))), sha: shas[name] })
+  });
+  if (!r.ok) throw new Error('Kunde inte spara');
+  const j = await r.json();
+  shas[name] = j.content.sha;
+}
+
+/* ── Render ── */
+async function loadAll() {
   try {
-    await user.jwt();
-    return user.token.access_token;
-  } catch(e) {
-    console.error('Token refresh failed', e);
-    return null;
+    await Promise.all(FILES.map(f => loadFile(f)));
+    render();
+  } catch (e) {
+    document.getElementById('content').innerHTML = `<div class="loading" style="color:var(--red)">Fel: ${e.message}</div>`;
   }
 }
 
-// ── Init ──
-netlifyIdentity.on('init', user => {
-  if (user) showAdmin(user);
-});
-
-netlifyIdentity.on('login', user => {
-  showAdmin(user);
-});
-
-function showAdmin(user) {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('admin-app').style.display = 'block';
-  document.getElementById('user-email').textContent = user.email || '';
-  loadAllContent();
+function render() {
+  const c = document.getElementById('content');
+  c.innerHTML = FILES.map(f => {
+    const preview = getPreview(f);
+    return `<div class="block" id="block-${f}">
+      <div class="block-head" onclick="toggle('${f}')">
+        <h2><span class="dot" style="background:${DOTS[f]}"></span>${LABELS[f]}</h2>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span class="preview">${preview}</span>
+          <span class="arrow">▼</span>
+        </div>
+      </div>
+      <div class="block-body">${renderFields(f)}</div>
+    </div>`;
+  }).join('');
 }
 
-function handleLogout() {
-  netlifyIdentity.logout();
-  document.getElementById('admin-app').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
+function getPreview(f) {
+  if (f === 'hero') return esc(data.hero.title);
+  if (f === 'faq') return data.faq.items.length + ' frågor';
+  if (f === 'about') return esc(data.about.title);
+  if (f === 'just-nu') return data['just-nu'].cards.length + ' nyheter';
+  if (f === 'services') return esc(data.services.title);
+  return '';
 }
 
-// ── Toast ──
-function toast(msg, type = 'success') {
-  const el = document.createElement('div');
-  el.className = `toast ${type}`;
-  el.innerHTML = (type === 'success' ? '&#10003; ' : '&#10007; ') + msg;
-  document.getElementById('toast-container').appendChild(el);
-  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; setTimeout(() => el.remove(), 300); }, 3500);
+function renderFields(f) {
+  if (f === 'hero') return renderHero();
+  if (f === 'faq') return renderFAQ();
+  if (f === 'about') return renderAbout();
+  if (f === 'just-nu') return renderJustNu();
+  if (f === 'services') return renderServices();
 }
 
-// ── Toggle sections ──
-function toggleSection(header) {
-  const card = header.closest('.section-card');
-  card.classList.toggle('open');
-}
-
-// ── Load all content ──
-async function loadAllContent() {
-  document.getElementById('loading').style.display = 'flex';
-  document.getElementById('sections').style.display = 'none';
-
-  const token = await refreshToken();
-  if (!token) { toast('Kunde inte hämta token. Ladda om sidan.', 'error'); return; }
-
-  try {
-    const results = await Promise.all(FILES.map(f =>
-      fetch(`${API_BASE}/${f}.json`, { headers: { Authorization: `Bearer ${token}` } })
-        .then(r => { if (!r.ok) throw new Error(`${f}: ${r.status}`); return r.json(); })
-    ));
-
-    FILES.forEach((f, i) => {
-      const raw = atob(results[i].content.replace(/\n/g, ''));
-      state[f] = { data: JSON.parse(raw), sha: results[i].sha };
-    });
-
-    renderAllSections();
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('sections').style.display = 'block';
-  } catch(e) {
-    console.error(e);
-    toast('Kunde inte ladda innehall: ' + e.message, 'error');
-    document.getElementById('loading').innerHTML = '<p style="color:var(--error)">Fel vid laddning. Kontrollera att du har behörighet.</p>';
-  }
-}
-
-// ── Save section ──
-async function saveSection(file) {
-  const btn = document.querySelector(`[data-section="${file}"] .btn-primary`);
-  const statusEl = document.querySelector(`[data-section="${file}"] .save-status`);
-  if (btn) { btn.disabled = true; btn.textContent = 'Sparar...'; }
-  if (statusEl) statusEl.textContent = '';
-
-  const token = await refreshToken();
-  if (!token) { toast('Autentisering misslyckades.', 'error'); if (btn) { btn.disabled = false; btn.textContent = 'Spara'; } return; }
-
-  // Collect current form data
-  collectFormData(file);
-
-  const content = btoa(unescape(encodeURIComponent(JSON.stringify(state[file].data, null, 2))));
-
-  try {
-    const res = await fetch(`${API_BASE}/${file}.json`, {
-      method: 'PUT',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: `Uppdatera ${file} via admin`, content, sha: state[file].sha })
-    });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `HTTP ${res.status}`);
-    }
-
-    const result = await res.json();
-    state[file].sha = result.content.sha;
-    toast(`${getSectionName(file)} sparad!`);
-    updatePreview(file);
-    if (statusEl) statusEl.textContent = 'Sparad just nu';
-  } catch(e) {
-    console.error(e);
-    toast(`Kunde inte spara: ${e.message}`, 'error');
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = 'Spara'; }
-  }
-}
-
-function getSectionName(file) {
-  return { hero: 'Startsida', faq: 'FAQ', about: 'Om oss', 'just-nu': 'Nyheter', services: 'Varför HM Motor' }[file] || file;
-}
-
-// ── Render all ──
-function renderAllSections() {
-  renderHero();
-  renderFaq();
-  renderAbout();
-  renderJustNu();
-  renderServices();
-  FILES.forEach(updatePreview);
-}
-
-function updatePreview(file) {
-  const el = document.getElementById(`preview-${file}`);
-  if (!el || !state[file]) return;
-  const d = state[file].data;
-  switch(file) {
-    case 'hero': el.textContent = d.title || ''; break;
-    case 'faq': el.textContent = `${d.items?.length || 0} fragor`; break;
-    case 'about': el.textContent = d.intro?.substring(0, 60) + '...' || ''; break;
-    case 'just-nu': el.textContent = (d.cards || []).map(c => c.title).join(', '); break;
-    case 'services': el.textContent = d.title || ''; break;
-  }
-}
-
-// ── Helper: create field HTML ──
-function fieldHTML(label, id, value, type = 'text', rows = 0) {
-  if (rows > 0) {
-    return `<div class="field-group"><label>${label}</label><textarea id="${id}" rows="${rows}">${esc(value || '')}</textarea></div>`;
-  }
-  return `<div class="field-group"><label>${label}</label><input type="${type}" id="${id}" value="${esc(value || '')}"></div>`;
-}
-
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function saveRow(file) {
-  return `<div class="save-row"><button class="btn btn-primary" onclick="saveSection('${file}')">Spara</button><span class="save-status"></span></div>`;
-}
-
-// ════════════════════════════════════════
-// SECTION RENDERERS
-// ════════════════════════════════════════
-
-// ── HERO ──
 function renderHero() {
-  const d = state.hero.data;
-  let html = '';
-  html += fieldHTML('Badge / Etikett', 'hero-badge', d.badge);
-  html += fieldHTML('Rubrik', 'hero-title', d.title);
-  html += fieldHTML('Undertext', 'hero-subtitle', d.subtitle, 'text', 3);
-  html += '<div class="field-row">';
-  html += fieldHTML('Knapp 1 — Text', 'hero-cta1-text', d.cta1_text);
-  html += fieldHTML('Knapp 1 — Lank', 'hero-cta1-url', d.cta1_url);
-  html += '</div><div class="field-row">';
-  html += fieldHTML('Knapp 2 — Text', 'hero-cta2-text', d.cta2_text);
-  html += fieldHTML('Knapp 2 — Lank', 'hero-cta2-url', d.cta2_url);
-  html += '</div>';
-  html += fieldHTML('Hero-bild (URL)', 'hero-image', d.image_url, 'url');
-
-  // Trust items
-  html += `<div class="list-section"><div class="list-label"><span>Trust-element (${d.trust_items?.length || 0} st)</span><button class="btn btn-outline" onclick="addTrustItem()">+ Lagg till</button></div><div id="hero-trust-list">`;
-  (d.trust_items || []).forEach((item, i) => {
-    html += `<div class="list-item"><div class="item-header"><span class="item-number">Element ${i+1}</span><button class="btn btn-danger" onclick="removeTrustItem(${i})">Ta bort</button></div>`;
-    html += '<div class="field-row">';
-    html += fieldHTML('Fetstil', `hero-trust-bold-${i}`, item.bold);
-    html += fieldHTML('Text', `hero-trust-text-${i}`, item.text);
-    html += '</div></div>';
-  });
-  html += '</div></div>';
-  html += saveRow('hero');
-  document.getElementById('body-hero').innerHTML = html;
+  const d = data.hero;
+  return `
+    ${field('Badge', d.badge, 'hero.badge')}
+    ${field('Rubrik', d.title, 'hero.title')}
+    ${textarea('Undertext', d.subtitle, 'hero.subtitle')}
+    <div class="field-row">
+      ${field('Knapp 1 — text', d.cta1_text, 'hero.cta1_text')}
+      ${field('Knapp 1 — länk', d.cta1_url, 'hero.cta1_url')}
+    </div>
+    <div class="field-row">
+      ${field('Knapp 2 — text', d.cta2_text, 'hero.cta2_text')}
+      ${field('Knapp 2 — länk', d.cta2_url, 'hero.cta2_url')}
+    </div>
+    ${field('Bakgrundsbild (URL)', d.image_url, 'hero.image_url')}
+    ${listSection('Trust-signaler', d.trust_items, 'hero.trust_items', ['bold:Fetstil', 'text:Text'])}
+    ${saveBar('hero')}`;
 }
 
-function addTrustItem() {
-  collectFormData('hero');
-  state.hero.data.trust_items = state.hero.data.trust_items || [];
-  state.hero.data.trust_items.push({ bold: '', text: '' });
-  renderHero();
+function renderFAQ() {
+  const d = data.faq;
+  return `
+    ${listSection('Frågor & svar', d.items, 'faq.items', ['question:Fråga', 'answer:Svar|textarea'])}
+    ${saveBar('faq')}`;
 }
 
-function removeTrustItem(i) {
-  collectFormData('hero');
-  state.hero.data.trust_items.splice(i, 1);
-  renderHero();
-}
-
-// ── FAQ ──
-function renderFaq() {
-  const d = state.faq.data;
-  let html = `<div class="list-section"><div class="list-label"><span>Fragor (${d.items?.length || 0} st)</span><button class="btn btn-outline" onclick="addFaqItem()">+ Lagg till fraga</button></div><div id="faq-list">`;
-  (d.items || []).forEach((item, i) => {
-    html += `<div class="list-item"><div class="item-header"><span class="item-number">Fraga ${i+1}</span><button class="btn btn-danger" onclick="removeFaqItem(${i})">Ta bort</button></div>`;
-    html += fieldHTML('Fraga', `faq-q-${i}`, item.question);
-    html += fieldHTML('Svar', `faq-a-${i}`, item.answer, 'text', 3);
-    html += '</div>';
-  });
-  html += '</div></div>';
-  html += saveRow('faq');
-  document.getElementById('body-faq').innerHTML = html;
-}
-
-function addFaqItem() {
-  collectFormData('faq');
-  state.faq.data.items = state.faq.data.items || [];
-  state.faq.data.items.push({ question: '', answer: '' });
-  renderFaq();
-}
-
-function removeFaqItem(i) {
-  collectFormData('faq');
-  state.faq.data.items.splice(i, 1);
-  renderFaq();
-}
-
-// ── ABOUT ──
 function renderAbout() {
-  const d = state.about.data;
-  let html = '';
-  html += fieldHTML('Rubrik', 'about-title', d.title);
-  html += fieldHTML('Introduktion', 'about-intro', d.intro, 'text', 3);
-
-  // Timeline
-  html += `<div class="list-section"><div class="list-label"><span>Tidslinje (${d.timeline?.length || 0} st)</span><button class="btn btn-outline" onclick="addTimeline()">+ Lagg till</button></div><div id="about-timeline-list">`;
-  (d.timeline || []).forEach((item, i) => {
-    html += `<div class="list-item"><div class="item-header"><span class="item-number">Tidslinje ${i+1}</span><button class="btn btn-danger" onclick="removeTimeline(${i})">Ta bort</button></div>`;
-    html += '<div class="field-row">';
-    html += fieldHTML('Ar', `about-tl-year-${i}`, item.year);
-    html += fieldHTML('Rubrik', `about-tl-title-${i}`, item.title);
-    html += '</div>';
-    html += fieldHTML('Text', `about-tl-text-${i}`, item.text, 'text', 2);
-    html += '</div>';
-  });
-  html += '</div></div>';
-
-  // Values
-  html += `<div class="list-section"><div class="list-label"><span>Varderingar (${d.values?.length || 0} st)</span><button class="btn btn-outline" onclick="addValue()">+ Lagg till</button></div><div id="about-values-list">`;
-  (d.values || []).forEach((item, i) => {
-    html += `<div class="list-item"><div class="item-header"><span class="item-number">Vardering ${i+1}</span><button class="btn btn-danger" onclick="removeValue(${i})">Ta bort</button></div>`;
-    html += fieldHTML('Rubrik', `about-val-title-${i}`, item.title);
-    html += fieldHTML('Text', `about-val-text-${i}`, item.text, 'text', 2);
-    html += '</div>';
-  });
-  html += '</div></div>';
-
-  html += saveRow('about');
-  document.getElementById('body-about').innerHTML = html;
+  const d = data.about;
+  return `
+    ${field('Rubrik', d.title, 'about.title')}
+    ${textarea('Introduktion', d.intro, 'about.intro')}
+    ${listSection('Tidslinje', d.timeline, 'about.timeline', ['year:År', 'title:Rubrik', 'text:Beskrivning|textarea'])}
+    ${listSection('Värderingar', d.values, 'about.values', ['title:Rubrik', 'text:Beskrivning|textarea'])}
+    ${saveBar('about')}`;
 }
 
-function addTimeline() { collectFormData('about'); state.about.data.timeline.push({ year: '', title: '', text: '' }); renderAbout(); }
-function removeTimeline(i) { collectFormData('about'); state.about.data.timeline.splice(i, 1); renderAbout(); }
-function addValue() { collectFormData('about'); state.about.data.values.push({ title: '', text: '' }); renderAbout(); }
-function removeValue(i) { collectFormData('about'); state.about.data.values.splice(i, 1); renderAbout(); }
-
-// ── JUST NU ──
 function renderJustNu() {
-  const d = state['just-nu'].data;
-  let html = `<div class="list-section"><div class="list-label"><span>Nyhetskort (${d.cards?.length || 0} / 3)</span>${(d.cards?.length || 0) < 3 ? '<button class="btn btn-outline" onclick="addNewsCard()">+ Lagg till kort</button>' : ''}</div><div id="news-list">`;
-  (d.cards || []).forEach((card, i) => {
-    html += `<div class="list-item"><div class="item-header"><span class="item-number">Kort ${i+1}</span><button class="btn btn-danger" onclick="removeNewsCard(${i})">Ta bort</button></div>`;
-    html += '<div class="field-row">';
-    html += fieldHTML('Etikett', `news-label-${i}`, card.label);
-    html += fieldHTML('Rubrik', `news-title-${i}`, card.title);
-    html += '</div>';
-    html += fieldHTML('Text', `news-text-${i}`, card.text, 'text', 2);
-    html += '<div class="field-row">';
-    html += fieldHTML('Lank', `news-link-${i}`, card.link);
-    html += fieldHTML('Lanktext', `news-linktext-${i}`, card.link_text);
-    html += '</div></div>';
-  });
-  html += '</div></div>';
-  html += saveRow('just-nu');
-  document.getElementById('body-just-nu').innerHTML = html;
+  const d = data['just-nu'];
+  return `
+    ${listSection('Nyhetskort (max 3)', d.cards, 'just-nu.cards', ['label:Etikett', 'title:Rubrik', 'text:Beskrivning|textarea', 'link:Länk', 'link_text:Länktext'])}
+    ${saveBar('just-nu')}`;
 }
 
-function addNewsCard() {
-  collectFormData('just-nu');
-  if ((state['just-nu'].data.cards || []).length >= 3) { toast('Max 3 nyhetskort', 'error'); return; }
-  state['just-nu'].data.cards = state['just-nu'].data.cards || [];
-  state['just-nu'].data.cards.push({ label: '', title: '', text: '', link: '', link_text: '' });
-  renderJustNu();
-}
-
-function removeNewsCard(i) {
-  collectFormData('just-nu');
-  state['just-nu'].data.cards.splice(i, 1);
-  renderJustNu();
-}
-
-// ── SERVICES ──
 function renderServices() {
-  const d = state.services.data;
-  let html = '';
-  html += fieldHTML('Rubrik', 'svc-title', d.title);
-  html += fieldHTML('Brödtext 1', 'svc-text1', d.text1, 'text', 3);
-  html += fieldHTML('Brödtext 2', 'svc-text2', d.text2, 'text', 3);
-
-  html += `<div class="list-section"><div class="list-label"><span>Punkter (${d.points?.length || 0} st)</span><button class="btn btn-outline" onclick="addServicePoint()">+ Lagg till punkt</button></div><div id="svc-points-list">`;
-  (d.points || []).forEach((item, i) => {
-    html += `<div class="list-item"><div class="item-header"><span class="item-number">Punkt ${i+1}</span><button class="btn btn-danger" onclick="removeServicePoint(${i})">Ta bort</button></div>`;
-    html += fieldHTML('Rubrik', `svc-pt-title-${i}`, item.title);
-    html += fieldHTML('Text', `svc-pt-text-${i}`, item.text, 'text', 2);
-    html += '</div>';
-  });
-  html += '</div></div>';
-
-  html += saveRow('services');
-  document.getElementById('body-services').innerHTML = html;
+  const d = data.services;
+  return `
+    ${field('Rubrik', d.title, 'services.title')}
+    ${textarea('Text stycke 1', d.text1, 'services.text1')}
+    ${textarea('Text stycke 2', d.text2, 'services.text2')}
+    ${listSection('Punkter', d.points, 'services.points', ['title:Rubrik', 'text:Text|textarea'])}
+    ${saveBar('services')}`;
 }
 
-function addServicePoint() { collectFormData('services'); state.services.data.points.push({ title: '', text: '' }); renderServices(); }
-function removeServicePoint(i) { collectFormData('services'); state.services.data.points.splice(i, 1); renderServices(); }
+/* ── Field helpers ── */
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-// ════════════════════════════════════════
-// COLLECT FORM DATA
-// ════════════════════════════════════════
+function field(label, value, path) {
+  return `<div class="field"><label>${label}</label><input type="text" value="${esc(value||'')}" onchange="setVal('${path}',this.value)" oninput="setVal('${path}',this.value)"></div>`;
+}
 
-function val(id) { const el = document.getElementById(id); return el ? el.value : ''; }
+function textarea(label, value, path) {
+  return `<div class="field"><label>${label}</label><textarea onchange="setVal('${path}',this.value)" oninput="setVal('${path}',this.value)">${esc(value||'')}</textarea></div>`;
+}
 
-function collectFormData(file) {
-  switch(file) {
-    case 'hero': {
-      const d = state.hero.data;
-      d.badge = val('hero-badge');
-      d.title = val('hero-title');
-      d.subtitle = val('hero-subtitle');
-      d.cta1_text = val('hero-cta1-text');
-      d.cta1_url = val('hero-cta1-url');
-      d.cta2_text = val('hero-cta2-text');
-      d.cta2_url = val('hero-cta2-url');
-      d.image_url = val('hero-image');
-      (d.trust_items || []).forEach((item, i) => {
-        item.bold = val(`hero-trust-bold-${i}`);
-        item.text = val(`hero-trust-text-${i}`);
-      });
-      break;
-    }
-    case 'faq': {
-      const d = state.faq.data;
-      (d.items || []).forEach((item, i) => {
-        item.question = val(`faq-q-${i}`);
-        item.answer = val(`faq-a-${i}`);
-      });
-      break;
-    }
-    case 'about': {
-      const d = state.about.data;
-      d.title = val('about-title');
-      d.intro = val('about-intro');
-      (d.timeline || []).forEach((item, i) => {
-        item.year = val(`about-tl-year-${i}`);
-        item.title = val(`about-tl-title-${i}`);
-        item.text = val(`about-tl-text-${i}`);
-      });
-      (d.values || []).forEach((item, i) => {
-        item.title = val(`about-val-title-${i}`);
-        item.text = val(`about-val-text-${i}`);
-      });
-      break;
-    }
-    case 'just-nu': {
-      const d = state['just-nu'].data;
-      (d.cards || []).forEach((card, i) => {
-        card.label = val(`news-label-${i}`);
-        card.title = val(`news-title-${i}`);
-        card.text = val(`news-text-${i}`);
-        card.link = val(`news-link-${i}`);
-        card.link_text = val(`news-linktext-${i}`);
-      });
-      break;
-    }
-    case 'services': {
-      const d = state.services.data;
-      d.title = val('svc-title');
-      d.text1 = val('svc-text1');
-      d.text2 = val('svc-text2');
-      (d.points || []).forEach((item, i) => {
-        item.title = val(`svc-pt-title-${i}`);
-        item.text = val(`svc-pt-text-${i}`);
-      });
-      break;
-    }
+function listSection(label, items, path, fieldDefs) {
+  const maxNote = path === 'just-nu.cards' ? 3 : 999;
+  let html = `<div style="margin-top:16px">
+    <div class="list-header"><span>${label}</span></div>`;
+  items.forEach((item, i) => {
+    html += `<div class="list-item">
+      <button class="remove-btn" onclick="removeItem('${path}',${i})" title="Ta bort">×</button>`;
+    fieldDefs.forEach(fd => {
+      const [key, rest] = fd.split(':');
+      const [lbl, type] = rest.split('|');
+      const val = item[key] || '';
+      const p = `${path}.${i}.${key}`;
+      if (type === 'textarea') {
+        html += `<div class="field"><label>${lbl}</label><textarea onchange="setListVal('${path}',${i},'${key}',this.value)" oninput="setListVal('${path}',${i},'${key}',this.value)">${esc(val)}</textarea></div>`;
+      } else {
+        html += `<div class="field"><label>${lbl}</label><input type="text" value="${esc(val)}" onchange="setListVal('${path}',${i},'${key}',this.value)" oninput="setListVal('${path}',${i},'${key}',this.value)"></div>`;
+      }
+    });
+    html += '</div>';
+  });
+  if (items.length < maxNote) {
+    html += `<button class="add-btn" onclick="addItem('${path}')">+ Lägg till</button>`;
   }
+  html += '</div>';
+  return html;
+}
+
+function saveBar(file) {
+  return `<div class="save-bar">
+    <span class="save-status" id="status-${file}"></span>
+    <button class="save-btn" id="savebtn-${file}" onclick="save('${file}')">Spara ändringar</button>
+  </div>`;
+}
+
+/* ── Data ops ── */
+function setVal(path, val) {
+  const parts = path.split('.');
+  const file = parts[0] === 'just-nu' ? 'just-nu' : parts[0];
+  const key = parts[0] === 'just-nu' ? parts.slice(1).join('.') : parts.slice(1).join('.');
+  let obj = data[file];
+  const keys = key.split('.');
+  for (let i = 0; i < keys.length - 1; i++) obj = obj[keys[i]];
+  obj[keys[keys.length - 1]] = val;
+}
+
+function setListVal(path, idx, key, val) {
+  const file = path.includes('just-nu') ? 'just-nu' : path.split('.')[0];
+  const arrKey = path.split('.').slice(file === 'just-nu' ? 1 : 1).join('.');
+  let arr = data[file];
+  arrKey.split('.').forEach(k => arr = arr[k]);
+  arr[idx][key] = val;
+}
+
+function getArr(path) {
+  const file = path.includes('just-nu') ? 'just-nu' : path.split('.')[0];
+  const arrKey = path.split('.').slice(file === 'just-nu' ? 1 : 1).join('.');
+  let arr = data[file];
+  arrKey.split('.').forEach(k => arr = arr[k]);
+  return { file, arr };
+}
+
+function removeItem(path, idx) {
+  const { file, arr } = getArr(path);
+  arr.splice(idx, 1);
+  render();
+  const block = document.getElementById('block-' + file);
+  if (block) block.classList.add('open');
+}
+
+function addItem(path) {
+  const { file, arr } = getArr(path);
+  // Create empty item with same keys as first item or defaults
+  if (arr.length > 0) {
+    const template = {};
+    Object.keys(arr[0]).forEach(k => template[k] = '');
+    arr.push(template);
+  } else {
+    // Defaults per section
+    const defaults = {
+      'hero.trust_items': { bold: '', text: '' },
+      'faq.items': { question: '', answer: '' },
+      'about.timeline': { year: '', title: '', text: '' },
+      'about.values': { title: '', text: '' },
+      'just-nu.cards': { label: '', title: '', text: '', link: '', link_text: '' },
+      'services.points': { title: '', text: '' }
+    };
+    arr.push(defaults[path] || {});
+  }
+  render();
+  const block = document.getElementById('block-' + file);
+  if (block) block.classList.add('open');
+}
+
+/* ── Save ── */
+async function save(file) {
+  const btn = document.getElementById('savebtn-' + file);
+  const status = document.getElementById('status-' + file);
+  btn.disabled = true;
+  btn.classList.add('saving');
+  btn.textContent = 'Sparar...';
+  status.textContent = '';
+  try {
+    await saveFile(file);
+    toast('Sparat!', 'success');
+    status.textContent = 'Sparat just nu';
+    status.style.color = 'var(--green)';
+    // Update preview
+    const block = document.getElementById('block-' + file);
+    const prev = block.querySelector('.preview');
+    if (prev) prev.textContent = getPreview(file);
+  } catch (e) {
+    toast('Kunde inte spara: ' + e.message, 'error');
+    status.textContent = 'Misslyckades';
+    status.style.color = 'var(--red)';
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('saving');
+    btn.textContent = 'Spara ändringar';
+  }
+}
+
+/* ── UI helpers ── */
+function toggle(f) {
+  document.getElementById('block-' + f).classList.toggle('open');
+}
+
+function toast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ── Init ── */
+if (window.netlifyIdentity) {
+  netlifyIdentity.on('init', () => initAuth());
 }
 </script>
-
 </body>
 </html>
