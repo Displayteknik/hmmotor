@@ -248,7 +248,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-let editor, token, pageSha;
+let editor, token, pageSha, originalHead, originalScripts;
 
 /* ================================================================
    AUTH
@@ -350,6 +350,11 @@ function initEditor(html) {
   // Parse the incoming HTML
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
+
+  // Save original <head> and body scripts for buildFullPage
+  originalHead = doc.head.innerHTML;
+  const bodyScriptEls = doc.body.querySelectorAll('script');
+  originalScripts = Array.from(bodyScriptEls).map(s => s.outerHTML.replace(/<\/script>/g, '<\\/script>')).join('\n');
 
   // Gather external CSS links
   const cssLinks = [];
@@ -749,35 +754,17 @@ async function saveChanges() {
 }
 
 function buildFullPage(bodyHTML, editorCSS) {
+  // Use the original <head> from the loaded page (preserves SEO, JSON-LD, OG-tags, Swedish chars)
+  const head = originalHead || '';
+  const scripts = originalScripts ? originalScripts.replace(/<\\\/script>/g, '<\/script>') : '';
   return `<!DOCTYPE html>
 <html lang="sv">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HM Motor Krokom | Begagnade Bilar, Fyrhjulingar & ATV i Jamtland</title>
-<meta name="description" content="HM Motor i Krokom — Jamtlands mest palitliga fordonshandlare sedan 1990. Begagnade bilar, CF Moto fyrhjulingar, mopeder, slapvagnar. Finansiering via Wasa Kredit.">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://hmmotor.se/">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=5">
-<script src="https://unpkg.com/lucide@latest" defer><\/script>
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js" defer><\/script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"><\/script>
+${head}
 </head>
 <body>
 ${bodyHTML}
-<script src="assets/js/supabase.js"><\/script>
-<script src="assets/js/content.js"><\/script>
-<script src="assets/js/main.js"><\/script>
-<script>
-if (window.netlifyIdentity) {
-  window.netlifyIdentity.on("init", user => {
-    if (!user) window.netlifyIdentity.on("login", () => document.location.href = "/admin/");
-  });
-}
-<\/script>
+${scripts}
 </body>
 </html>`;
 }
