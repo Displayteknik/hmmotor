@@ -1282,10 +1282,10 @@ function initEditor(html) {
     if (tag === 'IFRAME') {
       traits.push({ type:'text', label:'Kalla (URL)', name:'src', placeholder:'https://...' });
     }
-    model.set('traits', traits);
-    if (isText) {
-      const dt = Array.from(el.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent.trim()).join(' ') || el.textContent.trim();
-      model.set('content-text', dt);
+    // For text: DON'T set traits (triggers GrapesJS to force-show traits panel)
+    // Text editing happens via RTE + Style Manager, not traits
+    if (!isText) {
+      model.set('traits', traits);
     }
 
     if (isText) {
