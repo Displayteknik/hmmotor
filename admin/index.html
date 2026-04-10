@@ -17,9 +17,7 @@
 
   <!-- GrapesJS Plugins -->
   <script src="https://unpkg.com/grapesjs-preset-webpage@1.0.3/dist/index.js"></script>
-  <!-- Quill.js for rich text editing -->
-  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+  <!-- (RTE: using GrapesJS built-in with extended toolbar) -->
   <!-- Pickr — premium color picker (6KB) -->
   <link href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
@@ -360,22 +358,7 @@
     .gjs-sm-sector.gjs-sm-open .gjs-sm-sector-title::before{transform:rotate(90deg)}
     /* Hide default caret icon */
     .gjs-sm-sector-caret{display:none !important}
-    .gjs-sm-properties{padding:4px 10px 10px !important;display:grid !important;grid-template-columns:1fr 1fr !important;gap:6px 8px !important}
-    /* Full-width properties (display, position, etc) */
-    .gjs-sm-property--display,.gjs-sm-property--position,.gjs-sm-property--overflow,
-    .gjs-sm-property--flex-direction,.gjs-sm-property--flex-wrap,.gjs-sm-property--justify-content,
-    .gjs-sm-property--align-items,.gjs-sm-property--align-content,
-    .gjs-sm-property--font-family,.gjs-sm-property--text-align,.gjs-sm-property--text-decoration,
-    .gjs-sm-property--text-transform,.gjs-sm-property--background,.gjs-sm-property--background-image,
-    .gjs-sm-property--background-color,.gjs-sm-property--border,.gjs-sm-property--outline,
-    .gjs-sm-property--box-shadow,.gjs-sm-property--transform,.gjs-sm-property--text-shadow,
-    .gjs-sm-property--transition-property,.gjs-sm-property--transition-timing-function,
-    .gjs-sm-composite,.gjs-sm-stack,
-    .gjs-sm-property--margin,.gjs-sm-property--padding,
-    .gjs-sm-property--border-radius,.gjs-sm-property--cursor,
-    .gjs-sm-property--background-repeat,.gjs-sm-property--background-position,
-    .gjs-sm-property--background-size,.gjs-sm-property--background-attachment,
-    .gjs-sm-property--transition-duration{grid-column:1/-1 !important}
+    .gjs-sm-properties{padding:6px 10px 10px !important}
     .gjs-sm-label{color:var(--text-muted) !important;font-size:.62rem !important;font-weight:600 !important;margin-bottom:2px !important}
     .gjs-field{
       background:var(--input-bg) !important;border:1px solid var(--border) !important;
@@ -418,23 +401,20 @@
     #left-panel ::-webkit-scrollbar-thumb,#right-panel ::-webkit-scrollbar-thumb,.code-view ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
     #left-panel ::-webkit-scrollbar-thumb:hover,#right-panel ::-webkit-scrollbar-thumb:hover{background:#333}
 
-    /* ═══ QUILL RTE TOOLBAR ═══ */
-    #quill-toolbar{display:none;align-items:center;gap:2px;flex-wrap:wrap}
-    #quill-toolbar button,#quill-toolbar .ql-picker{
-      width:28px;height:28px;padding:4px;border:none;border-radius:5px;
-      background:transparent;color:var(--text-secondary);cursor:pointer;transition:all .12s;
-      display:flex;align-items:center;justify-content:center;
+    /* ═══ GrapesJS RTE TOOLBAR (styled) ═══ */
+    .gjs-rte-toolbar{
+      background:var(--bg-panel) !important;border:1px solid var(--border) !important;
+      border-radius:var(--radius-md) !important;box-shadow:var(--shadow-lg) !important;
+      padding:4px !important;
     }
-    #quill-toolbar button:hover,#quill-toolbar .ql-picker:hover{background:var(--bg-hover);color:var(--text-primary)}
-    #quill-toolbar button.ql-active{background:var(--accent);color:#09090b}
-    #quill-toolbar .ql-picker{width:auto;min-width:60px;font-size:.7rem;color:var(--text-secondary)}
-    #quill-toolbar .ql-picker-label{padding:4px 8px}
-    #quill-toolbar .ql-picker-options{background:var(--bg-panel);border:1px solid var(--border);border-radius:6px;box-shadow:var(--shadow-lg)}
-    #quill-toolbar svg{width:16px;height:16px}
-    #quill-toolbar .ql-stroke{stroke:currentColor;fill:none}
-    #quill-toolbar .ql-fill{fill:currentColor}
-    /* Hide default GrapesJS RTE */
-    .gjs-rte-toolbar{display:none !important}
+    .gjs-rte-actionbar{padding:2px !important;display:flex !important;gap:2px !important}
+    .gjs-rte-action{
+      color:var(--text-secondary) !important;border-radius:4px !important;
+      padding:4px 6px !important;transition:all var(--duration-fast) var(--ease-out) !important;
+      min-width:24px !important;text-align:center !important;
+    }
+    .gjs-rte-action:hover{color:var(--text-primary) !important;background:var(--bg-hover) !important}
+    .gjs-rte-active{color:var(--accent) !important;background:var(--accent-dim) !important}
 
     /* ═══ CODE VIEW ═══ */
     .code-view{
@@ -910,7 +890,7 @@ function initEditor(html) {
       sectors: [
         {
           name: 'Layout',
-          open: true,
+          open: false,
           properties: [
             { extend: 'display', type: 'radio', defaults: 'block', options: [
               {value:'block',name:'Block'},{value:'flex',name:'Flex'},{value:'grid',name:'Grid'},
@@ -930,7 +910,7 @@ function initEditor(html) {
         },
         {
           name: 'Typografi',
-          open: false,
+          open: true,
           properties: [
             'font-family','font-size','font-weight','font-style',
             'letter-spacing','line-height','color',
@@ -1159,56 +1139,29 @@ function initEditor(html) {
     });
   };
 
-  /* ── Quill.js as custom Rich Text Editor ── */
-  editor.setCustomRte({
-    enable(el, rte) {
-      if (rte) {
-        rte.enable();
-        return rte;
-      }
-      // Create Quill toolbar container
-      let toolbar = document.getElementById('quill-toolbar');
-      if (!toolbar) {
-        toolbar = document.createElement('div');
-        toolbar.id = 'quill-toolbar';
-        toolbar.innerHTML = `
-          <button class="ql-bold"></button>
-          <button class="ql-italic"></button>
-          <button class="ql-underline"></button>
-          <button class="ql-strike"></button>
-          <select class="ql-size"><option value="small"></option><option selected></option><option value="large"></option><option value="huge"></option></select>
-          <select class="ql-color"></select>
-          <button class="ql-link"></button>
-          <select class="ql-align"><option selected></option><option value="center"></option><option value="right"></option></select>
-          <button class="ql-list" value="ordered"></button>
-          <button class="ql-list" value="bullet"></button>
-          <button class="ql-clean"></button>
-        `;
-        document.body.appendChild(toolbar);
-      }
-      // Position toolbar above the element
-      const rect = el.getBoundingClientRect();
-      const canvasFrame = editor.Canvas.getFrameEl();
-      const canvasRect = canvasFrame?.getBoundingClientRect() || { left: 0, top: 0 };
-      toolbar.style.cssText = 'position:fixed;z-index:9999;display:flex;background:var(--bg-panel);border:1px solid var(--border);border-radius:8px;padding:4px;box-shadow:0 4px 16px rgba(0,0,0,0.4);left:'+(canvasRect.left + rect.left)+'px;top:'+(canvasRect.top + rect.top - 44)+'px';
-
-      el.contentEditable = true;
-      const quill = new Quill(el, {
-        theme: null, // No theme — use our custom toolbar
-        modules: {
-          toolbar: '#quill-toolbar'
+  /* ── Extended built-in RTE toolbar ── */
+  // GrapesJS RTE works inside the iframe — no cross-frame issues
+  // Add extra actions: font size, text color, link
+  editor.on('rte:enable', () => {
+    const rte = editor.RichTextEditor;
+    // Add fontSize buttons if not already added
+    if (!rte.get('fontSize-up')) {
+      rte.add('fontSize-up', {
+        icon: '<span style="font-size:14px;font-weight:700">A+</span>',
+        attributes: { title: 'Oka textstorlek' },
+        result: rte => {
+          const doc = rte.el?.ownerDocument || document;
+          doc.execCommand('fontSize', false, '5');
         }
       });
-      quill.focus();
-      return quill;
-    },
-    disable(el, rte) {
-      el.contentEditable = false;
-      const toolbar = document.getElementById('quill-toolbar');
-      if (toolbar) toolbar.style.display = 'none';
-    },
-    getContent(el, rte) {
-      return el.innerHTML;
+      rte.add('fontSize-down', {
+        icon: '<span style="font-size:10px;font-weight:700">A-</span>',
+        attributes: { title: 'Minska textstorlek' },
+        result: rte => {
+          const doc = rte.el?.ownerDocument || document;
+          doc.execCommand('fontSize', false, '2');
+        }
+      });
     }
   });
 
@@ -1380,17 +1333,6 @@ function initEditor(html) {
             summary.innerHTML = '<span>' + font + '</span><span>' + size + '</span><span>w' + weight + '</span><span class="el-color-dot" style="background:' + color + '"></span>';
           }
         } catch(e) {}
-        // Open Typography sector, close others
-        const sectors = document.querySelectorAll('#styles-panel .gjs-sm-sector');
-        sectors.forEach(s => {
-          const title = s.querySelector('.gjs-sm-sector-title');
-          const name = title?.textContent?.trim();
-          if (name === 'Typografi') {
-            if (!s.classList.contains('gjs-sm-open')) title?.click();
-          } else {
-            if (s.classList.contains('gjs-sm-open')) title?.click();
-          }
-        });
       }, 150);
     } else if (traits.length) {
       // 3. For non-text with traits: show Egenskaper
