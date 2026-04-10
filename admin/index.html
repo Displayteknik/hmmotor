@@ -76,10 +76,10 @@
 
     /* ═══ TOPBAR ═══ */
     .topbar{
-      height:50px;background:var(--bg-panel);
+      height:42px;background:var(--bg-panel);
       border-bottom:1px solid var(--border);
       display:flex;align-items:center;justify-content:space-between;
-      padding:0 14px;flex-shrink:0;z-index:100;
+      padding:0 10px;flex-shrink:0;z-index:100;
       box-shadow:0 1px 4px rgba(0,0,0,0.2);
     }
     .topbar .left{display:flex;align-items:center;gap:10px}
@@ -108,13 +108,14 @@
     /* ── Right: Actions ── */
     .topbar .right{display:flex;align-items:center;gap:5px}
     .tb-btn{
-      font-size:.75rem;font-weight:500;font-family:inherit;
-      padding:6px 10px;border-radius:var(--radius-sm);cursor:pointer;
+      font-size:.7rem;font-weight:500;font-family:inherit;
+      padding:5px 8px;border-radius:var(--radius-sm);cursor:pointer;
       border:1px solid var(--border);background:var(--bg-panel);
       color:var(--text-secondary);text-decoration:none;
-      transition:all .15s var(--ease);display:flex;align-items:center;gap:5px;
+      transition:all .15s var(--ease);display:flex;align-items:center;gap:4px;
       white-space:nowrap;
     }
+    .tb-btn.icon-only{padding:5px 6px}
     .tb-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
     .tb-btn:hover{background:var(--bg-hover);color:var(--text-primary);border-color:#2a2a30}
     .tb-btn.primary{background:var(--accent);color:#09090b;border-color:var(--accent);font-weight:600}
@@ -123,32 +124,44 @@
     .tb-btn .shortcut{font-size:.6rem;opacity:.5;margin-left:2px}
     .tb-sep{width:1px;height:22px;background:var(--border);margin:0 4px}
 
-    /* ═══ BREADCRUMB BAR ═══ */
-    .breadcrumb-bar{
-      height:30px;background:var(--bg-deep);border-bottom:1px solid var(--border-subtle);
-      display:flex;align-items:center;padding:0 14px;flex-shrink:0;
-      font-size:.7rem;color:var(--text-dimmed);gap:4px;overflow-x:auto;
-    }
-    .breadcrumb-bar::-webkit-scrollbar{height:0}
-    .bc-item{cursor:pointer;padding:2px 6px;border-radius:4px;transition:all .12s;white-space:nowrap;color:var(--text-dimmed)}
-    .bc-item:hover{background:var(--bg-hover);color:var(--text-secondary)}
-    .bc-item.active{color:var(--accent)}
-    .bc-sep{color:var(--text-dimmed);font-size:.6rem;opacity:.5}
+    /* ═══ BREADCRUMB (inline in element-info) ═══ */
+    .bc-inline{display:flex;align-items:center;gap:3px;font-size:.6rem;color:var(--text-dimmed);margin-left:auto;overflow:hidden}
+    .bc-inline .bc-item{cursor:pointer;padding:1px 4px;border-radius:3px;transition:all .12s;white-space:nowrap;color:var(--text-dimmed)}
+    .bc-inline .bc-item:hover{background:var(--bg-hover);color:var(--text-secondary)}
+    .bc-inline .bc-item.active{color:var(--accent)}
+    .bc-inline .bc-sep{opacity:.4;font-size:.55rem}
 
     /* ═══ MAIN LAYOUT ═══ */
     .main-area{display:flex;flex:1;overflow:hidden}
 
     /* ═══ LEFT PANEL ═══ */
     #left-panel{
-      width:260px;min-width:260px;background:var(--bg-panel);
+      width:210px;min-width:0;background:var(--bg-panel);
       border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;
+      transition:width .2s var(--ease),min-width .2s var(--ease),opacity .15s;
     }
+    #left-panel.collapsed{width:0;border-right:none;opacity:0;pointer-events:none}
 
     /* ═══ RIGHT PANEL ═══ */
     #right-panel{
-      width:340px;min-width:340px;background:var(--bg-panel);
+      width:260px;min-width:0;background:var(--bg-panel);
       border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;
+      transition:width .2s var(--ease),min-width .2s var(--ease),opacity .15s;
     }
+    #right-panel.collapsed{width:0;border-left:none;opacity:0;pointer-events:none}
+
+    /* ── Panel toggle buttons ── */
+    .panel-toggle{
+      position:absolute;top:50%;z-index:30;
+      width:20px;height:40px;display:flex;align-items:center;justify-content:center;
+      background:var(--bg-panel);border:1px solid var(--border);cursor:pointer;
+      color:var(--text-muted);transition:all .15s;
+    }
+    .panel-toggle:hover{color:var(--text-primary);background:var(--bg-hover)}
+    .panel-toggle svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .panel-toggle.left{left:0;transform:translateY(-50%);border-radius:0 6px 6px 0;border-left:none}
+    .panel-toggle.right{right:0;transform:translateY(-50%);border-radius:6px 0 0 6px;border-right:none}
+    body.canvas-fullscreen .panel-toggle{display:none}
 
     /* ═══ CANVAS AREA ═══ */
     .canvas-area{flex:1;display:flex;flex-direction:column;position:relative;overflow:hidden}
@@ -191,8 +204,8 @@
     /* ═══ TAB BUTTONS ═══ */
     .panel-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg-panel-alt);position:relative}
     .tab-btn{
-      flex:1;padding:10px 0;font-size:.68rem;font-weight:600;
-      text-transform:uppercase;letter-spacing:.06em;
+      flex:1;padding:7px 0;font-size:.65rem;font-weight:600;
+      text-transform:uppercase;letter-spacing:.05em;
       background:none;border:none;color:var(--text-dimmed);cursor:pointer;
       border-bottom:2px solid transparent;font-family:inherit;
       transition:color .15s, border-color .2s var(--ease);
@@ -253,10 +266,12 @@
     .gjs-three-bg{background:var(--bg-elevated) !important}
     .gjs-four-color,.gjs-four-color-h:hover{color:var(--accent) !important}
 
-    /* Hide default GrapesJS panels (we use custom) */
-    .gjs-pn-views-container,.gjs-pn-views{display:none !important}
-    .gjs-pn-panel{border:none !important;background:var(--bg-panel) !important}
-    .gjs-pn-commands,.gjs-pn-options,.gjs-pn-devices-c{background:var(--bg-panel) !important;border:none !important}
+    /* Hide ALL default GrapesJS chrome — we use custom UI */
+    .gjs-pn-views-container,.gjs-pn-views,.gjs-pn-commands,
+    .gjs-pn-options,.gjs-pn-devices-c,.gjs-pn-panels,
+    .gjs-pn-panel{display:none !important}
+    /* Override any GrapesJS top spacing from hidden panels */
+    .gjs-cv-canvas{top:0 !important}
 
     /* Canvas toolbar buttons */
     .gjs-pn-btn{border-radius:var(--radius-sm) !important;padding:6px !important;margin:2px !important;color:var(--text-muted) !important;transition:all .15s !important}
@@ -310,32 +325,53 @@
     .gjs-layer-caret{color:var(--text-dimmed) !important}
     .gjs-layer-children{border-left:1px solid var(--border) !important;margin-left:12px !important}
 
-    /* ═══ STYLE MANAGER ═══ */
-    .gjs-sm-sector{border-bottom:1px solid var(--border) !important}
+    /* ═══ STYLE MANAGER — Studio SDK Style ═══ */
+    .gjs-sm-sector{border-bottom:1px solid rgba(255,255,255,.04) !important;margin:0 !important}
     .gjs-sm-sector-title{
-      background:var(--bg-panel-alt) !important;color:var(--text-muted) !important;
-      font-size:.65rem !important;text-transform:uppercase !important;letter-spacing:.07em !important;
-      padding:10px 14px !important;font-weight:700 !important;cursor:pointer !important;
-      transition:color .15s !important;
+      background:transparent !important;color:var(--text-secondary) !important;
+      font-size:.72rem !important;text-transform:none !important;letter-spacing:0 !important;
+      padding:9px 12px !important;font-weight:600 !important;cursor:pointer !important;
+      transition:color .15s !important;display:flex !important;align-items:center !important;gap:6px !important;
     }
+    .gjs-sm-sector-title::before{content:'';display:inline-block;width:0;height:0;border-left:4px solid currentColor;border-top:3px solid transparent;border-bottom:3px solid transparent;transition:transform .15s;flex-shrink:0}
     .gjs-sm-sector.gjs-sm-open .gjs-sm-sector-title{color:var(--text-primary) !important}
-    .gjs-sm-properties{padding:10px 12px !important}
-    .gjs-sm-label{color:var(--text-muted) !important;font-size:.65rem !important;font-weight:600 !important}
+    .gjs-sm-sector.gjs-sm-open .gjs-sm-sector-title::before{transform:rotate(90deg)}
+    /* Hide default caret icon */
+    .gjs-sm-sector-caret{display:none !important}
+    .gjs-sm-properties{padding:4px 10px 10px !important;display:grid !important;grid-template-columns:1fr 1fr !important;gap:6px 8px !important}
+    /* Full-width properties (display, position, etc) */
+    .gjs-sm-property--display,.gjs-sm-property--position,.gjs-sm-property--overflow,
+    .gjs-sm-property--flex-direction,.gjs-sm-property--flex-wrap,.gjs-sm-property--justify-content,
+    .gjs-sm-property--align-items,.gjs-sm-property--align-content,
+    .gjs-sm-property--font-family,.gjs-sm-property--text-align,.gjs-sm-property--text-decoration,
+    .gjs-sm-property--text-transform,.gjs-sm-property--background,.gjs-sm-property--background-image,
+    .gjs-sm-property--background-color,.gjs-sm-property--border,.gjs-sm-property--outline,
+    .gjs-sm-property--box-shadow,.gjs-sm-property--transform,.gjs-sm-property--text-shadow,
+    .gjs-sm-property--transition-property,.gjs-sm-property--transition-timing-function,
+    .gjs-sm-composite,.gjs-sm-stack,
+    .gjs-sm-property--margin,.gjs-sm-property--padding,
+    .gjs-sm-property--border-radius,.gjs-sm-property--cursor,
+    .gjs-sm-property--background-repeat,.gjs-sm-property--background-position,
+    .gjs-sm-property--background-size,.gjs-sm-property--background-attachment,
+    .gjs-sm-property--transition-duration{grid-column:1/-1 !important}
+    .gjs-sm-label{color:var(--text-muted) !important;font-size:.62rem !important;font-weight:600 !important;margin-bottom:2px !important}
     .gjs-field{
       background:var(--input-bg) !important;border:1px solid var(--border) !important;
-      border-radius:var(--radius-sm) !important;color:var(--text-primary) !important;
-      font-size:.8rem !important;transition:border-color .15s,box-shadow .15s !important;
+      border-radius:5px !important;color:var(--text-primary) !important;
+      font-size:.78rem !important;transition:border-color .15s,box-shadow .15s !important;
+      min-height:30px !important;
     }
     .gjs-field:focus-within{border-color:var(--accent) !important;box-shadow:0 0 0 2px var(--accent-glow) !important}
     .gjs-field-arrows{display:flex !important}
-    .gjs-input-holder input{padding:7px 10px !important;font-size:.8rem !important}
-    .gjs-field select{padding:7px 10px !important;background:var(--input-bg) !important;color:var(--text-primary) !important;font-size:.8rem !important}
-    .gjs-field-color-picker{border-radius:4px !important}
+    .gjs-input-holder input{padding:5px 8px !important;font-size:.78rem !important}
+    .gjs-field select{padding:5px 8px !important;background:var(--input-bg) !important;color:var(--text-primary) !important;font-size:.78rem !important}
+    .gjs-field-color-picker{border-radius:3px !important;width:18px !important;height:18px !important}
+    .gjs-sm-property{margin-bottom:0 !important}
 
     /* ── Selector / Class manager ── */
-    .gjs-clm-tags{padding:8px 12px !important;background:var(--bg-panel) !important}
-    .gjs-clm-tag{background:var(--accent-dim) !important;border-radius:4px !important;color:var(--accent) !important;border:1px solid var(--border-accent) !important}
-    .gjs-clm-sels-info{font-size:.65rem !important;color:var(--text-dimmed) !important}
+    .gjs-clm-tags{padding:6px 10px !important;background:var(--bg-panel) !important}
+    .gjs-clm-tag{background:var(--accent-dim) !important;border-radius:4px !important;color:var(--accent) !important;border:1px solid var(--border-accent) !important;font-size:.65rem !important}
+    .gjs-clm-sels-info{font-size:.6rem !important;color:var(--text-dimmed) !important}
 
     /* ═══ TRAITS ═══ */
     .gjs-trt-traits{padding:4px 0 !important}
@@ -347,9 +383,11 @@
     .gjs-trt-trait input.gjs-field,.gjs-trt-trait .gjs-field input{padding:7px 10px !important;font-size:.82rem !important}
 
     /* ═══ RADIO / COMPOSITE ═══ */
-    .gjs-sm-composite{padding:4px 0 !important}
-    .gjs-radio-item{border-radius:4px !important;transition:background .1s !important}
+    .gjs-sm-composite{padding:2px 0 !important}
+    .gjs-radio-items{display:flex !important;background:var(--input-bg) !important;border:1px solid var(--border) !important;border-radius:5px !important;overflow:hidden !important;padding:2px !important;gap:1px !important}
+    .gjs-radio-item{border-radius:4px !important;transition:all .12s !important;flex:1 !important;text-align:center !important}
     .gjs-radio-item:hover{background:var(--bg-hover) !important}
+    .gjs-radio-item-label{font-size:.65rem !important;padding:4px 6px !important;display:block !important}
     .gjs-radio-item input:checked+.gjs-radio-item-label{background:var(--accent) !important;color:#09090b !important;border-radius:4px !important;font-weight:600 !important}
 
     /* ═══ SCROLLBARS ═══ */
@@ -411,7 +449,7 @@
     /* ═══ HIDE PANELS IN FULLSCREEN ═══ */
     body.canvas-fullscreen #left-panel,
     body.canvas-fullscreen #right-panel,
-    body.canvas-fullscreen .breadcrumb-bar{display:none !important}
+    body.canvas-fullscreen .bc-inline{display:none !important}
     body.canvas-fullscreen .topbar .left,
     body.canvas-fullscreen .topbar .center{opacity:.5}
 
@@ -466,36 +504,32 @@
       </button>
     </div>
     <div class="right">
-      <button class="tb-btn" onclick="undoAction()" title="Ctrl+Z">
+      <button class="tb-btn icon-only" onclick="undoAction()" title="Angra (Ctrl+Z)">
         <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
       </button>
-      <button class="tb-btn" onclick="redoAction()" title="Ctrl+Y">
+      <button class="tb-btn icon-only" onclick="redoAction()" title="Gor om (Ctrl+Y)">
         <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/></svg>
       </button>
       <span class="tb-sep"></span>
-      <a class="tb-btn" href="/" target="_blank" title="Visa sajten">
+      <a class="tb-btn icon-only" href="/" target="_blank" title="Visa sajten">
         <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        Forhandsvisa
       </a>
-      <button class="tb-btn" onclick="toggleCodeView()" title="Ctrl+Shift+C" id="codeToggleBtn">
+      <button class="tb-btn icon-only" onclick="toggleCodeView()" title="Kod (Ctrl+Shift+C)" id="codeToggleBtn">
         <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-        Kod
       </button>
       <span class="tb-sep"></span>
       <button class="tb-btn primary" id="saveBtn" onclick="saveChanges()" title="Ctrl+S">
         <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         Spara
-        <span class="shortcut">Ctrl+S</span>
       </button>
       <span class="tb-sep"></span>
-      <a class="tb-btn" href="/dashboard">Fordon</a>
-      <button class="tb-btn" onclick="netlifyIdentity.logout();location.reload()">Logga ut</button>
+      <a class="tb-btn icon-only" href="/dashboard" title="Fordon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+      </a>
+      <button class="tb-btn icon-only" onclick="netlifyIdentity.logout();location.reload()" title="Logga ut">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
     </div>
-  </div>
-
-  <!-- Breadcrumb bar -->
-  <div class="breadcrumb-bar" id="breadcrumb">
-    <span class="bc-item">body</span>
   </div>
 
   <!-- Main area -->
@@ -523,6 +557,12 @@
 
     <!-- ── Canvas ── -->
     <div class="canvas-area">
+      <button class="panel-toggle left" onclick="togglePanel('left')" title="Visa/dolj vanster panel">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="panel-toggle right" onclick="togglePanel('right')" title="Visa/dolj hoger panel">
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
       <div id="gjs"></div>
 
       <!-- Code view -->
@@ -555,6 +595,7 @@
     <div id="right-panel">
       <div id="element-info">
         <span class="el-empty">Klicka pa ett element</span>
+        <span class="bc-inline" id="breadcrumb"></span>
       </div>
       <div class="panel-tabs">
         <button class="tab-btn active" onclick="switchRight('traits')" id="tab-traits">Egenskaper</button>
@@ -965,8 +1006,28 @@ function initEditor(html) {
     content: '<div style="height:60px"></div>',
   });
 
-  /* ── Lucide icons after canvas load ── */
+  /* ── Remove GrapesJS default panels via API + DOM ── */
+  try {
+    editor.Panels.removePanel('commands');
+    editor.Panels.removePanel('options');
+    editor.Panels.removePanel('devices-c');
+    editor.Panels.removePanel('views');
+    editor.Panels.removePanel('views-container');
+  } catch(e) {}
+  function hideGjsPanels() {
+    document.querySelectorAll('.gjs-pn-commands,.gjs-pn-options,.gjs-pn-devices-c,.gjs-pn-panel,.gjs-pn-panels').forEach(el => {
+      el.remove();
+    });
+    const cv = document.querySelector('.gjs-cv-canvas');
+    if (cv) cv.style.setProperty('top', '0', 'important');
+  }
+
+  /* ── Fix relative paths + Lucide icons after canvas load ── */
   editor.on('canvas:frame:load', ({ window: w }) => {
+    // Inject <base> so relative image paths resolve correctly
+    const baseEl = w.document.createElement('base');
+    baseEl.href = window.location.origin + '/';
+    w.document.head.prepend(baseEl);
     setTimeout(() => { if (w.lucide) w.lucide.createIcons(); }, 500);
   });
 
@@ -1004,6 +1065,11 @@ function initEditor(html) {
   }
 
   editor.on('load', () => {
+    // Hide default GrapesJS chrome
+    hideGjsPanels();
+    setTimeout(hideGjsPanels, 300);
+    setTimeout(hideGjsPanels, 1000);
+    // Semantic names
     const w = editor.DomComponents.getWrapper();
     if (w) w.onAll(comp => setSemanticName(comp));
   });
@@ -1062,25 +1128,19 @@ function initEditor(html) {
   editor.on('component:selected', updateBreadcrumb);
   editor.on('component:deselected', () => updateBreadcrumb(null));
 
-  /* ── Text editing ── */
+  /* ── Text tags definition ── */
   const TEXT_TAGS = ['H1','H2','H3','H4','H5','H6','P','SPAN','A','SUMMARY','STRONG','LABEL','LI','TD','TH','BUTTON','FIGCAPTION'];
 
-  editor.on('component:selected', model => {
-    const el = model.getEl();
-    if (!el) return;
-    if (TEXT_TAGS.includes(el.tagName)) {
-      model.set('editable', true);
-      setTimeout(() => model.trigger('active'), 100);
-    }
-  });
-
-  /* ── Dynamic traits ── */
+  /* ── SINGLE consolidated component:selected handler ── */
   editor.on('component:selected', model => {
     const el = model.getEl();
     if (!el) return;
     const tag = el.tagName;
+    const isText = TEXT_TAGS.includes(tag);
+
+    // 1. Build traits
     const traits = [];
-    if (TEXT_TAGS.includes(tag)) {
+    if (isText) {
       traits.push({ type:'textarea', label:'Textinnehall', name:'content-text', changeProp:true, placeholder:'Skriv text...' });
     }
     if (tag === 'A') {
@@ -1094,15 +1154,36 @@ function initEditor(html) {
     if (tag === 'IFRAME') {
       traits.push({ type:'text', label:'Kalla (URL)', name:'src', placeholder:'https://...' });
     }
-    if (traits.length) {
-      model.set('traits', traits);
-      if (TEXT_TAGS.includes(tag)) {
-        const dt = Array.from(el.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent.trim()).join(' ') || el.textContent.trim();
-        model.set('content-text', dt);
-      }
+    model.set('traits', traits);
+    if (isText) {
+      const dt = Array.from(el.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent.trim()).join(' ') || el.textContent.trim();
+      model.set('content-text', dt);
+    }
+
+    // 2. For text: switch to Stilar + open Typography
+    if (isText) {
+      switchRight('styles');
+      setTimeout(() => {
+        const sectors = document.querySelectorAll('#styles-panel .gjs-sm-sector');
+        sectors.forEach(s => {
+          const title = s.querySelector('.gjs-sm-sector-title');
+          const name = title?.textContent?.trim();
+          if (name === 'Typografi') {
+            if (!s.classList.contains('gjs-sm-open')) title?.click();
+          } else {
+            if (s.classList.contains('gjs-sm-open')) title?.click();
+          }
+        });
+      }, 100);
+    } else if (traits.length) {
+      // 3. For non-text with traits: show Egenskaper
       switchRight('traits');
-    } else {
-      model.set('traits', []);
+    }
+
+    // 4. Enable inline editing for text
+    if (isText) {
+      model.set('editable', true);
+      setTimeout(() => model.trigger('active'), 120);
     }
   });
 
@@ -1124,6 +1205,27 @@ function initEditor(html) {
   editor.on('component:add', () => setUnsaved(true));
   editor.on('component:remove', () => setUnsaved(true));
   editor.on('style:property:update', () => setUnsaved(true));
+}
+
+/* ================================================================
+   PANEL TOGGLES
+   ================================================================ */
+function togglePanel(side) {
+  const panel = document.getElementById(side === 'left' ? 'left-panel' : 'right-panel');
+  const btn = document.querySelector('.panel-toggle.' + side);
+  panel.classList.toggle('collapsed');
+  const isCollapsed = panel.classList.contains('collapsed');
+  if (side === 'left') {
+    btn.innerHTML = isCollapsed
+      ? '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>'
+      : '<svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>';
+    btn.style.left = isCollapsed ? '0' : '';
+  } else {
+    btn.innerHTML = isCollapsed
+      ? '<svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>'
+      : '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>';
+    btn.style.right = isCollapsed ? '0' : '';
+  }
 }
 
 /* ================================================================
