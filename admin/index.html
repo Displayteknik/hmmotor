@@ -1313,36 +1313,39 @@ function initEditor(html) {
       model.set('content-text', dt);
     }
 
-    // 2. For text: show computed styles in element-info + switch to Stilar + open Typography
     if (isText) {
-      switchRight('styles');
-      // Show computed typography summary in element-info (read-only, no HTML pollution)
+      // Enable inline editing first
+      model.set('editable', true);
+      setTimeout(() => model.trigger('active'), 50);
+      // Switch to Stilar LAST (after model.trigger settles) and populate computed values
       setTimeout(() => {
+        switchRight('styles');
+        // Read actual computed styles and set them on the model so Style Manager shows real values
         try {
           const iframeWin = editor.Canvas.getFrameEl()?.contentWindow;
           const cs = iframeWin ? iframeWin.getComputedStyle(el) : null;
           if (cs) {
-            const infoEl = document.getElementById('element-info');
-            const font = cs.fontFamily.split(',')[0].replace(/['"]/g,'').trim();
-            const size = cs.fontSize;
-            const weight = cs.fontWeight;
-            const color = cs.color;
-            // Add computed summary below tag info
-            let summary = infoEl.querySelector('.el-computed');
-            if (!summary) { summary = document.createElement('div'); summary.className = 'el-computed'; infoEl.appendChild(summary); }
-            summary.innerHTML = '<span>' + font + '</span><span>' + size + '</span><span>w' + weight + '</span><span class="el-color-dot" style="background:' + color + '"></span>';
+            const existing = model.getStyle();
+            const computed = {
+              'font-family': cs.fontFamily,
+              'font-size': cs.fontSize,
+              'font-weight': cs.fontWeight,
+              'color': cs.color,
+              'line-height': cs.lineHeight,
+              'letter-spacing': cs.letterSpacing === 'normal' ? '' : cs.letterSpacing,
+              'text-align': cs.textAlign,
+            };
+            // Only set values that aren't already explicit — shows real data without polluting
+            const toSet = {};
+            for (const [k,v] of Object.entries(computed)) {
+              if (!existing[k] && v) toSet[k] = v;
+            }
+            if (Object.keys(toSet).length) model.setStyle({ ...existing, ...toSet });
           }
         } catch(e) {}
-      }, 150);
+      }, 300);
     } else if (traits.length) {
-      // 3. For non-text with traits: show Egenskaper
       switchRight('traits');
-    }
-
-    // 4. Enable inline editing for text
-    if (isText) {
-      model.set('editable', true);
-      setTimeout(() => model.trigger('active'), 120);
     }
   });
 
