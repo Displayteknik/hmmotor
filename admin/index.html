@@ -17,41 +17,60 @@
 
   <!-- GrapesJS Plugins -->
   <script src="https://unpkg.com/grapesjs-preset-webpage@1.0.3/dist/index.js"></script>
-  <script src="https://unpkg.com/grapesjs-plugin-forms@2.0.6/dist/index.js"></script>
-  <script src="https://unpkg.com/grapesjs-custom-code@1.0.2/dist/index.js"></script>
+  <!-- Quill.js for rich text editing -->
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+  <!-- Pickr — premium color picker (6KB) -->
+  <link href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+  <!-- Cropper.js — image crop/rotate before upload -->
+  <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
 
   <style>
     /* ═══════════════════════════════════════════════════
        DESIGN TOKENS
        ═══════════════════════════════════════════════════ */
     :root {
-      --bg-deepest: #08080a;
-      --bg-deep: #0c0c0e;
+      /* ── Colors: shadcn/ui zinc scale + HM Motor accent ── */
+      --bg-deepest: #09090b;
+      --bg-deep: #0a0a0c;
       --bg-panel: #131316;
-      --bg-panel-alt: #101012;
-      --bg-elevated: #1a1a1e;
-      --bg-hover: #1e1e24;
-      --border: #1e1e24;
-      --border-subtle: #171719;
+      --bg-panel-alt: #0f0f12;
+      --bg-elevated: #1c1c22;
+      --bg-hover: rgba(255,255,255,0.04);
+      --border: #1f1f23;
+      --border-subtle: #18181b;
       --border-accent: rgba(74,222,128,0.25);
       --accent: #4ade80;
       --accent-hover: #22c55e;
       --accent-glow: rgba(74,222,128,0.12);
       --accent-dim: rgba(74,222,128,0.06);
-      --text-primary: #e8e8ec;
-      --text-secondary: #a0a0ab;
-      --text-muted: #606068;
-      --text-dimmed: #45454d;
-      --input-bg: #0a0a0c;
+      --text-primary: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --text-dimmed: #52525b;
+      --input-bg: #09090b;
+      --destructive: #ef4444;
+      --warning: #f59e0b;
+      /* ── Radius: shadcn/ui scale ── */
       --radius-sm: 6px;
       --radius-md: 8px;
       --radius-lg: 12px;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-      --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
-      --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+      --radius-xl: 16px;
+      /* ── Shadows: layered for depth (shadcn pattern) ── */
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -2px rgba(0,0,0,0.3);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5), 0 4px 6px -4px rgba(0,0,0,0.4);
       --shadow-glow: 0 0 16px rgba(74,222,128,0.1);
+      /* ── Animation: Framer Motion spring curves as CSS ── */
       --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
       --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-spring: cubic-bezier(0.22, 1.36, 0.36, 1);
+      --duration-fast: 120ms;
+      --duration-normal: 200ms;
+      --duration-slow: 350ms;
     }
 
     /* ═══ RESET ═══ */
@@ -97,7 +116,7 @@
       padding:5px 12px;border:none;border-radius:6px;
       background:transparent;color:var(--text-muted);
       font-size:.72rem;font-weight:600;font-family:inherit;
-      cursor:pointer;transition:all .15s var(--ease);
+      cursor:pointer;transition:all var(--duration-fast) var(--ease-out);
       white-space:nowrap;
     }
     .device-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
@@ -112,7 +131,7 @@
       padding:5px 8px;border-radius:var(--radius-sm);cursor:pointer;
       border:1px solid var(--border);background:var(--bg-panel);
       color:var(--text-secondary);text-decoration:none;
-      transition:all .15s var(--ease);display:flex;align-items:center;gap:4px;
+      transition:all var(--duration-fast) var(--ease-out);display:flex;align-items:center;gap:4px;
       white-space:nowrap;
     }
     .tb-btn.icon-only{padding:5px 6px}
@@ -259,6 +278,9 @@
     #element-info .el-classes{display:flex;gap:3px;flex-wrap:wrap}
     #element-info .el-class-pill{font-size:.6rem;color:var(--accent);background:var(--accent-dim);border:1px solid var(--border-accent);border-radius:4px;padding:1px 5px;font-weight:500}
     #element-info .el-empty{font-size:.72rem;color:var(--text-dimmed);font-style:italic}
+    #element-info .el-computed{display:flex;gap:6px;align-items:center;width:100%;margin-top:4px;padding-top:4px;border-top:1px solid var(--border)}
+    #element-info .el-computed span{font-size:.65rem;color:var(--text-secondary);font-weight:500}
+    #element-info .el-color-dot{width:12px;height:12px;border-radius:3px;border:1px solid var(--border);flex-shrink:0}
 
     /* ═══ GRAPESJS DARK THEME ═══ */
     .gjs-one-bg{background:var(--bg-panel) !important}
@@ -396,12 +418,23 @@
     #left-panel ::-webkit-scrollbar-thumb,#right-panel ::-webkit-scrollbar-thumb,.code-view ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
     #left-panel ::-webkit-scrollbar-thumb:hover,#right-panel ::-webkit-scrollbar-thumb:hover{background:#333}
 
-    /* ═══ RICH TEXT EDITOR ═══ */
-    .gjs-rte-toolbar{background:var(--bg-panel) !important;border:1px solid var(--border) !important;border-radius:var(--radius-md) !important;box-shadow:var(--shadow-lg) !important}
-    .gjs-rte-actionbar{padding:3px !important}
-    .gjs-rte-action{color:var(--text-secondary) !important;border-radius:4px !important;transition:all .12s !important}
-    .gjs-rte-action:hover{color:var(--text-primary) !important;background:var(--bg-hover) !important}
-    .gjs-rte-active{color:var(--accent) !important;background:var(--accent-dim) !important}
+    /* ═══ QUILL RTE TOOLBAR ═══ */
+    #quill-toolbar{display:none;align-items:center;gap:2px;flex-wrap:wrap}
+    #quill-toolbar button,#quill-toolbar .ql-picker{
+      width:28px;height:28px;padding:4px;border:none;border-radius:5px;
+      background:transparent;color:var(--text-secondary);cursor:pointer;transition:all .12s;
+      display:flex;align-items:center;justify-content:center;
+    }
+    #quill-toolbar button:hover,#quill-toolbar .ql-picker:hover{background:var(--bg-hover);color:var(--text-primary)}
+    #quill-toolbar button.ql-active{background:var(--accent);color:#09090b}
+    #quill-toolbar .ql-picker{width:auto;min-width:60px;font-size:.7rem;color:var(--text-secondary)}
+    #quill-toolbar .ql-picker-label{padding:4px 8px}
+    #quill-toolbar .ql-picker-options{background:var(--bg-panel);border:1px solid var(--border);border-radius:6px;box-shadow:var(--shadow-lg)}
+    #quill-toolbar svg{width:16px;height:16px}
+    #quill-toolbar .ql-stroke{stroke:currentColor;fill:none}
+    #quill-toolbar .ql-fill{fill:currentColor}
+    /* Hide default GrapesJS RTE */
+    .gjs-rte-toolbar{display:none !important}
 
     /* ═══ CODE VIEW ═══ */
     .code-view{
@@ -452,6 +485,41 @@
     body.canvas-fullscreen .bc-inline{display:none !important}
     body.canvas-fullscreen .topbar .left,
     body.canvas-fullscreen .topbar .center{opacity:.5}
+
+    /* ═══ ACETERNITY-STYLE EFFECTS ═══ */
+    /* Glow border on focus (inspired by Aceternity spotlight) */
+    .gjs-field:focus-within{
+      border-color:var(--accent) !important;
+      box-shadow:0 0 0 2px var(--accent-glow), 0 0 20px -5px rgba(74,222,128,0.15) !important;
+    }
+    /* Subtle gradient shimmer on selected block in layer tree */
+    .gjs-layer.gjs-selected{
+      background:linear-gradient(135deg, rgba(74,222,128,0.06) 0%, rgba(74,222,128,0.02) 100%) !important;
+      border-left:2px solid var(--accent) !important;
+    }
+    /* Block drag hover — glowing border effect */
+    .gjs-block:hover{
+      border-color:var(--accent) !important;
+      box-shadow:0 0 0 1px rgba(74,222,128,0.1), 0 4px 12px rgba(0,0,0,0.3) !important;
+      transform:translateY(-1px) !important;
+    }
+    /* Tab active indicator — animated underline slide */
+    .tab-btn.active{position:relative}
+    .tab-btn.active::after{
+      content:'';position:absolute;bottom:-2px;left:20%;right:20%;height:2px;
+      background:var(--accent);border-radius:1px;
+      animation:tab-slide var(--duration-normal) var(--ease-out);
+    }
+    @keyframes tab-slide{from{left:40%;right:40%;opacity:0}to{left:20%;right:20%;opacity:1}}
+    /* Button press effect (Framer Motion spring feel) */
+    .tb-btn:active,.device-btn:active,.zoom-btn:active{transform:scale(0.95);transition:transform 80ms var(--ease-spring)}
+    /* Panel collapse/expand — smooth height */
+    #left-panel,#right-panel{transition:width var(--duration-slow) var(--ease-out)}
+    /* Toast entrance — spring animation */
+    .toast.show{animation:toast-in var(--duration-slow) var(--ease-spring)}
+    @keyframes toast-in{from{transform:translateX(-50%) translateY(20px) scale(0.95);opacity:0}to{transform:translateX(-50%) translateY(0) scale(1);opacity:1}}
+    /* Crop modal backdrop blur (Aceternity pattern) */
+    .crop-modal-backdrop{backdrop-filter:blur(8px) saturate(120%)}
 
     /* ═══ LOADING OVERLAY ═══ */
     .loading-overlay{
@@ -597,6 +665,7 @@
         <span class="el-empty">Klicka pa ett element</span>
         <span class="bc-inline" id="breadcrumb"></span>
       </div>
+
       <div class="panel-tabs">
         <button class="tab-btn active" onclick="switchRight('traits')" id="tab-traits">Egenskaper</button>
         <button class="tab-btn" onclick="switchRight('styles')" id="tab-styles">Stilar</button>
@@ -824,11 +893,7 @@ function initEditor(html) {
       ]),
       scripts: ['https://unpkg.com/lucide@latest']
     },
-    plugins: [
-      'gjs-preset-webpage',
-      'grapesjs-plugin-forms',
-      'grapesjs-custom-code',
-    ],
+    plugins: ['gjs-preset-webpage'],
     pluginsOpts: {
       'gjs-preset-webpage': {
         blocksBasicOpts: { flexGrid: true },
@@ -836,8 +901,6 @@ function initEditor(html) {
         countdownOpts: false,
         formsOpts: false,
       },
-      'grapesjs-plugin-forms': {},
-      'grapesjs-custom-code': {},
     },
     blockManager: { appendTo: '#blocks-panel' },
     layerManager: { appendTo: '#layers-panel' },
@@ -945,8 +1008,42 @@ function initEditor(html) {
       ]
     },
     assetManager: {
-      upload: false,
-      dropzone: false,
+      upload: false,   // We handle upload manually via GitHub API
+      dropzone: true,
+      openAssetsOnDrop: 1,
+      autoAdd: 1,
+      // Pre-populate with existing site images
+      assets: [
+        { src: window.location.origin + '/assets/img/hm-motor-logo.png', name: 'HM Motor Logo' },
+      ],
+      uploadFile: async function(e) {
+        const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
+        if (!files || !files.length || !token) return;
+        for (const file of files) {
+          if (!file.type.startsWith('image/')) continue;
+          try {
+            // Offer crop before upload (Cropper.js)
+            const processedFile = window.cropAndUpload ? await window.cropAndUpload(file) : file;
+            if (!processedFile) continue; // User cancelled
+            const reader = new FileReader();
+            const base64 = await new Promise((resolve) => {
+              reader.onload = () => resolve(reader.result.split(',')[1]);
+              reader.readAsDataURL(processedFile);
+            });
+            const path = 'assets/img/uploads/' + Date.now() + '-' + file.name.replace(/[^a-zA-Z0-9._-]/g, '');
+            const r = await fetch('/.netlify/git/github/contents/' + path, {
+              method: 'PUT',
+              headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ message: 'Upload: ' + file.name, content: base64 })
+            });
+            if (r.ok) {
+              const imgUrl = window.location.origin + '/' + path;
+              editor.AssetManager.add({ src: imgUrl, name: file.name });
+              toast('Bild uppladdad: ' + file.name, 'success');
+            }
+          } catch(err) { toast('Uppladdning misslyckades: ' + err.message, 'error'); }
+        }
+      }
     },
   });
 
@@ -1006,18 +1103,122 @@ function initEditor(html) {
     content: '<div style="height:60px"></div>',
   });
 
-  /* ── Remove GrapesJS default panels via API + DOM ── */
-  try {
-    editor.Panels.removePanel('commands');
-    editor.Panels.removePanel('options');
-    editor.Panels.removePanel('devices-c');
-    editor.Panels.removePanel('views');
-    editor.Panels.removePanel('views-container');
-  } catch(e) {}
-  function hideGjsPanels() {
-    document.querySelectorAll('.gjs-pn-commands,.gjs-pn-options,.gjs-pn-devices-c,.gjs-pn-panel,.gjs-pn-panels').forEach(el => {
-      el.remove();
+  /* ── Pickr color picker — replace default GrapesJS color inputs ── */
+  editor.on('load', () => {
+    // Override GrapesJS color picker fields with Pickr
+    const observer = new MutationObserver(() => {
+      document.querySelectorAll('#styles-panel .gjs-field-color-picker:not([data-pickr])').forEach(cpEl => {
+        cpEl.setAttribute('data-pickr', 'true');
+        const input = cpEl.closest('.gjs-field')?.querySelector('input');
+        if (!input) return;
+        const pickr = Pickr.create({
+          el: cpEl,
+          theme: 'nano',
+          default: input.value || '#000000',
+          components: {
+            preview: true, opacity: true, hue: true,
+            interaction: { hex: true, rgba: true, input: true, save: true }
+          }
+        });
+        pickr.on('save', (color) => {
+          if (color) {
+            const hex = color.toHEXA().toString();
+            input.value = hex;
+            input.dispatchEvent(new Event('change'));
+          }
+          pickr.hide();
+        });
+      });
     });
+    const sp = document.getElementById('styles-panel');
+    if (sp) observer.observe(sp, { childList: true, subtree: true });
+  });
+
+  /* ── Cropper.js — image crop modal for uploads ── */
+  window.cropAndUpload = async function(file) {
+    return new Promise((resolve) => {
+      // Create modal
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px';
+      const img = document.createElement('img');
+      img.style.cssText = 'max-width:80vw;max-height:60vh';
+      img.src = URL.createObjectURL(file);
+      const btns = document.createElement('div');
+      btns.style.cssText = 'margin-top:16px;display:flex;gap:8px';
+      btns.innerHTML = '<button id="crop-save" style="background:#4ade80;color:#09090b;border:none;padding:8px 24px;border-radius:6px;font-weight:600;cursor:pointer">Beskar & ladda upp</button><button id="crop-skip" style="background:transparent;color:#a0a0ab;border:1px solid #2a2a30;padding:8px 24px;border-radius:6px;cursor:pointer">Ladda upp utan beskarning</button><button id="crop-cancel" style="background:transparent;color:#606068;border:none;padding:8px 16px;cursor:pointer">Avbryt</button>';
+      modal.appendChild(img);
+      modal.appendChild(btns);
+      document.body.appendChild(modal);
+      const cropper = new Cropper(img, { viewMode: 1, autoCropArea: 0.9 });
+      btns.querySelector('#crop-save').onclick = () => {
+        const canvas = cropper.getCroppedCanvas();
+        canvas.toBlob(blob => { cropper.destroy(); modal.remove(); resolve(blob); }, file.type);
+      };
+      btns.querySelector('#crop-skip').onclick = () => { cropper.destroy(); modal.remove(); resolve(file); };
+      btns.querySelector('#crop-cancel').onclick = () => { cropper.destroy(); modal.remove(); resolve(null); };
+    });
+  };
+
+  /* ── Quill.js as custom Rich Text Editor ── */
+  editor.setCustomRte({
+    enable(el, rte) {
+      if (rte) {
+        rte.enable();
+        return rte;
+      }
+      // Create Quill toolbar container
+      let toolbar = document.getElementById('quill-toolbar');
+      if (!toolbar) {
+        toolbar = document.createElement('div');
+        toolbar.id = 'quill-toolbar';
+        toolbar.innerHTML = `
+          <button class="ql-bold"></button>
+          <button class="ql-italic"></button>
+          <button class="ql-underline"></button>
+          <button class="ql-strike"></button>
+          <select class="ql-size"><option value="small"></option><option selected></option><option value="large"></option><option value="huge"></option></select>
+          <select class="ql-color"></select>
+          <button class="ql-link"></button>
+          <select class="ql-align"><option selected></option><option value="center"></option><option value="right"></option></select>
+          <button class="ql-list" value="ordered"></button>
+          <button class="ql-list" value="bullet"></button>
+          <button class="ql-clean"></button>
+        `;
+        document.body.appendChild(toolbar);
+      }
+      // Position toolbar above the element
+      const rect = el.getBoundingClientRect();
+      const canvasFrame = editor.Canvas.getFrameEl();
+      const canvasRect = canvasFrame?.getBoundingClientRect() || { left: 0, top: 0 };
+      toolbar.style.cssText = 'position:fixed;z-index:9999;display:flex;background:var(--bg-panel);border:1px solid var(--border);border-radius:8px;padding:4px;box-shadow:0 4px 16px rgba(0,0,0,0.4);left:'+(canvasRect.left + rect.left)+'px;top:'+(canvasRect.top + rect.top - 44)+'px';
+
+      el.contentEditable = true;
+      const quill = new Quill(el, {
+        theme: null, // No theme — use our custom toolbar
+        modules: {
+          toolbar: '#quill-toolbar'
+        }
+      });
+      quill.focus();
+      return quill;
+    },
+    disable(el, rte) {
+      el.contentEditable = false;
+      const toolbar = document.getElementById('quill-toolbar');
+      if (toolbar) toolbar.style.display = 'none';
+    },
+    getContent(el, rte) {
+      return el.innerHTML;
+    }
+  });
+
+  /* ── Remove GrapesJS default panels ── */
+  // Remove via API first, then clean DOM as fallback
+  ['commands','options','devices-c','views','views-container'].forEach(id => {
+    try { editor.Panels.removePanel(id); } catch(e) {}
+  });
+  function cleanGjsChrome() {
+    document.querySelectorAll('.gjs-pn-commands,.gjs-pn-options,.gjs-pn-devices-c,.gjs-pn-panel,.gjs-pn-panels').forEach(el => el.remove());
     const cv = document.querySelector('.gjs-cv-canvas');
     if (cv) cv.style.setProperty('top', '0', 'important');
   }
@@ -1065,10 +1266,9 @@ function initEditor(html) {
   }
 
   editor.on('load', () => {
-    // Hide default GrapesJS chrome
-    hideGjsPanels();
-    setTimeout(hideGjsPanels, 300);
-    setTimeout(hideGjsPanels, 1000);
+    // Clean remaining GrapesJS chrome from DOM
+    cleanGjsChrome();
+    setTimeout(cleanGjsChrome, 500);
     // Semantic names
     const w = editor.DomComponents.getWrapper();
     if (w) w.onAll(comp => setSemanticName(comp));
@@ -1160,10 +1360,27 @@ function initEditor(html) {
       model.set('content-text', dt);
     }
 
-    // 2. For text: switch to Stilar + open Typography
+    // 2. For text: show computed styles in element-info + switch to Stilar + open Typography
     if (isText) {
       switchRight('styles');
+      // Show computed typography summary in element-info (read-only, no HTML pollution)
       setTimeout(() => {
+        try {
+          const iframeWin = editor.Canvas.getFrameEl()?.contentWindow;
+          const cs = iframeWin ? iframeWin.getComputedStyle(el) : null;
+          if (cs) {
+            const infoEl = document.getElementById('element-info');
+            const font = cs.fontFamily.split(',')[0].replace(/['"]/g,'').trim();
+            const size = cs.fontSize;
+            const weight = cs.fontWeight;
+            const color = cs.color;
+            // Add computed summary below tag info
+            let summary = infoEl.querySelector('.el-computed');
+            if (!summary) { summary = document.createElement('div'); summary.className = 'el-computed'; infoEl.appendChild(summary); }
+            summary.innerHTML = '<span>' + font + '</span><span>' + size + '</span><span>w' + weight + '</span><span class="el-color-dot" style="background:' + color + '"></span>';
+          }
+        } catch(e) {}
+        // Open Typography sector, close others
         const sectors = document.querySelectorAll('#styles-panel .gjs-sm-sector');
         sectors.forEach(s => {
           const title = s.querySelector('.gjs-sm-sector-title');
@@ -1174,7 +1391,7 @@ function initEditor(html) {
             if (s.classList.contains('gjs-sm-open')) title?.click();
           }
         });
-      }, 100);
+      }, 150);
     } else if (traits.length) {
       // 3. For non-text with traits: show Egenskaper
       switchRight('traits');
@@ -1426,7 +1643,9 @@ async function saveChanges() {
 function buildFullPage(bodyHTML, editorCSS) {
   const head = originalHead || '';
   const scripts = originalScripts ? originalScripts.replace(/<\\\/script>/g, '<\/script>') : '';
-  return '<!DOCTYPE html>\n<html lang="sv">\n<head>\n' + head + '\n</head>\n<body>\n' + bodyHTML + '\n' + scripts + '\n</body>\n</html>';
+  // Include editor CSS in a <style> block — without this, all style changes are lost
+  const cssBlock = editorCSS ? '\n<style data-gjs-editor>\n' + editorCSS + '\n</style>\n' : '';
+  return '<!DOCTYPE html>\n<html lang="sv">\n<head>\n' + head + cssBlock + '\n</head>\n<body>\n' + bodyHTML + '\n' + scripts + '\n</body>\n</html>';
 }
 
 /* ================================================================
