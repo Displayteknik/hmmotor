@@ -17,8 +17,6 @@
 
   <!-- GrapesJS Plugins -->
   <script src="https://unpkg.com/grapesjs-preset-webpage@1.0.3/dist/index.js"></script>
-  <!-- RTE Extensions: font-size, font-color, headings, alignment -->
-  <script src="https://unpkg.com/grapesjs-rte-extensions@1.0.2/dist/index.js"></script>
   <!-- Pickr — premium color picker (6KB) -->
   <link href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
@@ -874,23 +872,13 @@ function initEditor(html) {
       ]),
       scripts: ['https://unpkg.com/lucide@latest']
     },
-    plugins: ['gjs-preset-webpage', 'grapesjs-rte-extensions'],
+    plugins: ['gjs-preset-webpage'],
     pluginsOpts: {
       'gjs-preset-webpage': {
         blocksBasicOpts: { flexGrid: true },
         navbarOpts: false,
         countdownOpts: false,
         formsOpts: false,
-      },
-      'grapesjs-rte-extensions': {
-        fontSize: true,
-        fontColor: true,
-        hilite: false,
-        heading: true,
-        link: true,
-        align: true,
-        list: true,
-        maxWidth: '600px',
       },
     },
     blockManager: { appendTo: '#blocks-panel' },
@@ -1150,7 +1138,7 @@ function initEditor(html) {
     });
   };
 
-  /* ── RTE: grapesjs-rte-extensions handles fontSize, fontColor, headings, etc. ── */
+  /* ── RTE: using GrapesJS built-in Rich Text Editor ── */
 
   /* ── Remove GrapesJS default panels ── */
   // Remove via API first, then clean DOM as fallback
@@ -1329,10 +1317,6 @@ function initEditor(html) {
           }
           if (Object.keys(toSet).length) {
             model.setStyle({ ...existing, ...toSet });
-            // CRITICAL: Style Manager doesn't refresh after setStyle — toggle selection to force it
-            // (documented in GrapesJS issue #2777)
-            editor.selectToggle(model);
-            setTimeout(() => editor.select(model), 30);
           }
         }
 
