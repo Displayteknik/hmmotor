@@ -4,240 +4,567 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HM Motor — Visuell redigering</title>
+
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Auth -->
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <!-- GrapesJS -->
+
+  <!-- GrapesJS Core -->
   <link href="https://unpkg.com/grapesjs@0.21.13/dist/css/grapes.min.css" rel="stylesheet">
   <script src="https://unpkg.com/grapesjs@0.21.13/dist/grapes.min.js"></script>
+
+  <!-- GrapesJS Plugins -->
   <script src="https://unpkg.com/grapesjs-preset-webpage@1.0.3/dist/index.js"></script>
+  <script src="https://unpkg.com/grapesjs-plugin-forms@2.0.6/dist/index.js"></script>
+  <script src="https://unpkg.com/grapesjs-custom-code@1.0.2/dist/index.js"></script>
+
   <style>
-    /* ── Reset ── */
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Inter',sans-serif;background:#111113;color:#e4e4e7;height:100vh;overflow:hidden}
-
-    /* ── Login ── */
-    #login{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#111113}
-    #login h1{font-size:1.4rem;font-weight:700;margin-bottom:.25rem;color:#fff}
-    #login p{color:#71717a;font-size:.85rem;margin-bottom:2rem}
-    #login button{background:#4ade80;color:#09090b;border:none;padding:12px 32px;font-size:.9rem;font-weight:600;border-radius:8px;cursor:pointer;font-family:inherit;transition:background .15s}
-    #login button:hover{background:#22c55e}
-
-    /* ── Editor wrapper ── */
-    #editor-wrap{display:none;height:100vh;flex-direction:column}
-
-    /* ── Top bar ── */
-    .topbar{height:46px;background:#18181b;border-bottom:1px solid #27272a;display:flex;align-items:center;justify-content:space-between;padding:0 12px;flex-shrink:0;z-index:10}
-    .topbar .left{display:flex;align-items:center;gap:10px}
-    .topbar .brand{font-weight:700;font-size:.85rem;color:#fff}
-    .topbar .sep{color:#3f3f46}
-    .topbar .mode{color:#71717a;font-size:.8rem}
-    .topbar .right{display:flex;align-items:center;gap:6px}
-    .topbar button,.topbar a{font-size:.78rem;font-weight:500;font-family:inherit;padding:6px 12px;border-radius:6px;cursor:pointer;border:1px solid #27272a;background:#18181b;color:#a1a1aa;text-decoration:none;transition:all .15s}
-    .topbar button:hover,.topbar a:hover{background:#27272a;color:#e4e4e7}
-    .topbar .save-btn{background:#4ade80;color:#09090b;border-color:#4ade80;font-weight:600}
-    .topbar .save-btn:hover{background:#22c55e;border-color:#22c55e}
-
-    /* ── GrapesJS canvas ── */
-    #gjs{flex:1;overflow:hidden}
-
-    /* ── Dark theme base ── */
-    .gjs-one-bg{background:#18181b !important}
-    .gjs-two-color{color:#e4e4e7 !important}
-    .gjs-three-bg{background:#27272a !important}
-    .gjs-four-color,.gjs-four-color-h:hover{color:#4ade80 !important}
-    .gjs-cv-canvas{background:#1a1a1e !important}
-
-    /* ── GrapesJS panels base ── */
-    .gjs-pn-panel{border:none !important;background:#18181b !important}
-
-    /* Hide the default right sidebar GrapesJS creates */
-    .gjs-pn-views-container{display:none !important}
-    .gjs-pn-views{display:none !important}
-
-    /* Keep the canvas toolbar */
-    .gjs-pn-commands,
-    .gjs-pn-options,
-    .gjs-pn-devices-c{
-      background:#18181b !important;
-      border:none !important;
+    /* ═══════════════════════════════════════════════════
+       DESIGN TOKENS
+       ═══════════════════════════════════════════════════ */
+    :root {
+      --bg-deepest: #08080a;
+      --bg-deep: #0c0c0e;
+      --bg-panel: #131316;
+      --bg-panel-alt: #101012;
+      --bg-elevated: #1a1a1e;
+      --bg-hover: #1e1e24;
+      --border: #1e1e24;
+      --border-subtle: #171719;
+      --border-accent: rgba(74,222,128,0.25);
+      --accent: #4ade80;
+      --accent-hover: #22c55e;
+      --accent-glow: rgba(74,222,128,0.12);
+      --accent-dim: rgba(74,222,128,0.06);
+      --text-primary: #e8e8ec;
+      --text-secondary: #a0a0ab;
+      --text-muted: #606068;
+      --text-dimmed: #45454d;
+      --input-bg: #0a0a0c;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+      --shadow-glow: 0 0 16px rgba(74,222,128,0.1);
+      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    /* Panel buttons (canvas toolbar icons) */
-    .gjs-pn-btn{border-radius:6px !important;padding:6px !important;margin:2px !important;color:#71717a !important;transition:all .15s !important}
-    .gjs-pn-btn:hover{color:#e4e4e7 !important;background:rgba(255,255,255,.06) !important}
-    .gjs-pn-btn.gjs-pn-active{background:#4ade80 !important;color:#09090b !important}
+    /* ═══ RESET ═══ */
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-deepest);color:var(--text-primary);height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
 
-    /* ── Green selection outlines ── */
-    .gjs-selected{outline:2px solid #4ade80 !important;outline-offset:2px}
-    .gjs-hovered{outline:1px dashed #4ade80 !important}
+    /* ═══ LOGIN ═══ */
+    #login{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;
+      background:var(--bg-deepest);
+      background-image:radial-gradient(circle at 50% 30%, rgba(74,222,128,0.04) 0%, transparent 60%);
+    }
+    #login .login-icon{width:48px;height:48px;margin-bottom:20px;background:var(--accent);border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-glow)}
+    #login .login-icon svg{width:24px;height:24px;stroke:#09090b;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    #login h1{font-size:1.5rem;font-weight:700;margin-bottom:.35rem;color:#fff;letter-spacing:-0.02em}
+    #login p{color:var(--text-muted);font-size:.85rem;margin-bottom:2.5rem}
+    #login button{background:var(--accent);color:#09090b;border:none;padding:12px 36px;font-size:.9rem;font-weight:600;border-radius:var(--radius-md);cursor:pointer;font-family:inherit;transition:all .2s var(--ease);box-shadow:var(--shadow-glow)}
+    #login button:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 0 24px rgba(74,222,128,0.2)}
+
+    /* ═══ EDITOR WRAPPER ═══ */
+    #editor-wrap{display:none;height:100vh;flex-direction:column}
+
+    /* ═══ TOPBAR ═══ */
+    .topbar{
+      height:50px;background:var(--bg-panel);
+      border-bottom:1px solid var(--border);
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 14px;flex-shrink:0;z-index:100;
+      box-shadow:0 1px 4px rgba(0,0,0,0.2);
+    }
+    .topbar .left{display:flex;align-items:center;gap:10px}
+    .topbar .brand{font-weight:700;font-size:.85rem;color:#fff;display:flex;align-items:center;gap:8px}
+    .topbar .brand-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(74,222,128,0.4)}
+    .topbar .sep{color:var(--text-dimmed);font-size:.7rem}
+    .topbar .file-name{color:var(--text-muted);font-size:.78rem;font-weight:500}
+    .topbar .unsaved-dot{width:6px;height:6px;border-radius:50%;background:#f59e0b;display:none;margin-left:4px;animation:pulse-dot 2s infinite}
+    @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
+
+    /* ── Center: Device Switcher ── */
+    .topbar .center{display:flex;align-items:center;gap:2px;background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--radius-md);padding:3px}
+    .device-btn{
+      display:flex;align-items:center;gap:5px;
+      padding:5px 12px;border:none;border-radius:6px;
+      background:transparent;color:var(--text-muted);
+      font-size:.72rem;font-weight:600;font-family:inherit;
+      cursor:pointer;transition:all .15s var(--ease);
+      white-space:nowrap;
+    }
+    .device-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+    .device-btn:hover{color:var(--text-secondary);background:var(--bg-hover)}
+    .device-btn.active{background:var(--accent);color:#09090b}
+    .device-btn .device-width{font-size:.65rem;opacity:.7;font-weight:400}
+
+    /* ── Right: Actions ── */
+    .topbar .right{display:flex;align-items:center;gap:5px}
+    .tb-btn{
+      font-size:.75rem;font-weight:500;font-family:inherit;
+      padding:6px 10px;border-radius:var(--radius-sm);cursor:pointer;
+      border:1px solid var(--border);background:var(--bg-panel);
+      color:var(--text-secondary);text-decoration:none;
+      transition:all .15s var(--ease);display:flex;align-items:center;gap:5px;
+      white-space:nowrap;
+    }
+    .tb-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+    .tb-btn:hover{background:var(--bg-hover);color:var(--text-primary);border-color:#2a2a30}
+    .tb-btn.primary{background:var(--accent);color:#09090b;border-color:var(--accent);font-weight:600}
+    .tb-btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+    .tb-btn.primary.saving{opacity:.7;pointer-events:none}
+    .tb-btn .shortcut{font-size:.6rem;opacity:.5;margin-left:2px}
+    .tb-sep{width:1px;height:22px;background:var(--border);margin:0 4px}
+
+    /* ═══ BREADCRUMB BAR ═══ */
+    .breadcrumb-bar{
+      height:30px;background:var(--bg-deep);border-bottom:1px solid var(--border-subtle);
+      display:flex;align-items:center;padding:0 14px;flex-shrink:0;
+      font-size:.7rem;color:var(--text-dimmed);gap:4px;overflow-x:auto;
+    }
+    .breadcrumb-bar::-webkit-scrollbar{height:0}
+    .bc-item{cursor:pointer;padding:2px 6px;border-radius:4px;transition:all .12s;white-space:nowrap;color:var(--text-dimmed)}
+    .bc-item:hover{background:var(--bg-hover);color:var(--text-secondary)}
+    .bc-item.active{color:var(--accent)}
+    .bc-sep{color:var(--text-dimmed);font-size:.6rem;opacity:.5}
+
+    /* ═══ MAIN LAYOUT ═══ */
+    .main-area{display:flex;flex:1;overflow:hidden}
+
+    /* ═══ LEFT PANEL ═══ */
+    #left-panel{
+      width:260px;min-width:260px;background:var(--bg-panel);
+      border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;
+    }
+
+    /* ═══ RIGHT PANEL ═══ */
+    #right-panel{
+      width:340px;min-width:340px;background:var(--bg-panel);
+      border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;
+    }
+
+    /* ═══ CANVAS AREA ═══ */
+    .canvas-area{flex:1;display:flex;flex-direction:column;position:relative;overflow:hidden}
+    #gjs{flex:1;overflow:hidden}
+
+    /* ── Dot grid background (Figma-style) ── */
+    .gjs-cv-canvas{
+      background-color:var(--bg-deep) !important;
+      background-image:radial-gradient(circle, #1a1a1e 1px, transparent 1px) !important;
+      background-size:20px 20px !important;
+    }
+
+    /* ── Zoom controls ── */
+    .zoom-controls{
+      position:absolute;bottom:14px;left:14px;z-index:20;
+      display:flex;align-items:center;gap:2px;
+      background:var(--bg-panel);border:1px solid var(--border);
+      border-radius:var(--radius-md);padding:3px;box-shadow:var(--shadow-md);
+    }
+    .zoom-btn{
+      width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+      border:none;background:transparent;color:var(--text-secondary);
+      border-radius:5px;cursor:pointer;font-size:.8rem;font-weight:600;
+      transition:all .12s;font-family:inherit;
+    }
+    .zoom-btn:hover{background:var(--bg-hover);color:var(--text-primary)}
+    .zoom-level{font-size:.68rem;color:var(--text-muted);font-weight:600;padding:0 6px;min-width:42px;text-align:center;user-select:none}
+
+    /* ── Fullscreen toggle ── */
+    .fullscreen-btn{
+      position:absolute;bottom:14px;right:14px;z-index:20;
+      width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+      background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius-md);
+      color:var(--text-secondary);cursor:pointer;box-shadow:var(--shadow-md);
+      transition:all .15s;
+    }
+    .fullscreen-btn:hover{background:var(--bg-hover);color:var(--text-primary)}
+    .fullscreen-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+    /* ═══ TAB BUTTONS ═══ */
+    .panel-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg-panel-alt);position:relative}
+    .tab-btn{
+      flex:1;padding:10px 0;font-size:.68rem;font-weight:600;
+      text-transform:uppercase;letter-spacing:.06em;
+      background:none;border:none;color:var(--text-dimmed);cursor:pointer;
+      border-bottom:2px solid transparent;font-family:inherit;
+      transition:color .15s, border-color .2s var(--ease);
+      position:relative;
+    }
+    .tab-btn:hover{color:var(--text-secondary)}
+    .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+    /* ═══ BLOCK SEARCH ═══ */
+    .block-search{padding:8px;border-bottom:1px solid var(--border);flex-shrink:0}
+    .block-search input{
+      width:100%;padding:7px 10px 7px 32px;
+      background:var(--input-bg);border:1px solid var(--border);
+      border-radius:var(--radius-sm);color:var(--text-primary);
+      font-size:.8rem;font-family:inherit;
+      transition:border-color .15s,box-shadow .15s;
+      outline:none;
+    }
+    .block-search input::placeholder{color:var(--text-dimmed)}
+    .block-search input:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow)}
+    .block-search{position:relative}
+    .block-search .search-icon{
+      position:absolute;left:18px;top:50%;transform:translateY(-50%);
+      width:14px;height:14px;color:var(--text-dimmed);pointer-events:none;
+    }
+    .block-search .search-icon svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+    /* ═══ PAGES LIST ═══ */
+    .pages-list{padding:8px}
+    .page-item{
+      display:flex;align-items:center;gap:8px;padding:8px 10px;
+      border-radius:var(--radius-sm);cursor:pointer;
+      transition:all .12s;color:var(--text-secondary);font-size:.78rem;
+      border:1px solid transparent;
+    }
+    .page-item:hover{background:var(--bg-hover);border-color:var(--border)}
+    .page-item.active{background:var(--accent-dim);border-color:var(--border-accent);color:var(--accent)}
+    .page-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+    .page-item .page-name{font-weight:500}
+    .page-item .page-badge{font-size:.6rem;color:var(--text-dimmed);margin-left:auto}
+
+    /* ═══ ELEMENT INFO HEADER ═══ */
+    #element-info{
+      background:var(--bg-panel-alt);padding:10px 14px;border-bottom:1px solid var(--border);
+      display:flex;align-items:center;gap:8px;flex-shrink:0;min-height:42px;flex-wrap:wrap;
+    }
+    #element-info .el-icon{width:18px;height:18px;color:var(--accent);flex-shrink:0}
+    #element-info .el-icon svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    #element-info .el-tag{font-weight:700;font-size:.7rem;color:var(--text-primary);text-transform:uppercase;letter-spacing:.03em}
+    #element-info .el-size{font-size:.62rem;color:var(--text-dimmed);font-weight:500;margin-left:2px}
+    #element-info .el-classes{display:flex;gap:3px;flex-wrap:wrap}
+    #element-info .el-class-pill{font-size:.6rem;color:var(--accent);background:var(--accent-dim);border:1px solid var(--border-accent);border-radius:4px;padding:1px 5px;font-weight:500}
+    #element-info .el-empty{font-size:.72rem;color:var(--text-dimmed);font-style:italic}
+
+    /* ═══ GRAPESJS DARK THEME ═══ */
+    .gjs-one-bg{background:var(--bg-panel) !important}
+    .gjs-two-color{color:var(--text-primary) !important}
+    .gjs-three-bg{background:var(--bg-elevated) !important}
+    .gjs-four-color,.gjs-four-color-h:hover{color:var(--accent) !important}
+
+    /* Hide default GrapesJS panels (we use custom) */
+    .gjs-pn-views-container,.gjs-pn-views{display:none !important}
+    .gjs-pn-panel{border:none !important;background:var(--bg-panel) !important}
+    .gjs-pn-commands,.gjs-pn-options,.gjs-pn-devices-c{background:var(--bg-panel) !important;border:none !important}
+
+    /* Canvas toolbar buttons */
+    .gjs-pn-btn{border-radius:var(--radius-sm) !important;padding:6px !important;margin:2px !important;color:var(--text-muted) !important;transition:all .15s !important}
+    .gjs-pn-btn:hover{color:var(--text-primary) !important;background:var(--bg-hover) !important}
+    .gjs-pn-btn.gjs-pn-active{background:var(--accent) !important;color:#09090b !important}
+
+    /* ── Selection & hover ── */
+    .gjs-selected{outline:2px solid var(--accent) !important;outline-offset:2px;border-radius:2px}
+    .gjs-hovered{outline:1px dashed rgba(74,222,128,0.5) !important;outline-offset:1px}
 
     /* ── Element toolbar ── */
-    .gjs-toolbar{background:#18181b;border:1px solid #27272a;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.4)}
-    .gjs-toolbar-item{color:#a1a1aa}
-    .gjs-toolbar-item:hover{color:#4ade80}
+    .gjs-toolbar{background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);padding:2px}
+    .gjs-toolbar-item{color:var(--text-secondary);border-radius:4px;padding:4px;transition:all .12s}
+    .gjs-toolbar-item:hover{color:var(--accent);background:var(--accent-dim)}
 
-    /* ── Badge/label ── */
-    .gjs-badge{background:#4ade80;color:#09090b;font-weight:600;border-radius:4px;padding:2px 8px;font-size:11px}
+    /* ── Badge ── */
+    .gjs-badge{background:var(--accent);color:#09090b;font-weight:600;border-radius:4px;padding:2px 8px;font-size:10px;letter-spacing:.02em;box-shadow:var(--shadow-sm)}
 
-    /* ── Blocks (draggable elements) ── */
-    .gjs-blocks-cs{padding:8px !important;display:grid !important;grid-template-columns:1fr 1fr !important;gap:6px !important}
-    .gjs-block{background:#18181b !important;border:1px solid #27272a !important;border-radius:8px !important;color:#a1a1aa !important;padding:10px 8px !important;min-height:auto !important;font-size:.75rem !important;transition:all .15s !important;display:flex !important;flex-direction:column !important;align-items:center !important;gap:6px !important;width:auto !important}
-    .gjs-block:hover{border-color:#4ade80 !important;color:#e4e4e7 !important;background:#1c2a1f !important}
-    .gjs-block__media{display:flex !important;align-items:center;justify-content:center;width:28px !important;height:28px !important;flex-shrink:0}
-    .gjs-block__media svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-    .gjs-block-label{font-size:.72rem !important;line-height:1.2 !important}
-    .gjs-block-category .gjs-title{background:#111113 !important;color:#71717a !important;font-size:.7rem !important;text-transform:uppercase !important;letter-spacing:.06em !important;padding:10px 12px !important;border-bottom:1px solid #27272a !important}
+    /* ═══ BLOCKS ═══ */
+    .gjs-blocks-cs{padding:6px !important;display:grid !important;grid-template-columns:1fr 1fr !important;gap:5px !important}
+    .gjs-block{
+      background:var(--bg-panel) !important;border:1px solid var(--border) !important;
+      border-radius:var(--radius-md) !important;color:var(--text-secondary) !important;
+      padding:10px 6px !important;min-height:auto !important;font-size:.7rem !important;
+      transition:all .2s var(--ease) !important;display:flex !important;
+      flex-direction:column !important;align-items:center !important;gap:5px !important;width:auto !important;
+    }
+    .gjs-block:hover{
+      border-color:var(--accent) !important;color:var(--text-primary) !important;
+      background:var(--accent-dim) !important;
+      box-shadow:var(--shadow-glow) !important;transform:translateY(-1px) !important;
+    }
+    .gjs-block__media{display:flex !important;align-items:center;justify-content:center;width:26px !important;height:26px !important;flex-shrink:0}
+    .gjs-block__media svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+    .gjs-block-label{font-size:.68rem !important;line-height:1.2 !important;text-align:center !important}
+    .gjs-block-category .gjs-title{
+      background:var(--bg-deep) !important;color:var(--text-dimmed) !important;
+      font-size:.65rem !important;text-transform:uppercase !important;letter-spacing:.08em !important;
+      padding:10px 12px !important;border-bottom:1px solid var(--border) !important;
+      font-weight:700 !important;
+    }
 
-    /* ── Layers (left panel) ── */
-    .gjs-layers{background:#18181b !important}
-    .gjs-layer{border-bottom:1px solid rgba(255,255,255,.03) !important;transition:background .1s !important;position:relative}
-    .gjs-layer:hover{background:rgba(74,222,128,.03) !important}
-    .gjs-layer-name{font-size:.78rem !important;padding:6px 4px !important;color:#a1a1aa !important}
-    .gjs-layer.gjs-selected{background:rgba(74,222,128,.08) !important;border-left:3px solid #4ade80 !important}
-    .gjs-layer.gjs-selected .gjs-layer-name{color:#e4e4e7 !important}
-    .gjs-layer-title{padding:4px 8px !important}
-    .gjs-layer-caret{color:#52525b !important}
-    /* Indent lines for hierarchy */
-    .gjs-layer-children{border-left:1px solid #27272a !important;margin-left:12px !important}
+    /* ═══ LAYERS ═══ */
+    .gjs-layers{background:var(--bg-panel) !important}
+    .gjs-layer{border-bottom:1px solid rgba(255,255,255,.02) !important;transition:background .1s !important;position:relative}
+    .gjs-layer:hover{background:var(--accent-dim) !important}
+    .gjs-layer-name{font-size:.73rem !important;padding:5px 4px !important;color:var(--text-secondary) !important}
+    .gjs-layer.gjs-selected{background:rgba(74,222,128,.07) !important;border-left:3px solid var(--accent) !important}
+    .gjs-layer.gjs-selected .gjs-layer-name{color:var(--text-primary) !important}
+    .gjs-layer-title{padding:3px 6px !important}
+    .gjs-layer-caret{color:var(--text-dimmed) !important}
+    .gjs-layer-children{border-left:1px solid var(--border) !important;margin-left:12px !important}
 
-    /* ── Style Manager (right panel sectors) ── */
-    .gjs-sm-sector{border-bottom:1px solid #27272a !important}
-    .gjs-sm-sector-title{background:#111113 !important;color:#71717a !important;font-size:.7rem !important;text-transform:uppercase !important;letter-spacing:.06em !important;padding:10px 14px !important;font-weight:600 !important;cursor:pointer !important;transition:color .15s !important}
-    .gjs-sm-sector.gjs-sm-open .gjs-sm-sector-title{color:#e4e4e7 !important}
-    .gjs-sm-properties{padding:10px 14px !important}
-    .gjs-sm-label{color:#71717a !important;font-size:.7rem !important;font-weight:500 !important}
-    .gjs-field{background:#09090b !important;border:1px solid #27272a !important;border-radius:6px !important;color:#e4e4e7 !important;font-size:.82rem !important;transition:border-color .15s, box-shadow .15s !important}
-    .gjs-field:focus-within{border-color:#4ade80 !important;box-shadow:0 0 0 2px rgba(74,222,128,.15) !important}
+    /* ═══ STYLE MANAGER ═══ */
+    .gjs-sm-sector{border-bottom:1px solid var(--border) !important}
+    .gjs-sm-sector-title{
+      background:var(--bg-panel-alt) !important;color:var(--text-muted) !important;
+      font-size:.65rem !important;text-transform:uppercase !important;letter-spacing:.07em !important;
+      padding:10px 14px !important;font-weight:700 !important;cursor:pointer !important;
+      transition:color .15s !important;
+    }
+    .gjs-sm-sector.gjs-sm-open .gjs-sm-sector-title{color:var(--text-primary) !important}
+    .gjs-sm-properties{padding:10px 12px !important}
+    .gjs-sm-label{color:var(--text-muted) !important;font-size:.65rem !important;font-weight:600 !important}
+    .gjs-field{
+      background:var(--input-bg) !important;border:1px solid var(--border) !important;
+      border-radius:var(--radius-sm) !important;color:var(--text-primary) !important;
+      font-size:.8rem !important;transition:border-color .15s,box-shadow .15s !important;
+    }
+    .gjs-field:focus-within{border-color:var(--accent) !important;box-shadow:0 0 0 2px var(--accent-glow) !important}
     .gjs-field-arrows{display:flex !important}
-    .gjs-input-holder input{padding:8px 12px !important;font-size:.85rem !important}
-    .gjs-field select{padding:8px 12px !important;background:#09090b !important;color:#e4e4e7 !important;font-size:.85rem !important}
+    .gjs-input-holder input{padding:7px 10px !important;font-size:.8rem !important}
+    .gjs-field select{padding:7px 10px !important;background:var(--input-bg) !important;color:var(--text-primary) !important;font-size:.8rem !important}
     .gjs-field-color-picker{border-radius:4px !important}
 
     /* ── Selector / Class manager ── */
-    .gjs-clm-tags{padding:8px 12px !important;background:#18181b !important}
-    .gjs-clm-tag{background:#1a3a24 !important;border-radius:4px !important;color:#4ade80 !important;border:1px solid rgba(74,222,128,.2) !important}
-    .gjs-clm-sels-info{font-size:.7rem !important;color:#52525b !important}
+    .gjs-clm-tags{padding:8px 12px !important;background:var(--bg-panel) !important}
+    .gjs-clm-tag{background:var(--accent-dim) !important;border-radius:4px !important;color:var(--accent) !important;border:1px solid var(--border-accent) !important}
+    .gjs-clm-sels-info{font-size:.65rem !important;color:var(--text-dimmed) !important}
 
-    /* ── Traits (component settings) ── */
+    /* ═══ TRAITS ═══ */
     .gjs-trt-traits{padding:4px 0 !important}
-    .gjs-trt-trait{padding:10px 16px !important;border-bottom:1px solid rgba(255,255,255,.04) !important;display:flex !important;flex-direction:column !important;gap:6px !important}
+    .gjs-trt-trait{padding:8px 14px !important;border-bottom:1px solid rgba(255,255,255,.03) !important;display:flex !important;flex-direction:column !important;gap:5px !important}
     .gjs-trt-trait:last-child{border-bottom:none !important}
-    .gjs-trt-trait .gjs-label{font-size:.7rem !important;font-weight:600 !important;color:#71717a !important;text-transform:uppercase !important;letter-spacing:.04em !important;width:100% !important;white-space:normal !important;overflow:visible !important;text-overflow:unset !important;min-width:0 !important;flex:none !important}
-    .gjs-trt-trait .gjs-field{min-height:36px !important;width:100% !important}
-    .gjs-trt-trait textarea.gjs-field{min-height:120px !important;resize:vertical !important;line-height:1.6 !important;padding:10px 12px !important;font-size:.85rem !important}
-    .gjs-trt-trait input.gjs-field,
-    .gjs-trt-trait .gjs-field input{padding:8px 12px !important;font-size:.85rem !important}
+    .gjs-trt-trait .gjs-label{font-size:.65rem !important;font-weight:700 !important;color:var(--text-muted) !important;text-transform:uppercase !important;letter-spacing:.05em !important;width:100% !important;white-space:normal !important;overflow:visible !important;text-overflow:unset !important;min-width:0 !important;flex:none !important}
+    .gjs-trt-trait .gjs-field{min-height:34px !important;width:100% !important}
+    .gjs-trt-trait textarea.gjs-field{min-height:100px !important;resize:vertical !important;line-height:1.5 !important;padding:8px 10px !important;font-size:.82rem !important}
+    .gjs-trt-trait input.gjs-field,.gjs-trt-trait .gjs-field input{padding:7px 10px !important;font-size:.82rem !important}
 
-    /* ── Element info header ── */
-    #element-info{
-      background:#111113;padding:12px 16px;border-bottom:1px solid #27272a;
-      display:flex;align-items:center;gap:8px;flex-shrink:0;min-height:44px;flex-wrap:wrap;
-    }
-    #element-info .el-icon{width:20px;height:20px;color:#4ade80;flex-shrink:0}
-    #element-info .el-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-    #element-info .el-tag{font-weight:700;font-size:.75rem;color:#e4e4e7;text-transform:uppercase;letter-spacing:.03em}
-    #element-info .el-classes{display:flex;gap:4px;flex-wrap:wrap}
-    #element-info .el-class-pill{font-size:.65rem;color:#4ade80;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);border-radius:4px;padding:1px 6px;font-weight:500}
-    #element-info .el-empty{font-size:.75rem;color:#52525b;font-style:italic}
-
-    /* ── Tab buttons (shared) ── */
-    .panel-tabs{display:flex;border-bottom:1px solid #27272a;flex-shrink:0;background:#111113}
-    .tab-btn{
-      flex:1;padding:10px 0;font-size:.72rem;font-weight:600;
-      text-transform:uppercase;letter-spacing:.05em;
-      background:none;border:none;color:#52525b;cursor:pointer;
-      border-bottom:2px solid transparent;font-family:inherit;
-      transition:color .15s, border-color .15s;
-    }
-    .tab-btn:hover{color:#a1a1aa}
-    .tab-btn.active{color:#4ade80;border-bottom-color:#4ade80}
-
-    /* ── Scrollbars (all panels) ── */
-    #left-panel ::-webkit-scrollbar,
-    #right-panel ::-webkit-scrollbar{width:5px}
-    #left-panel ::-webkit-scrollbar-track,
-    #right-panel ::-webkit-scrollbar-track{background:#18181b}
-    #left-panel ::-webkit-scrollbar-thumb,
-    #right-panel ::-webkit-scrollbar-thumb{background:#27272a;border-radius:3px}
-    #left-panel ::-webkit-scrollbar-thumb:hover,
-    #right-panel ::-webkit-scrollbar-thumb:hover{background:#3f3f46}
-
-    /* ── Rich text editor toolbar ── */
-    .gjs-rte-toolbar{background:#18181b !important;border:1px solid #27272a !important;border-radius:6px !important;box-shadow:0 4px 12px rgba(0,0,0,.4) !important}
-    .gjs-rte-actionbar{padding:4px !important}
-    .gjs-rte-action{color:#a1a1aa !important;border-radius:4px !important}
-    .gjs-rte-action:hover{color:#e4e4e7 !important;background:rgba(255,255,255,.08) !important}
-    .gjs-rte-active{color:#4ade80 !important}
-
-    /* ── Composite/radio fields polish ── */
-    .gjs-sm-composite{padding:6px 0 !important}
+    /* ═══ RADIO / COMPOSITE ═══ */
+    .gjs-sm-composite{padding:4px 0 !important}
     .gjs-radio-item{border-radius:4px !important;transition:background .1s !important}
-    .gjs-radio-item:hover{background:rgba(255,255,255,.04) !important}
-    .gjs-radio-item input:checked + .gjs-radio-item-label{background:#4ade80 !important;color:#09090b !important;border-radius:4px !important;font-weight:600 !important}
+    .gjs-radio-item:hover{background:var(--bg-hover) !important}
+    .gjs-radio-item input:checked+.gjs-radio-item-label{background:var(--accent) !important;color:#09090b !important;border-radius:4px !important;font-weight:600 !important}
 
-    /* ── Toast ── */
-    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);opacity:0;padding:10px 20px;border-radius:8px;font-size:.85rem;font-weight:500;color:#fff;z-index:9999;transition:all .3s;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+    /* ═══ SCROLLBARS ═══ */
+    #left-panel ::-webkit-scrollbar,#right-panel ::-webkit-scrollbar,.code-view ::-webkit-scrollbar{width:4px}
+    #left-panel ::-webkit-scrollbar-track,#right-panel ::-webkit-scrollbar-track,.code-view ::-webkit-scrollbar-track{background:transparent}
+    #left-panel ::-webkit-scrollbar-thumb,#right-panel ::-webkit-scrollbar-thumb,.code-view ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    #left-panel ::-webkit-scrollbar-thumb:hover,#right-panel ::-webkit-scrollbar-thumb:hover{background:#333}
+
+    /* ═══ RICH TEXT EDITOR ═══ */
+    .gjs-rte-toolbar{background:var(--bg-panel) !important;border:1px solid var(--border) !important;border-radius:var(--radius-md) !important;box-shadow:var(--shadow-lg) !important}
+    .gjs-rte-actionbar{padding:3px !important}
+    .gjs-rte-action{color:var(--text-secondary) !important;border-radius:4px !important;transition:all .12s !important}
+    .gjs-rte-action:hover{color:var(--text-primary) !important;background:var(--bg-hover) !important}
+    .gjs-rte-active{color:var(--accent) !important;background:var(--accent-dim) !important}
+
+    /* ═══ CODE VIEW ═══ */
+    .code-view{
+      display:none;flex-direction:column;background:var(--bg-deep);
+      border-top:1px solid var(--border);position:absolute;
+      bottom:0;left:0;right:0;height:45%;z-index:50;
+      box-shadow:0 -4px 20px rgba(0,0,0,0.4);
+    }
+    .code-view.open{display:flex}
+    .code-tabs{display:flex;background:var(--bg-panel);border-bottom:1px solid var(--border);align-items:center;padding:0 8px;flex-shrink:0}
+    .code-tab{padding:8px 14px;font-size:.7rem;font-weight:600;color:var(--text-muted);cursor:pointer;border:none;background:none;font-family:inherit;border-bottom:2px solid transparent;transition:all .15s}
+    .code-tab:hover{color:var(--text-secondary)}
+    .code-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+    .code-close{margin-left:auto;padding:4px 8px;background:none;border:1px solid var(--border);border-radius:4px;color:var(--text-muted);cursor:pointer;font-size:.7rem;font-family:inherit;transition:all .12s}
+    .code-close:hover{background:var(--bg-hover);color:var(--text-primary)}
+    .code-content{flex:1;overflow:auto;padding:12px 16px}
+    .code-content pre{
+      font-family:'JetBrains Mono','Fira Code','Cascadia Code',monospace;
+      font-size:.78rem;line-height:1.6;color:var(--text-secondary);
+      white-space:pre-wrap;word-break:break-all;tab-size:2;
+      margin:0;
+    }
+
+    /* ═══ TOAST ═══ */
+    .toast{
+      position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+      opacity:0;padding:10px 20px;border-radius:var(--radius-md);
+      font-size:.82rem;font-weight:500;color:#fff;z-index:9999;
+      transition:all .3s var(--ease-bounce);
+      box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:8px;
+      backdrop-filter:blur(12px);
+    }
     .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-    .toast.success{background:#059669}
-    .toast.error{background:#dc2626}
+    .toast.success{background:rgba(5,150,105,0.92)}
+    .toast.error{background:rgba(220,38,38,0.92)}
+    .toast svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 
-    /* ── Empty state for traits panel ── */
-    .traits-empty{padding:24px 16px;text-align:center;color:#52525b;font-size:.8rem;line-height:1.5}
+    /* ═══ EMPTY STATES ═══ */
+    .traits-empty{padding:32px 16px;text-align:center;color:var(--text-dimmed);font-size:.78rem;line-height:1.5}
+    .traits-empty svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.5;margin-bottom:8px;opacity:.4}
 
-    /* ── Section headers in left panel ── */
-    .panel-section-header{padding:10px 14px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#52525b;border-bottom:1px solid #27272a;background:#111113}
+    /* ═══ SECTION HEADER ═══ */
+    .panel-section-header{padding:10px 14px;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dimmed);border-bottom:1px solid var(--border);background:var(--bg-panel-alt)}
+
+    /* ═══ HIDE PANELS IN FULLSCREEN ═══ */
+    body.canvas-fullscreen #left-panel,
+    body.canvas-fullscreen #right-panel,
+    body.canvas-fullscreen .breadcrumb-bar{display:none !important}
+    body.canvas-fullscreen .topbar .left,
+    body.canvas-fullscreen .topbar .center{opacity:.5}
+
+    /* ═══ LOADING OVERLAY ═══ */
+    .loading-overlay{
+      position:fixed;inset:0;background:rgba(8,8,10,0.85);z-index:200;
+      display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;
+    }
+    .loading-overlay.active{display:flex}
+    .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading-overlay p{color:var(--text-muted);font-size:.85rem}
   </style>
 </head>
 <body>
 
+<!-- ═══ LOGIN ═══ -->
 <div id="login">
+  <div class="login-icon">
+    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+  </div>
   <h1>HM Motor</h1>
   <p>Visuell redigering</p>
   <button onclick="netlifyIdentity.open('login')">Logga in</button>
 </div>
 
+<!-- ═══ EDITOR ═══ -->
 <div id="editor-wrap">
+
+  <!-- Topbar -->
   <div class="topbar">
     <div class="left">
-      <span class="brand">HM Motor</span>
+      <span class="brand"><span class="brand-dot"></span>HM Motor</span>
       <span class="sep">/</span>
-      <span class="mode">Visuell redigering</span>
+      <span class="file-name" id="currentFile">index.html</span>
+      <span class="unsaved-dot" id="unsavedDot"></span>
+    </div>
+    <div class="center">
+      <button class="device-btn active" data-device="Desktop" onclick="setDevice('Desktop',this)">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Desktop
+      </button>
+      <button class="device-btn" data-device="Tablet" onclick="setDevice('Tablet',this)">
+        <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        Tablet
+        <span class="device-width">768px</span>
+      </button>
+      <button class="device-btn" data-device="Mobil" onclick="setDevice('Mobil',this)">
+        <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        Mobil
+        <span class="device-width">375px</span>
+      </button>
     </div>
     <div class="right">
-      <a href="/dashboard">Fordon</a>
-      <a href="/" target="_blank">Visa sajten &#8599;</a>
-      <button onclick="undoAction()">&#8630; Angra</button>
-      <button onclick="redoAction()">&#8631; Gor om</button>
-      <button class="save-btn" id="saveBtn" onclick="saveChanges()">Spara</button>
-      <button onclick="netlifyIdentity.logout();location.reload()" style="border-color:#3f3f46">Logga ut</button>
+      <button class="tb-btn" onclick="undoAction()" title="Ctrl+Z">
+        <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+      </button>
+      <button class="tb-btn" onclick="redoAction()" title="Ctrl+Y">
+        <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/></svg>
+      </button>
+      <span class="tb-sep"></span>
+      <a class="tb-btn" href="/" target="_blank" title="Visa sajten">
+        <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Forhandsvisa
+      </a>
+      <button class="tb-btn" onclick="toggleCodeView()" title="Ctrl+Shift+C" id="codeToggleBtn">
+        <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Kod
+      </button>
+      <span class="tb-sep"></span>
+      <button class="tb-btn primary" id="saveBtn" onclick="saveChanges()" title="Ctrl+S">
+        <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Spara
+        <span class="shortcut">Ctrl+S</span>
+      </button>
+      <span class="tb-sep"></span>
+      <a class="tb-btn" href="/dashboard">Fordon</a>
+      <button class="tb-btn" onclick="netlifyIdentity.logout();location.reload()">Logga ut</button>
     </div>
   </div>
-  <div style="display:flex;flex:1;overflow:hidden">
 
-    <!-- Left panel: Layers + Blocks -->
-    <div id="left-panel" style="width:240px;min-width:240px;background:#18181b;border-right:1px solid #27272a;display:flex;flex-direction:column;overflow:hidden">
+  <!-- Breadcrumb bar -->
+  <div class="breadcrumb-bar" id="breadcrumb">
+    <span class="bc-item">body</span>
+  </div>
+
+  <!-- Main area -->
+  <div class="main-area">
+
+    <!-- ── Left panel ── -->
+    <div id="left-panel">
       <div class="panel-tabs">
         <button class="tab-btn active" onclick="switchLeft('layers')" id="tab-layers">Lager</button>
         <button class="tab-btn" onclick="switchLeft('blocks')" id="tab-blocks">Block</button>
+        <button class="tab-btn" onclick="switchLeft('pages')" id="tab-pages">Sidor</button>
       </div>
       <div id="layers-panel" style="flex:1;overflow-y:auto"></div>
-      <div id="blocks-panel" style="flex:1;overflow-y:auto;display:none"></div>
+      <div id="blocks-wrapper" style="flex:1;overflow-y:auto;display:none;flex-direction:column">
+        <div class="block-search">
+          <span class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+          <input type="text" placeholder="Sok block..." id="blockSearch" oninput="filterBlocks(this.value)">
+        </div>
+        <div id="blocks-panel" style="flex:1;overflow-y:auto"></div>
+      </div>
+      <div id="pages-panel" style="flex:1;overflow-y:auto;display:none">
+        <div class="pages-list" id="pagesList"></div>
+      </div>
     </div>
 
-    <!-- Canvas -->
-    <div id="gjs" style="flex:1"></div>
+    <!-- ── Canvas ── -->
+    <div class="canvas-area">
+      <div id="gjs"></div>
 
-    <!-- Right panel: Element info + Tabs (Egenskaper / Stilar) -->
-    <div id="right-panel" style="width:320px;min-width:320px;background:#18181b;border-left:1px solid #27272a;display:flex;flex-direction:column;overflow:hidden">
+      <!-- Code view -->
+      <div class="code-view" id="codeView">
+        <div class="code-tabs">
+          <button class="code-tab active" onclick="switchCodeTab('html')" id="code-tab-html">HTML</button>
+          <button class="code-tab" onclick="switchCodeTab('css')" id="code-tab-css">CSS</button>
+          <button class="code-close" onclick="toggleCodeView()">Stang</button>
+        </div>
+        <div class="code-content" id="codeContent"><pre id="codeOutput"></pre></div>
+      </div>
+
+      <!-- Zoom controls -->
+      <div class="zoom-controls" id="zoomControls">
+        <button class="zoom-btn" onclick="zoomOut()">-</button>
+        <span class="zoom-level" id="zoomLevel">100%</span>
+        <button class="zoom-btn" onclick="zoomIn()">+</button>
+        <button class="zoom-btn" onclick="zoomReset()" title="Aterstall">
+          <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        </button>
+      </div>
+
+      <!-- Fullscreen toggle -->
+      <button class="fullscreen-btn" onclick="toggleFullscreen()" title="Fullskarm (Ctrl+Shift+F)">
+        <svg viewBox="0 0 24 24" id="fs-icon"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+      </button>
+    </div>
+
+    <!-- ── Right panel ── -->
+    <div id="right-panel">
       <div id="element-info">
         <span class="el-empty">Klicka pa ett element</span>
       </div>
       <div class="panel-tabs">
-        <button class="tab-btn" onclick="switchRight('styles')" id="tab-styles">Stilar</button>
         <button class="tab-btn active" onclick="switchRight('traits')" id="tab-traits">Egenskaper</button>
+        <button class="tab-btn" onclick="switchRight('styles')" id="tab-styles">Stilar</button>
       </div>
       <div id="traits-panel" style="flex:1;overflow-y:auto">
-        <div class="traits-empty">Markera ett element for att redigera egenskaper</div>
+        <div class="traits-empty">
+          <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          <div>Markera ett element for att redigera</div>
+        </div>
       </div>
       <div id="styles-panel" style="flex:1;overflow-y:auto;display:none"></div>
     </div>
@@ -245,10 +572,32 @@
   </div>
 </div>
 
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loader">
+  <div class="spinner"></div>
+  <p>Laddar editor...</p>
+</div>
+
+<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
+/* ================================================================
+   STATE
+   ================================================================ */
 let editor, token, pageSha, originalHead, originalScripts;
+let hasUnsavedChanges = false;
+let currentZoom = 100;
+let currentCodeTab = 'html';
+let currentPage = 'index.html';
+
+const PAGES = [
+  { file: 'index.html', name: 'Startsida', icon: 'home' },
+  { file: 'bilar.html', name: 'Bilar', icon: 'file' },
+  { file: 'fyrhjulingar.html', name: 'Fyrhjulingar', icon: 'file' },
+  { file: 'mopeder.html', name: 'Mopeder', icon: 'file' },
+  { file: 'fordon.html', name: 'Fordon (detalj)', icon: 'file' },
+];
 
 /* ================================================================
    AUTH
@@ -266,7 +615,17 @@ async function startApp(user) {
   token = await user.jwt();
   document.getElementById('login').style.display = 'none';
   document.getElementById('editor-wrap').style.display = 'flex';
+  showLoader(true);
+  renderPagesList();
   await loadPageAndInit();
+  showLoader(false);
+}
+
+/* ================================================================
+   LOADER
+   ================================================================ */
+function showLoader(show) {
+  document.getElementById('loader').classList.toggle('active', show);
 }
 
 /* ================================================================
@@ -274,7 +633,7 @@ async function startApp(user) {
    ================================================================ */
 async function loadPageAndInit() {
   try {
-    const r = await fetch('/.netlify/git/github/contents/index.html', {
+    const r = await fetch('/.netlify/git/github/contents/' + currentPage, {
       headers: { Authorization: 'Bearer ' + token }
     });
     const j = await r.json();
@@ -282,25 +641,67 @@ async function loadPageAndInit() {
     const html = decodeURIComponent(escape(atob(j.content)));
     initEditor(html);
   } catch (e) {
-    // Fallback: fetch the live page
-    const r = await fetch('/');
+    const r = await fetch('/' + (currentPage === 'index.html' ? '' : currentPage));
     const html = await r.text();
     initEditor(html);
   }
 }
 
 /* ================================================================
+   PAGES LIST
+   ================================================================ */
+function renderPagesList() {
+  const el = document.getElementById('pagesList');
+  el.innerHTML = PAGES.map(p => `
+    <div class="page-item${p.file === currentPage ? ' active' : ''}" onclick="switchPage('${p.file}')">
+      <svg viewBox="0 0 24 24">${p.icon === 'home'
+        ? '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'
+        : '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>'
+      }</svg>
+      <span class="page-name">${p.name}</span>
+      <span class="page-badge">${p.file}</span>
+    </div>
+  `).join('');
+}
+
+async function switchPage(file) {
+  if (file === currentPage) return;
+  if (hasUnsavedChanges && !confirm('Du har osparade andringar. Byt sida anda?')) return;
+  currentPage = file;
+  document.getElementById('currentFile').textContent = file;
+  renderPagesList();
+  showLoader(true);
+  if (editor) editor.destroy();
+  await loadPageAndInit();
+  showLoader(false);
+  setUnsaved(false);
+}
+
+/* ================================================================
    BLOCK SVG ICONS
    ================================================================ */
-const BLOCK_ICONS = {
+const ICONS = {
   section: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>',
   cta: '<svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="10" rx="5"/><line x1="8" y1="12" x2="16" y2="12"/></svg>',
   card: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="7" y1="14" x2="17" y2="14"/><line x1="7" y1="17" x2="13" y2="17"/></svg>',
   faq: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 0 1 4.87.5c0 1.5-2.37 2-2.37 3"/><circle cx="12" cy="16.5" r=".5" fill="currentColor"/></svg>',
   trust: '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
+  hero: '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M2 8h20"/><circle cx="8" cy="14" r="2"/><path d="M14 12h4m-4 4h4"/></svg>',
+  image: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>',
+  logo: '<svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>',
+  contact: '<svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
+  badge: '<svg viewBox="0 0 24 24"><path d="M12 15l-2 5 1-.5 1 1 1-1 1 .5-2-5z"/><circle cx="12" cy="9" r="6"/></svg>',
+  feature: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+  testimonial: '<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+  stats: '<svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+  video: '<svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>',
+  map: '<svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+  code: '<svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+  divider: '<svg viewBox="0 0 24 24"><line x1="2" y1="12" x2="22" y2="12"/></svg>',
+  spacer: '<svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>',
 };
 
-/* ── Layer icons by element type ── */
+/* ── Layer icons ── */
 const LAYER_ICONS = {
   section: '<svg viewBox="0 0 24 24" width="14" height="14"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" fill="none" stroke-width="1.5"/><line x1="3" y1="9" x2="21" y2="9" stroke="currentColor" stroke-width="1.5"/></svg>',
   div: '<svg viewBox="0 0 24 24" width="14" height="14"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" fill="none" stroke-width="1.5"/></svg>',
@@ -347,16 +748,13 @@ function getLayerIcon(tag) {
    GRAPESJS INIT
    ================================================================ */
 function initEditor(html) {
-  // Parse the incoming HTML
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
 
-  // Save original <head> and body scripts for buildFullPage
   originalHead = doc.head.innerHTML;
   const bodyScriptEls = doc.body.querySelectorAll('script');
   originalScripts = Array.from(bodyScriptEls).map(s => s.outerHTML.replace(/<\/script>/g, '<\\/script>')).join('\n');
 
-  // Gather external CSS links
   const cssLinks = [];
   doc.querySelectorAll('link[rel="stylesheet"]').forEach(l => {
     let href = l.getAttribute('href');
@@ -364,12 +762,10 @@ function initEditor(html) {
     if (href) cssLinks.push(href);
   });
 
-  // Get body HTML without scripts
   const bodyClone = doc.body.cloneNode(true);
   bodyClone.querySelectorAll('script').forEach(s => s.remove());
   const bodyHTML = bodyClone.innerHTML;
 
-  // Get inline styles
   let inlineCSS = '';
   doc.querySelectorAll('style').forEach(s => inlineCSS += s.textContent);
 
@@ -385,18 +781,22 @@ function initEditor(html) {
       styles: cssLinks.concat([
         'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap'
       ]),
-      scripts: [
-        'https://unpkg.com/lucide@latest'
-      ]
+      scripts: ['https://unpkg.com/lucide@latest']
     },
-    plugins: ['gjs-preset-webpage'],
+    plugins: [
+      'gjs-preset-webpage',
+      'grapesjs-plugin-forms',
+      'grapesjs-custom-code',
+    ],
     pluginsOpts: {
       'gjs-preset-webpage': {
         blocksBasicOpts: { flexGrid: true },
         navbarOpts: false,
         countdownOpts: false,
         formsOpts: false,
-      }
+      },
+      'grapesjs-plugin-forms': {},
+      'grapesjs-custom-code': {},
     },
     blockManager: { appendTo: '#blocks-panel' },
     layerManager: { appendTo: '#layers-panel' },
@@ -404,24 +804,95 @@ function initEditor(html) {
     styleManager: {
       appendTo: '#styles-panel',
       sectors: [
-        { name: 'Layout', open: true, properties: [
-          { extend: 'display', type: 'radio', defaults: 'block', options: [
-            {value:'block',name:'Block'},{value:'flex',name:'Flex'},{value:'grid',name:'Grid'},
-            {value:'inline',name:'Inline'},{value:'none',name:'Dolj'}
-          ]},
-          'flex-direction','flex-wrap','justify-content','align-items','align-content','gap',
-          'position','top','right','bottom','left','z-index','overflow'
-        ]},
-        { name: 'Storlek', open: false, properties: [
-          'width','min-width','max-width','height','min-height','max-height','margin','padding'
-        ]},
-        { name: 'Typografi', open: false, properties: [
-          'font-family','font-size','font-weight','letter-spacing','color','line-height',
-          'text-align','text-decoration','text-transform'
-        ]},
-        { name: 'Utseende', open: false, properties: [
-          'background-color','background','border-radius','border','box-shadow','opacity'
-        ]},
+        {
+          name: 'Layout',
+          open: true,
+          properties: [
+            { extend: 'display', type: 'radio', defaults: 'block', options: [
+              {value:'block',name:'Block'},{value:'flex',name:'Flex'},{value:'grid',name:'Grid'},
+              {value:'inline-block',name:'Inline-B'},{value:'none',name:'Dolj'}
+            ]},
+            'flex-direction','flex-wrap','justify-content','align-items','align-content','gap',
+            'position','top','right','bottom','left','z-index','overflow'
+          ]
+        },
+        {
+          name: 'Storlek',
+          open: false,
+          properties: [
+            'width','min-width','max-width','height','min-height','max-height',
+            'margin','padding'
+          ]
+        },
+        {
+          name: 'Typografi',
+          open: false,
+          properties: [
+            'font-family','font-size','font-weight','font-style',
+            'letter-spacing','line-height','color',
+            'text-align','text-decoration','text-transform',
+            { property: 'text-shadow', type: 'stack', properties: [
+              { property: 'text-shadow-h', type: 'integer', units: ['px'], defaults: '0' },
+              { property: 'text-shadow-v', type: 'integer', units: ['px'], defaults: '0' },
+              { property: 'text-shadow-blur', type: 'integer', units: ['px'], defaults: '0' },
+              { property: 'text-shadow-color', type: 'color' },
+            ]}
+          ]
+        },
+        {
+          name: 'Bakgrund',
+          open: false,
+          properties: [
+            'background-color',
+            'background-image',
+            'background-repeat',
+            'background-position',
+            'background-size',
+            'background-attachment',
+          ]
+        },
+        {
+          name: 'Kantlinje',
+          open: false,
+          properties: [
+            'border','border-radius',
+            'border-top','border-right','border-bottom','border-left',
+            'outline',
+          ]
+        },
+        {
+          name: 'Effekter',
+          open: false,
+          properties: [
+            { property: 'box-shadow', type: 'stack', properties: [
+              { property: 'box-shadow-h', type: 'integer', units: ['px'], defaults: '0' },
+              { property: 'box-shadow-v', type: 'integer', units: ['px'], defaults: '0' },
+              { property: 'box-shadow-blur', type: 'integer', units: ['px'], min: 0, defaults: '5' },
+              { property: 'box-shadow-spread', type: 'integer', units: ['px'], defaults: '0' },
+              { property: 'box-shadow-color', type: 'color', defaults: 'rgba(0,0,0,0.2)' },
+              { property: 'box-shadow-type', type: 'select', defaults: '', options: [
+                {value:'', name:'Utanfor'},{value:'inset', name:'Insida'}
+              ]}
+            ]},
+            'opacity',
+            'cursor',
+            { property: 'transform', type: 'stack', properties: [
+              { property: 'transform-rotate', type: 'integer', units: ['deg'], defaults: '0', functionName: 'rotate' },
+              { property: 'transform-scale', type: 'number', defaults: '1', step: 0.1, functionName: 'scale' },
+              { property: 'transform-translateX', type: 'integer', units: ['px','%'], defaults: '0', functionName: 'translateX' },
+              { property: 'transform-translateY', type: 'integer', units: ['px','%'], defaults: '0', functionName: 'translateY' },
+            ]},
+          ]
+        },
+        {
+          name: 'Animering',
+          open: false,
+          properties: [
+            'transition-property',
+            'transition-duration',
+            'transition-timing-function',
+          ]
+        }
       ]
     },
     traitManager: { appendTo: '#traits-panel' },
@@ -432,291 +903,392 @@ function initEditor(html) {
         { name: 'Mobil', width: '375px', widthMedia: '480px' },
       ]
     },
+    assetManager: {
+      upload: false,
+      dropzone: false,
+    },
   });
 
-  /* ── Custom HM Motor blocks ── */
+  /* ── Custom HM Motor Blocks ── */
   const bm = editor.BlockManager;
 
-  bm.add('hm-section', {
-    label: 'Sektion',
-    category: 'HM Motor',
-    media: BLOCK_ICONS.section,
-    content: '<section class="section section--white"><div class="container"><div class="section-header"><h2>Ny sektion</h2></div><p>Innehall har...</p></div></section>',
+  // Category: HM Motor
+  bm.add('hm-hero', { label: 'Hero-sektion', category: 'HM Motor', media: ICONS.hero,
+    content: '<section class="hero" style="background:#0c1a2e;color:#fff;padding:80px 0;text-align:center"><div class="container" style="max-width:1200px;margin:0 auto;padding:0 20px"><span style="display:inline-block;background:#2563eb;color:#fff;padding:4px 12px;border-radius:20px;font-size:13px;margin-bottom:16px">Ny modell</span><h1 style="font-size:2.5rem;margin-bottom:16px">Rubrik har</h1><p style="font-size:1.1rem;color:#94a3b8;max-width:600px;margin:0 auto 24px">Beskrivning av hero-sektionen</p><a href="#" class="btn btn-blue btn-lg" style="display:inline-block;background:#2563eb;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:600">Kontakta oss</a></div></section>',
+  });
+  bm.add('hm-section', { label: 'Sektion', category: 'HM Motor', media: ICONS.section,
+    content: '<section class="section section--white" style="padding:60px 0"><div class="container" style="max-width:1200px;margin:0 auto;padding:0 20px"><div class="section-header" style="text-align:center;margin-bottom:40px"><h2 style="font-size:1.8rem;margin-bottom:8px">Ny sektion</h2><p style="color:#64748b">Beskrivning</p></div></div></section>',
+  });
+  bm.add('hm-cta', { label: 'CTA-knapp', category: 'HM Motor', media: ICONS.cta,
+    content: '<a href="#" class="btn btn-blue btn-lg" style="display:inline-block;background:#2563eb;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center">Klicka har</a>',
+  });
+  bm.add('hm-card', { label: 'Nyhetskort', category: 'HM Motor', media: ICONS.card,
+    content: '<div class="just-nu-card" style="background:#fff;border-radius:12px;padding:24px;border:1px solid #e2e8f0"><span style="display:inline-block;background:#dbeafe;color:#2563eb;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;margin-bottom:12px">Nyheter</span><h3 style="font-size:1.1rem;margin-bottom:8px">Rubrik</h3><p style="color:#64748b;font-size:.9rem;margin-bottom:12px">Beskrivning av nyheten</p><a href="#" style="color:#2563eb;text-decoration:none;font-weight:600;font-size:.9rem">Las mer &rarr;</a></div>',
+  });
+  bm.add('hm-faq', { label: 'FAQ-fraga', category: 'HM Motor', media: ICONS.faq,
+    content: '<details class="faq-item"><summary>Vanlig fraga<span class="faq-toggle">+</span></summary><p>Svar pa fragan har...</p></details>',
+  });
+  bm.add('hm-trust', { label: 'Trust-signal', category: 'HM Motor', media: ICONS.trust,
+    content: '<div class="hero-trust-item" style="text-align:center"><strong style="font-size:2rem;display:block;color:#2563eb">99+</strong><span style="color:#64748b;font-size:.85rem">Nojda kunder</span></div>',
+  });
+  bm.add('hm-feature', { label: 'Feature-kort', category: 'HM Motor', media: ICONS.feature,
+    content: '<div style="background:#fff;border-radius:12px;padding:24px;border:1px solid #e2e8f0;text-align:center"><div style="width:48px;height:48px;border-radius:10px;background:#dbeafe;display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><h3 style="font-size:1rem;margin-bottom:8px">Feature</h3><p style="color:#64748b;font-size:.85rem">Beskrivning av funktionen</p></div>',
+  });
+  bm.add('hm-testimonial', { label: 'Testimonial', category: 'HM Motor', media: ICONS.testimonial,
+    content: '<div style="background:#fff;border-radius:12px;padding:24px;border:1px solid #e2e8f0"><p style="font-style:italic;color:#334155;font-size:.95rem;margin-bottom:16px;line-height:1.6">"Fantastisk service! Rekommenderar varmt."</p><div style="display:flex;align-items:center;gap:12px"><div style="width:40px;height:40px;border-radius:50%;background:#dbeafe"></div><div><strong style="font-size:.85rem;display:block">Kundnamn</strong><span style="color:#94a3b8;font-size:.75rem">Stad</span></div></div></div>',
+  });
+  bm.add('hm-stats', { label: 'Statistik-rad', category: 'HM Motor', media: ICONS.stats,
+    content: '<div style="display:flex;gap:24px;justify-content:center;padding:40px 0"><div style="text-align:center"><strong style="font-size:2.2rem;display:block;color:#2563eb">500+</strong><span style="color:#64748b;font-size:.85rem">Fordon salda</span></div><div style="text-align:center"><strong style="font-size:2.2rem;display:block;color:#2563eb">15</strong><span style="color:#64748b;font-size:.85rem">Ars erfarenhet</span></div><div style="text-align:center"><strong style="font-size:2.2rem;display:block;color:#2563eb">98%</strong><span style="color:#64748b;font-size:.85rem">Nojda kunder</span></div></div>',
+  });
+  bm.add('hm-image-card', { label: 'Bildkort', category: 'HM Motor', media: ICONS.image,
+    content: '<div style="border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;background:#fff"><div style="height:200px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:.85rem">Bild har</div><div style="padding:20px"><h3 style="font-size:1rem;margin-bottom:6px">Rubrik</h3><p style="color:#64748b;font-size:.85rem">Kort beskrivning</p></div></div>',
+  });
+  bm.add('hm-logos', { label: 'Partner-logos', category: 'HM Motor', media: ICONS.logo,
+    content: '<div style="display:flex;align-items:center;justify-content:center;gap:40px;padding:32px 0;flex-wrap:wrap;opacity:.6"><div style="width:100px;height:40px;background:#e2e8f0;border-radius:6px"></div><div style="width:100px;height:40px;background:#e2e8f0;border-radius:6px"></div><div style="width:100px;height:40px;background:#e2e8f0;border-radius:6px"></div><div style="width:100px;height:40px;background:#e2e8f0;border-radius:6px"></div></div>',
+  });
+  bm.add('hm-badge', { label: 'Badge/Etikett', category: 'HM Motor', media: ICONS.badge,
+    content: '<span style="display:inline-block;background:#dbeafe;color:#2563eb;padding:4px 14px;border-radius:20px;font-size:13px;font-weight:600">Etikett</span>',
+  });
+  bm.add('hm-contact', { label: 'Kontaktformular', category: 'HM Motor', media: ICONS.contact,
+    content: '<form style="max-width:500px;margin:0 auto"><div style="margin-bottom:16px"><label style="display:block;font-size:.85rem;font-weight:600;margin-bottom:6px">Namn</label><input type="text" placeholder="Ditt namn" style="width:100%;padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:.9rem;font-family:inherit"></div><div style="margin-bottom:16px"><label style="display:block;font-size:.85rem;font-weight:600;margin-bottom:6px">E-post</label><input type="email" placeholder="din@email.se" style="width:100%;padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:.9rem;font-family:inherit"></div><div style="margin-bottom:16px"><label style="display:block;font-size:.85rem;font-weight:600;margin-bottom:6px">Meddelande</label><textarea rows="4" placeholder="Skriv ditt meddelande..." style="width:100%;padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:.9rem;font-family:inherit;resize:vertical"></textarea></div><button type="submit" style="background:#2563eb;color:#fff;padding:12px 32px;border:none;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit">Skicka</button></form>',
+  });
+  bm.add('hm-video', { label: 'Video-embed', category: 'HM Motor', media: ICONS.video,
+    content: '<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px"><iframe style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe></div>',
+  });
+  bm.add('hm-map', { label: 'Google Maps', category: 'HM Motor', media: ICONS.map,
+    content: '<div style="border-radius:12px;overflow:hidden;height:300px"><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1766.7!2d14.5!3d63.3!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNjPCsDE4JzAwLjAiTiAxNMKwMzAnMDAuMCJF!5e0!3m2!1ssv!2sse!4v1" style="width:100%;height:100%;border:0" allowfullscreen loading="lazy"></iframe></div>',
+  });
+  bm.add('hm-divider', { label: 'Avdelare', category: 'HM Motor', media: ICONS.divider,
+    content: '<hr style="border:none;height:1px;background:#e2e8f0;margin:32px 0">',
+  });
+  bm.add('hm-spacer', { label: 'Mellanrum', category: 'HM Motor', media: ICONS.spacer,
+    content: '<div style="height:60px"></div>',
   });
 
-  bm.add('hm-cta', {
-    label: 'CTA-knapp',
-    category: 'HM Motor',
-    media: BLOCK_ICONS.cta,
-    content: '<a href="#" class="btn btn-blue btn-lg">Klicka har</a>',
-  });
-
-  bm.add('hm-card', {
-    label: 'Nyhetskort',
-    category: 'HM Motor',
-    media: BLOCK_ICONS.card,
-    content: '<div class="just-nu-card"><span class="just-nu-label">Nyheter</span><h3>Rubrik</h3><p>Beskrivning</p><a href="#">Las mer &rarr;</a></div>',
-  });
-
-  bm.add('hm-faq', {
-    label: 'FAQ-fraga',
-    category: 'HM Motor',
-    media: BLOCK_ICONS.faq,
-    content: '<details class="faq-item"><summary>Ny fraga<span class="faq-toggle">+</span></summary><p>Svar har...</p></details>',
-  });
-
-  bm.add('hm-trust', {
-    label: 'Trust-signal',
-    category: 'HM Motor',
-    media: BLOCK_ICONS.trust,
-    content: '<div class="hero-trust-item"><strong>99+</strong> nojda kunder</div>',
-  });
-
-  /* ── Lucide icons init after canvas loads ── */
+  /* ── Lucide icons after canvas load ── */
   editor.on('canvas:frame:load', ({ window: w }) => {
-    setTimeout(() => {
-      if (w.lucide) w.lucide.createIcons();
-    }, 500);
+    setTimeout(() => { if (w.lucide) w.lucide.createIcons(); }, 500);
   });
 
   /* ── Semantic layer names ── */
-  const SEMANTIC_NAMES = {
-    'section': 'Section', 'header': 'Header Section', 'footer': 'Footer Section',
-    'nav': 'Navbar', 'main': 'Main Content', 'article': 'Article', 'aside': 'Sidebar',
-  };
+  const SEMANTIC = { section:'Section', header:'Header', footer:'Footer', nav:'Navbar', main:'Main', article:'Article', aside:'Sidebar' };
 
   function setSemanticName(comp) {
     const el = comp.getEl();
     if (!el) return;
     const tag = (el.tagName || '').toLowerCase();
     if (!tag || tag === 'body') return;
-
     const classes = comp.getClasses();
-    const firstClass = classes.length ? classes[0] : '';
+    const fc = classes.length ? classes[0] : '';
     let name = '';
-
-    // Try semantic name first
-    if (SEMANTIC_NAMES[tag]) {
-      name = SEMANTIC_NAMES[tag];
-    } else if (/^h[1-6]$/.test(tag)) {
-      // Count headings of same level for numbering
-      name = tag.toUpperCase() + ' Heading';
-    } else if (tag === 'p') {
-      name = 'P Description';
-    } else if (tag === 'a') {
-      name = 'Link';
-    } else if (tag === 'img') {
-      name = 'Image';
-    } else if (tag === 'div') {
-      if (firstClass) {
-        // Convert class to readable name
-        name = firstClass.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-      } else {
-        name = 'Div Block';
-      }
-    } else if (tag === 'details') {
-      name = 'FAQ Item';
-    } else if (tag === 'summary') {
-      name = 'FAQ Question';
-    } else if (tag === 'button') {
-      name = 'Button';
-    } else if (tag === 'span') {
-      name = firstClass ? firstClass.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Span';
-    } else if (tag === 'ul' || tag === 'ol') {
-      name = 'List';
-    } else if (tag === 'li') {
-      name = 'List Item';
-    } else if (tag === 'strong' || tag === 'em') {
-      name = tag === 'strong' ? 'Bold' : 'Italic';
-    } else {
-      name = tag.toUpperCase();
+    if (SEMANTIC[tag]) name = SEMANTIC[tag];
+    else if (/^h[1-6]$/.test(tag)) name = tag.toUpperCase() + ' Heading';
+    else if (tag === 'p') name = 'Paragraph';
+    else if (tag === 'a') name = 'Link';
+    else if (tag === 'img') name = 'Image';
+    else if (tag === 'div') name = fc ? fc.replace(/[-_]/g,' ').replace(/\b\w/g,c=>c.toUpperCase()) : 'Div';
+    else if (tag === 'details') name = 'FAQ Item';
+    else if (tag === 'summary') name = 'FAQ Question';
+    else if (tag === 'button') name = 'Button';
+    else if (tag === 'span') name = fc ? fc.replace(/[-_]/g,' ').replace(/\b\w/g,c=>c.toUpperCase()) : 'Span';
+    else if (tag === 'ul' || tag === 'ol') name = 'List';
+    else if (tag === 'li') name = 'List Item';
+    else if (tag === 'strong' || tag === 'em') name = tag === 'strong' ? 'Bold' : 'Italic';
+    else name = tag.toUpperCase();
+    const TEXT_ELS = ['h1','h2','h3','h4','h5','h6','p','a','button','label','li','summary'];
+    if (TEXT_ELS.includes(tag)) {
+      const t = (el.textContent||'').trim();
+      if (t.length>0 && t.length<30) name += ': "'+t.substring(0,20)+(t.length>20?'...':'')+'"';
     }
-
-    // For text elements, append a snippet
-    const TEXT_ELEMENTS = ['h1','h2','h3','h4','h5','h6','p','a','button','label','li','summary'];
-    if (TEXT_ELEMENTS.includes(tag)) {
-      const text = (el.textContent || '').trim();
-      if (text.length > 0 && text.length < 30) {
-        name += ': "' + text.substring(0, 20) + (text.length > 20 ? '...' : '') + '"';
-      }
-    }
-
     comp.set('custom-name', name);
   }
 
-  // Apply semantic names after init
   editor.on('load', () => {
-    const wrapper = editor.DomComponents.getWrapper();
-    if (wrapper) {
-      wrapper.onAll(comp => setSemanticName(comp));
-    }
+    const w = editor.DomComponents.getWrapper();
+    if (w) w.onAll(comp => setSemanticName(comp));
   });
+  editor.on('component:add', comp => setTimeout(() => setSemanticName(comp), 50));
 
-  // Apply to newly added components
-  editor.on('component:add', (comp) => {
-    setTimeout(() => setSemanticName(comp), 50);
-  });
-
-  /* ── Element info header with icon + class pills ── */
+  /* ── Element info with size ── */
   function updateElementInfo(model) {
-    const infoEl = document.getElementById('element-info');
-    if (!model) {
-      infoEl.innerHTML = '<span class="el-empty">Klicka pa ett element</span>';
-      return;
-    }
-    const el = model.getEl();
-    if (!el) return;
-
-    const tag = el.tagName.toLowerCase();
+    const el = document.getElementById('element-info');
+    if (!model) { el.innerHTML = '<span class="el-empty">Klicka pa ett element</span>'; return; }
+    const domEl = model.getEl();
+    if (!domEl) return;
+    const tag = domEl.tagName.toLowerCase();
     const classes = model.getClasses();
     const icon = getLayerIcon(tag);
-
-    let html = '<span class="el-icon">' + icon + '</span>';
-    html += '<span class="el-tag">' + tag + '</span>';
-
+    let sizeStr = '';
+    try {
+      const rect = domEl.getBoundingClientRect();
+      if (rect.width && rect.height) sizeStr = Math.round(rect.width) + ' x ' + Math.round(rect.height);
+    } catch(e) {}
+    let h = '<span class="el-icon">'+icon+'</span>';
+    h += '<span class="el-tag">'+tag+'</span>';
+    if (sizeStr) h += '<span class="el-size">'+sizeStr+'</span>';
     if (classes.length) {
-      html += '<span class="el-classes">';
-      classes.forEach(c => {
-        html += '<span class="el-class-pill">.' + c + '</span>';
-      });
-      html += '</span>';
+      h += '<span class="el-classes">';
+      classes.forEach(c => h += '<span class="el-class-pill">.'+c+'</span>');
+      h += '</span>';
     }
-
-    infoEl.innerHTML = html;
+    el.innerHTML = h;
   }
 
   editor.on('component:selected', updateElementInfo);
   editor.on('component:deselected', () => updateElementInfo(null));
 
-  /* ── Text tags that show content editor ── */
+  /* ── Breadcrumb ── */
+  function updateBreadcrumb(model) {
+    const bc = document.getElementById('breadcrumb');
+    if (!model) { bc.innerHTML = '<span class="bc-item">body</span>'; return; }
+    const chain = [];
+    let curr = model;
+    while (curr) {
+      const el = curr.getEl();
+      if (el) {
+        const tag = el.tagName ? el.tagName.toLowerCase() : '';
+        if (tag && tag !== 'body') chain.unshift({ tag, model: curr });
+      }
+      curr = curr.parent();
+    }
+    chain.unshift({ tag: 'body', model: null });
+    bc.innerHTML = chain.map((item, i) =>
+      (i > 0 ? '<span class="bc-sep">&#8250;</span>' : '') +
+      '<span class="bc-item' + (i === chain.length-1 ? ' active' : '') + '" ' +
+      (item.model ? 'onclick="selectBcItem('+i+')"' : '') + '>' + item.tag + '</span>'
+    ).join('');
+    bc._chain = chain;
+  }
+  editor.on('component:selected', updateBreadcrumb);
+  editor.on('component:deselected', () => updateBreadcrumb(null));
+
+  /* ── Text editing ── */
   const TEXT_TAGS = ['H1','H2','H3','H4','H5','H6','P','SPAN','A','SUMMARY','STRONG','LABEL','LI','TD','TH','BUTTON','FIGCAPTION'];
 
-  /* ── Single click to inline-edit text ── */
-  editor.on('component:selected', (model) => {
+  editor.on('component:selected', model => {
     const el = model.getEl();
     if (!el) return;
-    const tag = el.tagName;
-
-    if (TEXT_TAGS.includes(tag)) {
+    if (TEXT_TAGS.includes(el.tagName)) {
       model.set('editable', true);
-      // Trigger inline editing immediately
-      setTimeout(() => {
-        const elInCanvas = model.getEl();
-        if (elInCanvas) {
-          model.trigger('active');
-        }
-      }, 100);
+      setTimeout(() => model.trigger('active'), 100);
     }
   });
 
-  /* ── When selecting a component, configure traits ── */
-  editor.on('component:selected', (model) => {
+  /* ── Dynamic traits ── */
+  editor.on('component:selected', model => {
     const el = model.getEl();
     if (!el) return;
     const tag = el.tagName;
-
-    // Build trait list
     const traits = [];
     if (TEXT_TAGS.includes(tag)) {
-      traits.push({
-        type: 'textarea',
-        label: 'Textinnehall',
-        name: 'content-text',
-        changeProp: true,
-        placeholder: 'Skriv text...',
-      });
+      traits.push({ type:'textarea', label:'Textinnehall', name:'content-text', changeProp:true, placeholder:'Skriv text...' });
     }
-
-    // Link traits
     if (tag === 'A') {
-      traits.push({ type: 'text', label: 'Lank (URL)', name: 'href', placeholder: 'https://...' });
-      traits.push({ type: 'select', label: 'Oppna i', name: 'target', options: [{value:'', name:'Samma flik'},{value:'_blank', name:'Ny flik'}] });
+      traits.push({ type:'text', label:'Lank (URL)', name:'href', placeholder:'https://...' });
+      traits.push({ type:'select', label:'Oppna i', name:'target', options:[{value:'',name:'Samma flik'},{value:'_blank',name:'Ny flik'}] });
     }
-
-    // Image traits
     if (tag === 'IMG') {
-      traits.push({ type: 'text', label: 'Bild-URL', name: 'src', placeholder: 'https://...' });
-      traits.push({ type: 'text', label: 'Alt-text', name: 'alt', placeholder: 'Beskrivning...' });
+      traits.push({ type:'text', label:'Bild-URL', name:'src', placeholder:'https://...' });
+      traits.push({ type:'text', label:'Alt-text', name:'alt', placeholder:'Beskrivning...' });
     }
-
+    if (tag === 'IFRAME') {
+      traits.push({ type:'text', label:'Kalla (URL)', name:'src', placeholder:'https://...' });
+    }
     if (traits.length) {
       model.set('traits', traits);
-
-      // Set initial value for content-text
       if (TEXT_TAGS.includes(tag)) {
-        const directText = Array.from(el.childNodes)
-          .filter(n => n.nodeType === 3)
-          .map(n => n.textContent.trim())
-          .join(' ') || el.textContent.trim();
-        model.set('content-text', directText);
+        const dt = Array.from(el.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent.trim()).join(' ') || el.textContent.trim();
+        model.set('content-text', dt);
       }
-
-      // Auto-switch to Egenskaper tab
       switchRight('traits');
     } else {
-      // No traits — show empty state or switch to styles
       model.set('traits', []);
     }
   });
 
-  /* ── When content-text changes, update component ── */
-  editor.on('component:update:content-text', (model) => {
-    const newText = model.get('content-text');
-    if (newText !== undefined) {
+  editor.on('component:update:content-text', model => {
+    const t = model.get('content-text');
+    if (t !== undefined) {
       const el = model.getEl();
       if (el) {
-        const hasChildren = el.querySelector('*');
-        if (hasChildren) {
-          const textNode = Array.from(el.childNodes).find(n => n.nodeType === 3);
-          if (textNode) textNode.textContent = newText;
-        } else {
-          model.components(newText);
-        }
+        if (el.querySelector('*')) {
+          const tn = Array.from(el.childNodes).find(n=>n.nodeType===3);
+          if (tn) tn.textContent = t;
+        } else model.components(t);
       }
     }
   });
+
+  /* ── Track unsaved changes ── */
+  editor.on('component:update', () => setUnsaved(true));
+  editor.on('component:add', () => setUnsaved(true));
+  editor.on('component:remove', () => setUnsaved(true));
+  editor.on('style:property:update', () => setUnsaved(true));
+}
+
+/* ================================================================
+   BREADCRUMB CLICK
+   ================================================================ */
+function selectBcItem(i) {
+  const bc = document.getElementById('breadcrumb');
+  if (bc._chain && bc._chain[i] && bc._chain[i].model) {
+    editor.select(bc._chain[i].model);
+  }
 }
 
 /* ================================================================
    TAB SWITCHING
    ================================================================ */
 function switchLeft(tab) {
-  const layersPanel = document.getElementById('layers-panel');
-  const blocksPanel = document.getElementById('blocks-panel');
-  const tabLayers = document.getElementById('tab-layers');
-  const tabBlocks = document.getElementById('tab-blocks');
-
-  layersPanel.style.display = tab === 'layers' ? 'block' : 'none';
-  blocksPanel.style.display = tab === 'blocks' ? 'block' : 'none';
-
-  tabLayers.classList.toggle('active', tab === 'layers');
-  tabBlocks.classList.toggle('active', tab === 'blocks');
+  document.getElementById('layers-panel').style.display = tab==='layers' ? 'block' : 'none';
+  document.getElementById('blocks-wrapper').style.display = tab==='blocks' ? 'flex' : 'none';
+  document.getElementById('pages-panel').style.display = tab==='pages' ? 'block' : 'none';
+  document.getElementById('tab-layers').classList.toggle('active', tab==='layers');
+  document.getElementById('tab-blocks').classList.toggle('active', tab==='blocks');
+  document.getElementById('tab-pages').classList.toggle('active', tab==='pages');
 }
 
 function switchRight(tab) {
-  const traitsPanel = document.getElementById('traits-panel');
-  const stylesPanel = document.getElementById('styles-panel');
-  const tabTraits = document.getElementById('tab-traits');
-  const tabStyles = document.getElementById('tab-styles');
-
-  traitsPanel.style.display = tab === 'traits' ? 'block' : 'none';
-  stylesPanel.style.display = tab === 'styles' ? 'block' : 'none';
-
-  tabTraits.classList.toggle('active', tab === 'traits');
-  tabStyles.classList.toggle('active', tab === 'styles');
+  document.getElementById('traits-panel').style.display = tab==='traits' ? 'block' : 'none';
+  document.getElementById('styles-panel').style.display = tab==='styles' ? 'block' : 'none';
+  document.getElementById('tab-traits').classList.toggle('active', tab==='traits');
+  document.getElementById('tab-styles').classList.toggle('active', tab==='styles');
 }
 
 /* ================================================================
-   ACTIONS
+   BLOCK SEARCH
+   ================================================================ */
+function filterBlocks(query) {
+  const q = query.toLowerCase().trim();
+  const blocks = document.querySelectorAll('#blocks-panel .gjs-block');
+  blocks.forEach(b => {
+    const label = (b.querySelector('.gjs-block-label')?.textContent || '').toLowerCase();
+    b.style.display = !q || label.includes(q) ? '' : 'none';
+  });
+  // Also hide empty categories
+  const cats = document.querySelectorAll('#blocks-panel .gjs-block-category');
+  cats.forEach(cat => {
+    const visibleBlocks = cat.querySelectorAll('.gjs-block:not([style*="display: none"])');
+    const title = cat.querySelector('.gjs-title');
+    if (title) title.style.display = !q || visibleBlocks.length ? '' : 'none';
+  });
+}
+
+/* ================================================================
+   DEVICE SWITCHER
+   ================================================================ */
+function setDevice(name, btn) {
+  if (!editor) return;
+  editor.setDevice(name);
+  document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* ================================================================
+   UNSAVED CHANGES
+   ================================================================ */
+function setUnsaved(val) {
+  hasUnsavedChanges = val;
+  document.getElementById('unsavedDot').style.display = val ? 'inline-block' : 'none';
+}
+
+/* ================================================================
+   ZOOM
+   ================================================================ */
+function zoomIn() { setZoom(Math.min(currentZoom + 10, 200)); }
+function zoomOut() { setZoom(Math.max(currentZoom - 10, 30)); }
+function zoomReset() { setZoom(100); }
+function setZoom(val) {
+  currentZoom = val;
+  document.getElementById('zoomLevel').textContent = val + '%';
+  const frame = document.querySelector('.gjs-frame');
+  if (frame) {
+    frame.style.transform = 'scale(' + (val/100) + ')';
+    frame.style.transformOrigin = 'top left';
+    if (val !== 100) {
+      frame.style.width = (100/(val/100)) + '%';
+      frame.style.height = (100/(val/100)) + '%';
+    } else {
+      frame.style.width = '100%';
+      frame.style.height = '100%';
+    }
+  }
+}
+
+/* ================================================================
+   FULLSCREEN
+   ================================================================ */
+function toggleFullscreen() {
+  document.body.classList.toggle('canvas-fullscreen');
+  const isFS = document.body.classList.contains('canvas-fullscreen');
+  document.getElementById('fs-icon').innerHTML = isFS
+    ? '<polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/>'
+    : '<polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>';
+}
+
+/* ================================================================
+   CODE VIEW
+   ================================================================ */
+function toggleCodeView() {
+  const cv = document.getElementById('codeView');
+  const isOpen = cv.classList.toggle('open');
+  document.getElementById('codeToggleBtn').classList.toggle('active', isOpen);
+  if (isOpen) updateCodeView();
+}
+
+function updateCodeView() {
+  if (!editor) return;
+  const code = currentCodeTab === 'html' ? editor.getHtml() : editor.getCss();
+  document.getElementById('codeOutput').textContent = code;
+}
+
+function switchCodeTab(tab) {
+  currentCodeTab = tab;
+  document.getElementById('code-tab-html').classList.toggle('active', tab==='html');
+  document.getElementById('code-tab-css').classList.toggle('active', tab==='css');
+  updateCodeView();
+}
+
+/* ================================================================
+   KEYBOARD SHORTCUTS
+   ================================================================ */
+document.addEventListener('keydown', e => {
+  // Ctrl+S = Save
+  if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveChanges(); }
+  // Ctrl+Z = Undo
+  if (e.ctrlKey && !e.shiftKey && e.key === 'z') { e.preventDefault(); undoAction(); }
+  // Ctrl+Y = Redo
+  if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redoAction(); }
+  // Ctrl+Shift+F = Fullscreen
+  if (e.ctrlKey && e.shiftKey && e.key === 'F') { e.preventDefault(); toggleFullscreen(); }
+  // Ctrl+Shift+C = Code view
+  if (e.ctrlKey && e.shiftKey && e.key === 'C') { e.preventDefault(); toggleCodeView(); }
+  // Ctrl+D = Duplicate
+  if (e.ctrlKey && e.key === 'd') {
+    e.preventDefault();
+    if (editor) { const sel = editor.getSelected(); if (sel) sel.clone && editor.getSelected().collection.add(sel.clone()); }
+  }
+  // Delete = Remove selected
+  if ((e.key === 'Delete' || e.key === 'Backspace') && !e.target.closest('input,textarea,[contenteditable]')) {
+    const sel = editor?.getSelected();
+    if (sel && sel.getEl()?.tagName !== 'BODY') { sel.remove(); }
+  }
+});
+
+/* ================================================================
+   UNDO / REDO
    ================================================================ */
 function undoAction() { if (editor) editor.UndoManager.undo(); }
 function redoAction() { if (editor) editor.UndoManager.redo(); }
 
+/* ================================================================
+   SAVE
+   ================================================================ */
 async function saveChanges() {
   if (!editor) return;
   const btn = document.getElementById('saveBtn');
-  btn.textContent = 'Sparar...';
-  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;margin:0"></div> Sparar...';
+  btn.classList.add('saving');
 
   try {
     const html = editor.getHtml();
@@ -724,49 +1296,35 @@ async function saveChanges() {
     const fullHTML = buildFullPage(html, css);
     const encoded = btoa(unescape(encodeURIComponent(fullHTML)));
 
-    // Get fresh SHA
-    const shaResp = await fetch('/.netlify/git/github/contents/index.html', {
+    const shaResp = await fetch('/.netlify/git/github/contents/' + currentPage, {
       headers: { Authorization: 'Bearer ' + token }
     });
     const shaData = await shaResp.json();
     pageSha = shaData.sha;
 
-    const r = await fetch('/.netlify/git/github/contents/index.html', {
+    const r = await fetch('/.netlify/git/github/contents/' + currentPage, {
       method: 'PUT',
       headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: 'Visuell redigering via admin',
-        content: encoded,
-        sha: pageSha
-      })
+      body: JSON.stringify({ message: 'Visuell redigering: ' + currentPage, content: encoded, sha: pageSha })
     });
 
     if (!r.ok) throw new Error('Kunde inte spara');
     const result = await r.json();
     pageSha = result.content.sha;
-    toast('Sparat! Sajten uppdateras om ~30 sek.', 'success');
+    setUnsaved(false);
+    toast('Sparat! Publiceras om ~30 sek.', 'success');
   } catch (e) {
     toast('Fel: ' + e.message, 'error');
   }
 
-  btn.textContent = 'Spara';
-  btn.disabled = false;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Spara <span class="shortcut">Ctrl+S</span>';
+  btn.classList.remove('saving');
 }
 
 function buildFullPage(bodyHTML, editorCSS) {
-  // Use the original <head> from the loaded page (preserves SEO, JSON-LD, OG-tags, Swedish chars)
   const head = originalHead || '';
   const scripts = originalScripts ? originalScripts.replace(/<\\\/script>/g, '<\/script>') : '';
-  return `<!DOCTYPE html>
-<html lang="sv">
-<head>
-${head}
-</head>
-<body>
-${bodyHTML}
-${scripts}
-</body>
-</html>`;
+  return '<!DOCTYPE html>\n<html lang="sv">\n<head>\n' + head + '\n</head>\n<body>\n' + bodyHTML + '\n' + scripts + '\n</body>\n</html>';
 }
 
 /* ================================================================
@@ -774,10 +1332,20 @@ ${scripts}
    ================================================================ */
 function toast(msg, type) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
+  const icon = type === 'success'
+    ? '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
+    : '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+  t.innerHTML = icon + msg;
   t.className = 'toast ' + type + ' show';
   setTimeout(() => t.classList.remove('show'), 4000);
 }
+
+/* ================================================================
+   WARN ON LEAVE
+   ================================================================ */
+window.addEventListener('beforeunload', e => {
+  if (hasUnsavedChanges) { e.preventDefault(); e.returnValue = ''; }
+});
 
 /* ================================================================
    INIT
