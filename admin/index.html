@@ -17,7 +17,8 @@
 
   <!-- GrapesJS Plugins -->
   <script src="https://unpkg.com/grapesjs-preset-webpage@1.0.3/dist/index.js"></script>
-  <!-- (RTE: using GrapesJS built-in with extended toolbar) -->
+  <!-- RTE Extensions: font-size, font-color, headings, alignment -->
+  <script src="https://unpkg.com/grapesjs-rte-extensions@1.0.2/dist/index.js"></script>
   <!-- Pickr — premium color picker (6KB) -->
   <link href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
@@ -873,13 +874,23 @@ function initEditor(html) {
       ]),
       scripts: ['https://unpkg.com/lucide@latest']
     },
-    plugins: ['gjs-preset-webpage'],
+    plugins: ['gjs-preset-webpage', 'grapesjs-rte-extensions'],
     pluginsOpts: {
       'gjs-preset-webpage': {
         blocksBasicOpts: { flexGrid: true },
         navbarOpts: false,
         countdownOpts: false,
         formsOpts: false,
+      },
+      'grapesjs-rte-extensions': {
+        fontSize: true,
+        fontColor: true,
+        hilite: false,
+        heading: true,
+        link: true,
+        align: true,
+        list: true,
+        maxWidth: '600px',
       },
     },
     blockManager: { appendTo: '#blocks-panel' },
@@ -1139,31 +1150,7 @@ function initEditor(html) {
     });
   };
 
-  /* ── Extended built-in RTE toolbar ── */
-  // GrapesJS RTE works inside the iframe — no cross-frame issues
-  // Add extra actions: font size, text color, link
-  editor.on('rte:enable', () => {
-    const rte = editor.RichTextEditor;
-    // Add fontSize buttons if not already added
-    if (!rte.get('fontSize-up')) {
-      rte.add('fontSize-up', {
-        icon: '<span style="font-size:14px;font-weight:700">A+</span>',
-        attributes: { title: 'Oka textstorlek' },
-        result: rte => {
-          const doc = rte.el?.ownerDocument || document;
-          doc.execCommand('fontSize', false, '5');
-        }
-      });
-      rte.add('fontSize-down', {
-        icon: '<span style="font-size:10px;font-weight:700">A-</span>',
-        attributes: { title: 'Minska textstorlek' },
-        result: rte => {
-          const doc = rte.el?.ownerDocument || document;
-          doc.execCommand('fontSize', false, '2');
-        }
-      });
-    }
-  });
+  /* ── RTE: grapesjs-rte-extensions handles fontSize, fontColor, headings, etc. ── */
 
   /* ── Remove GrapesJS default panels ── */
   // Remove via API first, then clean DOM as fallback
@@ -1314,35 +1301,47 @@ function initEditor(html) {
     }
 
     if (isText) {
-      // Enable inline editing first
+      // 1. Enable inline editing
       model.set('editable', true);
       setTimeout(() => model.trigger('active'), 50);
-      // Switch to Stilar LAST (after model.trigger settles) and populate computed values
+
+      // 2. Switch panel + populate computed styles + open Typografi sector
+      //    Runs at 300ms to let GrapesJS finish its internal events
       setTimeout(() => {
         switchRight('styles');
-        // Read actual computed styles and set them on the model so Style Manager shows real values
-        try {
-          const iframeWin = editor.Canvas.getFrameEl()?.contentWindow;
-          const cs = iframeWin ? iframeWin.getComputedStyle(el) : null;
-          if (cs) {
-            const existing = model.getStyle();
-            const computed = {
-              'font-family': cs.fontFamily,
-              'font-size': cs.fontSize,
-              'font-weight': cs.fontWeight,
-              'color': cs.color,
-              'line-height': cs.lineHeight,
-              'letter-spacing': cs.letterSpacing === 'normal' ? '' : cs.letterSpacing,
-              'text-align': cs.textAlign,
-            };
-            // Only set values that aren't already explicit — shows real data without polluting
-            const toSet = {};
-            for (const [k,v] of Object.entries(computed)) {
-              if (!existing[k] && v) toSet[k] = v;
-            }
-            if (Object.keys(toSet).length) model.setStyle({ ...existing, ...toSet });
+
+        // Read computed styles from iframe and set on model
+        const iframeWin = editor.Canvas.getFrameEl()?.contentWindow;
+        if (iframeWin && el) {
+          const cs = iframeWin.getComputedStyle(el);
+          const existing = model.getStyle();
+          const toSet = {};
+          const props = {
+            'font-family': cs.fontFamily,
+            'font-size': cs.fontSize,
+            'font-weight': cs.fontWeight,
+            'color': cs.color,
+            'line-height': cs.lineHeight,
+            'text-align': cs.textAlign,
+          };
+          for (const [k,v] of Object.entries(props)) {
+            if (!existing[k] && v && v !== 'normal' && v !== '0px') toSet[k] = v;
           }
-        } catch(e) {}
+          if (Object.keys(toSet).length) {
+            model.setStyle({ ...existing, ...toSet });
+            // CRITICAL: Style Manager doesn't refresh after setStyle — toggle selection to force it
+            // (documented in GrapesJS issue #2777)
+            editor.selectToggle(model);
+            setTimeout(() => editor.select(model), 30);
+          }
+        }
+
+        // Open Typografi sector, close others (using proper API — issue #2511)
+        const sm = editor.StyleManager;
+        ['Layout','Storlek','Typografi','Bakgrund','Kantlinje','Effekter','Animering'].forEach(name => {
+          const sector = sm.getSector(name);
+          if (sector) sector.set('open', name === 'Typografi');
+        });
       }, 300);
     } else if (traits.length) {
       switchRight('traits');
